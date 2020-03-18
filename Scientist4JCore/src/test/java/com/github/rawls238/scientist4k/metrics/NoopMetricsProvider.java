@@ -1,6 +1,4 @@
-package com.github.rawls238.scientist4j.metrics;
-
-import com.github.rawls238.scientist4j.metrics.MetricsProvider;
+package com.github.rawls238.scientist4k.metrics;
 
 /**
  * A  minimal in-memory {@link MetricsProvider} implementation, suitable for test environments.

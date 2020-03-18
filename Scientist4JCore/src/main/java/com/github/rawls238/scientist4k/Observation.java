@@ -1,6 +1,6 @@
-package com.github.rawls238.scientist4j;
+package com.github.rawls238.scientist4k;
 
-import com.github.rawls238.scientist4j.metrics.MetricsProvider.Timer;
+import com.github.rawls238.scientist4k.metrics.MetricsProvider.Timer;
 
 import java.util.Optional;
 

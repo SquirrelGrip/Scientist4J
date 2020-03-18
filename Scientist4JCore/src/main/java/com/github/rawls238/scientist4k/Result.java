@@ -1,6 +1,6 @@
-package com.github.rawls238.scientist4j;
+package com.github.rawls238.scientist4k;
 
-import com.github.rawls238.scientist4j.exceptions.MismatchException;
+import com.github.rawls238.scientist4k.exceptions.MismatchException;
 
 import java.util.Map;
 import java.util.Optional;

@@ -1,6 +1,6 @@
-package com.github.rawls238.scientist4j;
+package com.github.rawls238.scientist4k;
 
-import com.github.rawls238.scientist4j.metrics.MetricsProvider;
+import com.github.rawls238.scientist4k.metrics.MetricsProvider;
 
 import java.util.HashMap;
 import java.util.Map;

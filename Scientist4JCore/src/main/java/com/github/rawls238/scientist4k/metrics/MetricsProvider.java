@@ -1,4 +1,4 @@
-package com.github.rawls238.scientist4j.metrics;
+package com.github.rawls238.scientist4k.metrics;
 
 public interface MetricsProvider<T> {
 

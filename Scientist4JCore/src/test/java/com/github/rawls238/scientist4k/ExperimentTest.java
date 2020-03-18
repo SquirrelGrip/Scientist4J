@@ -1,9 +1,9 @@
-package com.github.rawls238.scientist4j;
+package com.github.rawls238.scientist4k;
 
-import com.github.rawls238.scientist4j.exceptions.MismatchException;
-import com.github.rawls238.scientist4j.metrics.DropwizardMetricsProvider;
-import com.github.rawls238.scientist4j.metrics.MicrometerMetricsProvider;
-import com.github.rawls238.scientist4j.metrics.NoopMetricsProvider;
+import com.github.rawls238.scientist4k.exceptions.MismatchException;
+import com.github.rawls238.scientist4k.metrics.DropwizardMetricsProvider;
+import com.github.rawls238.scientist4k.metrics.MicrometerMetricsProvider;
+import com.github.rawls238.scientist4k.metrics.NoopMetricsProvider;
 import io.dropwizard.metrics5.Counter;
 import io.dropwizard.metrics5.MetricName;
 import org.junit.Test;

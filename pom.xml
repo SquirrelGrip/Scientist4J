@@ -104,5 +104,6 @@
 
     <modules>
         <module>Scientist4JCore</module>
+        <module>Scientist4KCore</module>
     </modules>
 </project>
