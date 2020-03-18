@@ -2,20 +2,20 @@
 
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.rawls238/Scientist4J/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.rawls238/Scientist4J)
 
-A port of Github's refactoring tool [Scientist](https://github.com/github/scientist) in Java
+A port of Github's refactoring tool [Scientist](https://github.com/github/scientist) in Kotlin
 
 # Installation
 
 ```xml
 <dependency>
-    <groupId>com.github.rawls238</groupId>
-    <artifactId>Scientist4JCore</artifactId>
-    <version>0.7</version>
+    <groupId>com.github.squirrelgrip</groupId>
+    <artifactId>Scientist4KCore</artifactId>
+    <version>0.1</version>
 </dependency>
 ```
 # Usage
 
-This Java port supports most of the functionality of the original Scientist library in Ruby, however its interface is a bit different.
+This Kotlin port supports most of the functionality of the original Scientist library in Ruby, however its interface is a bit different.
 
 The core component of this library is the `Experiment<T>` class. It's recommended to use this class as a Singleton. The main usage is as follows:
 
@@ -27,18 +27,18 @@ For a synchronous experiment, the order in which control and candidate functions
 
 To run a synchronous experiment:
 
-```java
-Experiment<Integer> e = new Experiment("foo");
-e.run(this::controlFunction, this::candidateFunction);
+```kotlin
+val e = Experiment("foo")
+e.run(controlFunction, candidateFunction)
 ```
 
 For an asynchronous experiment, the two functions are run asynchronously.
 
 To run an asynchronous experiment:
 
-```java
-Experiment<Integer> e = new Experiment("foo");
-e.runAsync(this::controlFunction, this::candidateFunction);
+```kotlin
+Experiment<Integer> e = Experiment("foo")
+e.runAsync(controlFunction, candidateFunction)
 ```
 
 Behind the scenes the following occurs in both cases:

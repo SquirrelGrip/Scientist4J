@@ -3,14 +3,14 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.github.rawls238</groupId>
-    <artifactId>Scientist4J</artifactId>
-    <version>0.7</version>
+    <groupId>com.github.squirrelgrip</groupId>
+    <artifactId>Scientist4K</artifactId>
+    <version>0.1</version>
     <packaging>pom</packaging>
 
     <name>Scientist4J</name>
-    <description>A Java port of Github's Scientist library for refactoring critical code paths</description>
-    <url>https://www.github.com/rawls238/Scientist4J</url>
+    <description>A Kotlin port of Github's Scientist library for refactoring critical code paths</description>
+    <url>https://www.github.com/squirrelgrip/Scientist4K</url>
 
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
