@@ -29,17 +29,6 @@
     </distributionManagement>
     <build>
         <plugins>
-            <!--<plugin>-->
-                <!--<groupId>org.sonatype.plugins</groupId>-->
-                <!--<artifactId>nexus-staging-maven-plugin</artifactId>-->
-                <!--<version>1.6.3</version>-->
-                <!--<extensions>true</extensions>-->
-                <!--<configuration>-->
-                    <!--<serverId>ossrh</serverId>-->
-                    <!--<nexusUrl>https://oss.sonatype.org/</nexusUrl>-->
-                    <!--<autoReleaseAfterClose>true</autoReleaseAfterClose>-->
-                <!--</configuration>-->
-            <!--</plugin>-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
@@ -94,16 +83,18 @@
         <developer>
             <name>Guy Aridor</name>
         </developer>
+        <developer>
+            <name>Adrian Richter</name>
+        </developer>
     </developers>
 
     <scm>
-        <connection>scm:git:git@github.com:rawls238/Scientist4J.git</connection>
-        <developerConnection>scm:git:git@github.com:rawls238/Scientist4J.git</developerConnection>
-        <url>git@github.com:rawls238/Scientist4J.git</url>
+        <connection>scm:git:git@github.com:squirrelgrip/Scientist4K.git</connection>
+        <developerConnection>scm:git:git@github.com:squirrelgrip/Scientist4K.git</developerConnection>
+        <url>git@github.com:squirrelgrip/Scientist4K.git</url>
     </scm>
 
     <modules>
-        <module>Scientist4JCore</module>
         <module>Scientist4KCore</module>
     </modules>
 </project>

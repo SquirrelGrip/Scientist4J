@@ -1,6 +1,6 @@
 # Scientist4J
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.rawls238/Scientist4J/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.rawls238/Scientist4J)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.squirrelgrip/Scientist4K/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.squirrelgrip/Scientist4K)
 
 A port of Github's refactoring tool [Scientist](https://github.com/github/scientist) in Kotlin
 
