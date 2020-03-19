@@ -8,7 +8,7 @@ class ExperimentBuilder<T> {
     private var name: String = "Test"
     private var metricsProvider: MetricsProvider<*> = DropwizardMetricsProvider()
     private var comparator: BiFunction<T?, T?, Boolean> = BiFunction { a: T?, b: T? -> a == b }
-    private val context: Map<String, Any> = mutableMapOf()
+    private var raiseOnMismatch: Boolean = false
 
     fun withName(name: String): ExperimentBuilder<T> {
         this.name = name
@@ -25,8 +25,13 @@ class ExperimentBuilder<T> {
         return this
     }
 
+    fun withRaiseOnMismatch(raiseOnMismatch: Boolean): ExperimentBuilder<T> {
+        this.raiseOnMismatch = raiseOnMismatch
+        return this
+    }
+
     fun build(): Experiment<T> {
-        return Experiment(name, context, false, metricsProvider, comparator)
+        return Experiment(name, mutableMapOf(), raiseOnMismatch, metricsProvider, comparator)
     }
 
 }
