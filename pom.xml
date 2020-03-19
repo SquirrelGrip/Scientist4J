@@ -91,7 +91,6 @@
                     <pushHotfixes>true</pushHotfixes>
                     <scmCommentPrefix>(CI):</scmCommentPrefix>
                     <useReleaseProfile>false</useReleaseProfile>
-                    <
                 </configuration>
             </plugin>
             <plugin>
