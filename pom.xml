@@ -91,6 +91,7 @@
                     <pushHotfixes>true</pushHotfixes>
                     <scmCommentPrefix>(CI):</scmCommentPrefix>
                     <useReleaseProfile>false</useReleaseProfile>
+                    <
                 </configuration>
             </plugin>
             <plugin>
@@ -161,44 +162,4 @@
         <module>Scientist4KCore</module>
     </modules>
 
-    <profiles>
-        <profile>
-            <id>release</id>
-            <properties>
-                <deployment.url>${project.distributionManagement.repository.url}</deployment.url>
-            </properties>
-        </profile>
-        <profile>
-            <id>gitflowStart</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>com.manamind.jgitflow</groupId>
-                        <artifactId>jgitflow-maven-plugin</artifactId>
-                        <version>1.0.0</version>
-                        <configuration combine.self="append">
-                            <allowSnapshots>true</allowSnapshots>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>gitflowFinish</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>com.manamind.jgitflow</groupId>
-                        <artifactId>jgitflow-maven-plugin</artifactId>
-                        <version>1.0.0</version>
-                        <configuration combine.self="append">
-                            <allowSnapshots>false</allowSnapshots>
-                            <goals>clean deploy -Prelease</goals>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-
-    </profiles>
 </project>
