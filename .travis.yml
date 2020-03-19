@@ -1,7 +1,13 @@
 language: java
 jdk:
-    - oraclejdk8
+  - oraclejdk8
 sudo: false
 install: true
 dist: trusty
-script: mvn clean test
+
+stages:
+  - build
+    script: mvn clean test
+  - name: deploy
+    if: branch =~ /^release.*$/
+    script: mvn deploy
