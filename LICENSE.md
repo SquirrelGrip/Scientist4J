@@ -1,6 +1,6 @@
-The Scientist4J package is licensed under the MIT "Expat" License:
+The Scientist4K package is licensed under the MIT "Expat" License:
 
-> Copyright (c) 2016: Guy Aridor.
+> Copyright (c) 2016: Adrian Richter.
 >
 > Permission is hereby granted, free of charge, to any person obtaining
 > a copy of this software and associated documentation files (the

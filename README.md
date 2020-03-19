@@ -1,4 +1,4 @@
-# Scientist4J
+# Scientist4K
 
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.squirrelgrip/Scientist4K/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.squirrelgrip/Scientist4K)
 
@@ -37,7 +37,7 @@ For an asynchronous experiment, the two functions are run asynchronously.
 To run an asynchronous experiment:
 
 ```kotlin
-Experiment<Integer> e = Experiment("foo")
+val e = Experiment<Int>("foo")
 e.runAsync(controlFunction, candidateFunction)
 ```
 

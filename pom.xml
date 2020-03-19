@@ -8,7 +8,6 @@
     <version>0.1</version>
     <packaging>pom</packaging>
 
-    <name>Scientist4J</name>
     <description>A Kotlin port of Github's Scientist library for refactoring critical code paths</description>
     <url>https://www.github.com/squirrelgrip/Scientist4K</url>
 
