@@ -5,9 +5,14 @@ install: true
 dist: trusty
 os: linux
 
+jobs:
+  include:
+    - stage: build
+      script: mvn clean test
+    - stage: deploy
+      script: mvn deploy
+
 stages:
-  - build
-    script: mvn clean test
+  - name: build
   - name: deploy
     if: branch =~ ^release.*$
-    script: mvn deploy
