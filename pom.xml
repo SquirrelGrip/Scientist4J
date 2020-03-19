@@ -98,9 +98,9 @@
                 <artifactId>maven-scm-plugin</artifactId>
                 <version>1.11.2</version>
                 <configuration>
-                    <providerImplementaions>
+                    <providerImplementations>
                         <git>jgit</git>
-                    </providerImplementaions>
+                    </providerImplementations>
                     <username>${env.GIT_USER}</username>
                     <password>${env.GIT_PASS}</password>
                 </configuration>
