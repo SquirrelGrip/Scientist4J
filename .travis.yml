@@ -9,5 +9,5 @@ stages:
   - build
     script: mvn clean test
   - name: deploy
-    if: branch =~ /^release.*$/
+    if: branch =~ ^release.*$
     script: mvn deploy
