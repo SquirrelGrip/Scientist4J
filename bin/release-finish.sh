@@ -7,7 +7,7 @@ git fetch origin
 git checkout -B "release/${CURRENT_RELEASE_VERSION}" "remotes/origin/release/${CURRENT_RELEASE_VERSION}" --
 
 # replace the -SNAPSHOT versions on the release branch with the release versions
-call mvn versions:set -DgenerateBackupPoms=false "-DnewVersion=${CURRENT_RELEASE_VERSION}"
+mvn versions:set -DgenerateBackupPoms=false "-DnewVersion=${CURRENT_RELEASE_VERSION}"
 git commit -a -m "[gitflow] updating poms for branch release/${CURRENT_RELEASE_VERSION} with non-snapshot versions"
 
 # merge the release branch to master and create a tag
