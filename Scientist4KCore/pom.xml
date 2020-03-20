@@ -11,6 +11,8 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <gpg.keyname>${project.basedir}/../all.gpg</gpg.keyname>
+
 
         <assertj.version>3.15.0</assertj.version>
         <dropwizard-metrics.version>5.0.0</dropwizard-metrics.version>
