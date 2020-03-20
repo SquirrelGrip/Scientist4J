@@ -9,7 +9,7 @@ git checkout -B develop remotes/origin/develop --
 git branch "release/${CURRENT_RELEASE_VERSION}"
 
 # update the versions on develop to the next -SNAPSHOT version
-mvn versions:set -DgenerateBackupPoms=false "-DnewVersion=${NEXT_DEVELOP_SNAPSHOT}"
+mvn versions:set -DgenerateBackupPoms=false -DnewVersion=${NEXT_DEVELOP_SNAPSHOT}
 git commit -a -m "[gitflow] updating poms for ${NEXT_DEVELOP_SNAPSHOT} development"
 
 # push the changes atomically
