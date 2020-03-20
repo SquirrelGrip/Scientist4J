@@ -5,7 +5,7 @@
 
     <groupId>com.github.squirrelgrip</groupId>
     <artifactId>Scientist4K</artifactId>
-    <version>0.1-SNAPSHOT</version>
+    <version>0.1</version>
     <packaging>pom</packaging>
 
     <name>${project.groupId}:${project.artifactId}</name>
@@ -33,6 +33,11 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
                 <version>1.5</version>
+                <configuration>
+                    <executable>gpg</executable>
+                    <keyname>${env.GPG_KEYNAME}</keyname>
+                    <passphrase>${env.GPG_PASSPHRASE}</passphrase>
+                </configuration>
                 <executions>
                     <execution>
                         <id>sign-artifacts</id>
@@ -50,19 +55,7 @@
                 <executions>
                     <execution>
                         <id>attach-sources</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.1.1</version>
-                <executions>
-                    <execution>
-                        <id>attach-javadocs</id>
+                        <phase>package</phase>
                         <goals>
                             <goal>jar</goal>
                         </goals>
@@ -98,9 +91,9 @@
                 <artifactId>maven-scm-plugin</artifactId>
                 <version>1.11.2</version>
                 <configuration>
-                    <providerImplementaions>
+                    <providerImplementations>
                         <git>jgit</git>
-                    </providerImplementaions>
+                    </providerImplementations>
                     <username>${env.GIT_USER}</username>
                     <password>${env.GIT_PASS}</password>
                 </configuration>
@@ -119,6 +112,17 @@
                 <configuration>
                     <deployAtEnd>true</deployAtEnd>
                     <retryFailedDeploymentCount>3</retryFailedDeploymentCount>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>1.6.8</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <serverId>ossrh</serverId>
+                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
                 </configuration>
             </plugin>
         </plugins>
@@ -150,44 +154,4 @@
         <module>Scientist4KCore</module>
     </modules>
 
-    <profiles>
-        <profile>
-            <id>release</id>
-            <properties>
-                <deployment.url>${project.distributionManagement.repository.url}</deployment.url>
-            </properties>
-        </profile>
-        <profile>
-            <id>gitflowStart</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>com.manamind.jgitflow</groupId>
-                        <artifactId>jgitflow-maven-plugin</artifactId>
-                        <version>1.0.0</version>
-                        <configuration combine.self="append">
-                            <allowSnapshots>true</allowSnapshots>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>gitflowFinish</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>com.manamind.jgitflow</groupId>
-                        <artifactId>jgitflow-maven-plugin</artifactId>
-                        <version>1.0.0</version>
-                        <configuration combine.self="append">
-                            <allowSnapshots>false</allowSnapshots>
-                            <goals>clean deploy -Prelease</goals>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-
-    </profiles>
 </project>
