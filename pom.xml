@@ -15,9 +15,6 @@
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <gpg.executable>gpg</gpg.executable>
-        <gpg.keyname>${project.basedir}/all.gpg</gpg.keyname>
-        <gpg.passphrase>${env.GPG_PASSPHRASE}</gpg.passphrase>
     </properties>
 
     <distributionManagement>
@@ -36,6 +33,11 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
                 <version>1.5</version>
+                <configuration>
+                    <executable>gpg</executable>
+                    <keyname>${env.GPG_KEYNAME}</keyname>
+                    <passphrase>${env.GPG_PASSPHRASE}</passphrase>
+                </configuration>
                 <executions>
                     <execution>
                         <id>sign-artifacts</id>
