@@ -33,11 +33,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
                 <version>1.5</version>
-                <configuration>
-                    <executable>gpg</executable>
-                    <keyname>${env.GPG_KEYNAME}</keyname>
-                    <passphrase>${env.GPG_PASSPHRASE}</passphrase>
-                </configuration>
                 <executions>
                     <execution>
                         <id>sign-artifacts</id>
