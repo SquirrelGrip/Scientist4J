@@ -37,10 +37,6 @@
                     <executable>gpg</executable>
                     <keyname>${env.GPG_KEYNAME}</keyname>
                     <passphrase>${env.GPG_PASSPHRASE}</passphrase>
-                    <gpgArguments>
-                        <arg>--pinentry-mode</arg>
-                        <arg>loopback</arg>
-                    </gpgArguments>
                 </configuration>
                 <executions>
                     <execution>
