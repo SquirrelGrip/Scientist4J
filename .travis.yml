@@ -25,5 +25,5 @@ stages:
     if: branch !~ ^release.*$
   - name: startRelease
     if: branch = develop AND env(RELEASE) = true
-  - name: deploy
+  - name: finishRelease
     if: branch =~ ^release.*$
