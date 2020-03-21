@@ -2,3 +2,5 @@
 target/
 *.iml
 .idea/
+pom.xml.versionBackuo
+all.gpg
