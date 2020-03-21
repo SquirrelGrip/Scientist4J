@@ -84,6 +84,7 @@
                     <pushHotfixes>true</pushHotfixes>
                     <scmCommentPrefix>(CI):</scmCommentPrefix>
                     <useReleaseProfile>false</useReleaseProfile>
+                    <autoVersionSubmodules>true</autoVersionSubmodules>
                 </configuration>
             </plugin>
             <plugin>
