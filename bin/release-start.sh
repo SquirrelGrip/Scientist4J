@@ -13,4 +13,4 @@ mvn versions:set -DgenerateBackupPoms=false -DnewVersion=${NEXT_DEVELOP_SNAPSHOT
 git commit -a -m "[gitflow] updating poms for ${NEXT_DEVELOP_SNAPSHOT} development"
 
 # push the changes atomically
-git push --atomic origin develop "release/${CURRENT_RELEASE_VERSION}"
+git push --atomic origin develop release/${CURRENT_RELEASE_VERSION}
