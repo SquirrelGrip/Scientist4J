@@ -24,6 +24,6 @@ stages:
   - name: build
     if: branch !~ ^release.*$
   - name: startRelease
-    if: branch = develop && $RELEASE = true
+    if: branch = develop AND env(RELEASE) = true
   - name: deploy
     if: branch =~ ^release.*$
