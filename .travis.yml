@@ -24,6 +24,6 @@ stages:
   - name: build
     if: branch !~ ^release.*$
   - name: startRelease
-    if: (branch = "develop") AND (env(RELEASE) = true)
+    if: (branch = "develop") AND (env(RELEASE) IS present)
   - name: finishRelease
     if: branch =~ ^release.*$
