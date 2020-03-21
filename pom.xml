@@ -76,15 +76,12 @@
                 <artifactId>jgitflow-maven-plugin</artifactId>
                 <version>1.0.0</version>
                 <configuration>
-                    <username>${env.GIT_USER}</username>
-                    <password>${env.GIT_PASS}</password>
                     <pullMaster>true</pullMaster>
                     <pullDevelop>true</pullDevelop>
                     <pushReleases>true</pushReleases>
                     <pushHotfixes>true</pushHotfixes>
                     <scmCommentPrefix>(CI):</scmCommentPrefix>
                     <useReleaseProfile>false</useReleaseProfile>
-                    <autoVersionSubmodules>true</autoVersionSubmodules>
                 </configuration>
             </plugin>
             <plugin>
@@ -95,8 +92,6 @@
                     <providerImplementations>
                         <git>jgit</git>
                     </providerImplementations>
-                    <username>${env.GIT_USER}</username>
-                    <password>${env.GIT_PASS}</password>
                 </configuration>
                 <dependencies>
                     <dependency>
@@ -146,9 +141,10 @@
     </developers>
 
     <scm>
-        <connection>scm:git:git@github.com:squirrelgrip/Scientist4K.git</connection>
-        <developerConnection>scm:git:git@github.com:squirrelgrip/Scientist4K.git</developerConnection>
-        <url>git@github.com:squirrelgrip/Scientist4K.git</url>
+        <connection>scm:git:https://${GITHUB_TOKEN}@github.com/SquirrelGrip/Scientist4K.git</connection>
+        <developerConnection>scm:git:https://${GITHUB_TOKEN}@github.com/SquirrelGrip/Scientist4K.git
+        </developerConnection>
+        <url>https://github.com/SquirrelGrip/Scientist4K</url>
     </scm>
 
     <modules>

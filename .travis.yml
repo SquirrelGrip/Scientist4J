@@ -1,19 +1,17 @@
 language: java
 jdk:
-  - oraclejdk8
+- oraclejdk8
 install: true
 dist: trusty
 os: linux
-
 cache:
   directories:
-    - $HOME/.m2
-
+    - "$HOME/.m2"
 before_install:
-  - openssl aes-256-cbc -K $encrypted_404964577bd1_key -iv $encrypted_404964577bd1_iv -in all.gpg.enc -out all.gpg -d
+  - openssl aes-256-cbc -K $encrypted_404964577bd1_key -iv $encrypted_404964577bd1_iv
+    -in all.gpg.enc -out all.gpg -d
   - gpg --import all.gpg
   - cp settings.xml $HOME/.m2/settings.xml
-
 jobs:
   include:
     - stage: build
@@ -29,3 +27,6 @@ stages:
     if: (branch = "develop") AND (env(RELEASE) IS present AND env(RELEASE) = true)
   - name: finishRelease
     if: branch =~ ^release.*$
+env:
+  global:
+    secure: chnf0A6e2idhUCn9Mhy2XM6tTg1npbooqVm8Dc1MQgIMyoAmU7cC4r5y9G7uIHhsZsBl7Z5kRerxmjqjYkTXgLQI74OjXza32HgrAsD917KpI4LypgftzMRqQe0EML3evP4X2lF9MEkfmaL9xl+urlvIHZIxd3q8SrzUXwBaJgnF8WpOBidIoTKEHfnsLmdWzhnQRqOWNXbvNo1PpNy9GoVNPTeRktyRS3nCMBE8+q/hwPP/dPhWC+kWfuVRvxZLD7RJihqlmtFY+92NgHaHkCYIzme2WHmd80CPVZdDmbUB4VCAm4arxMVsU676g6CmysLvbqaeiJjqrCr+s/7tOBZJTGt/hBkoZvUlxsSCkrgvygnkTH2acRGS9gKPMZNvwqnbNBxt+2djg4PiezRN0hm0oDpMvBJYG9gvqhrEclyze8wVHresBAOYaP63E7fOoomNhH0QbyzX+lSKePMwIy76+LCw7clq2m4e9rFamLNFYLtMq4/RmCB5+7+EklwO3RMrDxLzkEPxfDKqHNDCwJ4nCdLbEzlzhpoWgi7lBB2sQbmPn/N63n8cGEKaMjz9mDzd60gpOOmc47eI6rY1jReod8lA3hVdO2zKgzEVWT+X1uMdiN4qrpBgJOziEZdYkb7rw9sGqHQl2NpUsT2ho6AOVOq9Z+n/dhecY5/9RUw=
