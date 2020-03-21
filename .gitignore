@@ -2,5 +2,5 @@
 target/
 *.iml
 .idea/
-pom.xml.versionsBackuo
+pom.xml.versionsBackup
 all.gpg
