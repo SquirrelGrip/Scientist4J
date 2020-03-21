@@ -141,8 +141,8 @@
     </developers>
 
     <scm>
-        <connection>scm:git:https://${GITHUB_TOKEN}@github.com/SquirrelGrip/Scientist4K.git</connection>
-        <developerConnection>scm:git:https://${GITHUB_TOKEN}@github.com/SquirrelGrip/Scientist4K.git
+        <connection>scm:git:https://${env.GITHUB_TOKEN}@github.com/SquirrelGrip/Scientist4K.git</connection>
+        <developerConnection>scm:git:https://${env.GITHUB_TOKEN}@github.com/SquirrelGrip/Scientist4K.git
         </developerConnection>
         <url>https://github.com/SquirrelGrip/Scientist4K</url>
     </scm>
