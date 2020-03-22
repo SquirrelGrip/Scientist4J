@@ -77,7 +77,7 @@
                 <version>1.0.0</version>
                 <configuration>
                     <username>${env.GIT_USER}</username>
-                    <password>${env.GIT_PASS}</password>
+                    <password>${env.GIT_TOKEN}</password>
                     <pullMaster>true</pullMaster>
                     <pullDevelop>true</pullDevelop>
                     <pushReleases>true</pushReleases>
@@ -95,7 +95,7 @@
                         <git>jgit</git>
                     </providerImplementations>
                     <username>${env.GIT_USER}</username>
-                    <password>${env.GIT_PASS}</password>
+                    <password>${env.GIT_TOKEN}</password>
                 </configuration>
                 <dependencies>
                     <dependency>
