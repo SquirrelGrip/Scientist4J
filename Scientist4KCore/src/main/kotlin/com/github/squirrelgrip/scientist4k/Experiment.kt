@@ -42,7 +42,7 @@ open class Experiment<T>(
         totalCount = metricsProvider.counter(NAMESPACE_PREFIX, name, "total")
     }
 
-    fun run(control: () -> T?, candidate: () -> T?): T? {
+    open fun run(control: () -> T?, candidate: () -> T?): T? {
         return if (isAsync) {
             runAsync(control, candidate)
         } else {
@@ -50,7 +50,7 @@ open class Experiment<T>(
         }
     }
 
-    fun runSync(control: () -> T?, candidate: () -> T?): T? {
+    open fun runSync(control: () -> T?, candidate: () -> T?): T? {
         val controlObservation: Observation<T> = executeControl(control)
         val candidateObservation = if (runIf() && enabled()) {
             executeCandidate(candidate)
@@ -64,7 +64,7 @@ open class Experiment<T>(
         return controlObservation.value
     }
 
-    fun runAsync(control: () -> T?, candidate: () -> T?) =
+    open fun runAsync(control: () -> T?, candidate: () -> T?) =
             runBlocking {
                 val deferredControlObservation = GlobalScope.async { executeControl(control) }
                 val deferredCandidateObservation = if (runIf() && enabled()) {
@@ -138,17 +138,17 @@ open class Experiment<T>(
         return true
     }
 
-    open fun publish(r: Result<T>) {}
+    open fun publish(result: Result<T>) {}
 
-    fun runIf(): Boolean {
+    open fun runIf(): Boolean {
         return true
     }
 
-    fun enabled(): Boolean {
+    open fun enabled(): Boolean {
         return true
     }
 
-    protected val isAsync: Boolean
+    open val isAsync: Boolean
         get() = true
 
     companion object {

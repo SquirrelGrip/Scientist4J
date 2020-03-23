@@ -34,4 +34,8 @@ class ExperimentBuilder<T> {
         return Experiment(name, mutableMapOf(), raiseOnMismatch, metricsProvider, comparator)
     }
 
+    fun buildControlled(): ControlledExperiment<T> {
+        return ControlledExperiment(name, mutableMapOf(), raiseOnMismatch, metricsProvider, comparator)
+    }
+
 }
