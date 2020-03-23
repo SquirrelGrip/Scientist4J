@@ -24,36 +24,71 @@ open class ControlledExperiment<T>(
 
     private val controlExperiment = object : Experiment<T>("$name-control", context, false, metricsProvider, comparator) {
         override fun publish(result: Result<T>) {
-            println("control experiment publish called")
+            processResult(result, true)
         }
     }
 
-    fun run(controlA: () -> T?, controlB: () -> T?, candidate: () -> T?): T? {
+    fun run(controlPrimary: () -> T?, controlSecondary: () -> T?, candidate: () -> T?, note: Note = Note()): T? {
         return if (isAsync) {
-            runAsync(controlA, controlB, candidate)
+            runAsync(controlPrimary, controlSecondary, candidate, note)
         } else {
-            runSync(controlA, controlB, candidate)
+            runSync(controlPrimary, controlSecondary, candidate, note)
         }
     }
 
-    fun runSync(controlA: () -> T?, controlB: () -> T?, candidate: () -> T?): T? {
-        return super.runSync({ controlExperiment.runSync(controlA, controlB) }, candidate)
+    override fun run(control: () -> T?, candidate: () -> T?, note: Note): T? {
+        return run(control, control, candidate, note)
     }
 
-    override fun runSync(control: () -> T?, candidate: () -> T?): T? {
-        return runSync(control, control, candidate)
+    fun runSync(controlPrimary: () -> T?, controlSecondary: () -> T?, candidate: () -> T?, note: Note = Note()): T? {
+        return super.runSync({ controlExperiment.runSync(controlPrimary, controlSecondary, note) }, candidate, note)
     }
 
-    fun runAsync(controlA: () -> T?, controlB: () -> T?, candidate: () -> T?): T? {
-        return super.runAsync({ controlExperiment.runAsync(controlA, controlB) }, candidate)
+    override fun runSync(control: () -> T?, candidate: () -> T?, note: Note): T? {
+        return runSync(control, control, candidate, note)
     }
 
-    override fun runAsync(control: () -> T?, candidate: () -> T?): T? {
-        return runAsync(control, control, candidate)
+    fun runAsync(controlPrimary: () -> T?, controlSecondary: () -> T?, candidate: () -> T?, note: Note = Note()): T? {
+        return super.runAsync({ controlExperiment.runAsync(controlPrimary, controlSecondary, note) }, candidate, note)
+    }
+
+    override fun runAsync(control: () -> T?, candidate: () -> T?, note: Note): T? {
+        return runAsync(control, control, candidate, note)
     }
 
     override fun publish(result: Result<T>) {
-        println("candidate experiment publish called")
+        processResult(result, false)
+    }
+
+    private val matchingMap = mutableMapOf<Long, Result<T>>()
+
+    private fun processResult(result: Result<T>, control: Boolean) {
+        synchronized(matchingMap) {
+            val matchingResult = retrieveOrStoreResult(result)
+            if (matchingResult != null) {
+                if (control) {
+                    publish(ControlledResult(result.note, result, matchingResult))
+                } else {
+                    publish(ControlledResult(result.note, matchingResult, result))
+                }
+            }
+        }
+    }
+
+    private fun retrieveOrStoreResult(result: Result<T>): Result<T>? {
+        val matchingResult = matchingMap[result.note.sampleId]
+        if (matchingResult == null) {
+            matchingMap[result.note.sampleId] = result
+        } else {
+            matchingMap.remove(result.note.sampleId)
+        }
+        return matchingResult
+    }
+
+    open fun publish(result: ControlledResult<T>) {
+        println(result.controlResult.match)
+        println(result.candidateResult.match)
+        println(result.match)
     }
 
 }

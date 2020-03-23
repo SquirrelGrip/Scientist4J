@@ -35,14 +35,14 @@ class ExperimentTest {
     @Test
     fun itThrowsAnExceptionWhenControlFails() {
         assertThrows(ExpectingAnException::class.java) {
-            Experiment<Int>("test", NoopMetricsProvider()).run({ exceptionThrowingFunction() }) { exceptionThrowingFunction() }
+            Experiment<Int>("test", NoopMetricsProvider()).run({ exceptionThrowingFunction() }, { exceptionThrowingFunction() })
         }
     }
 
     @Test
     fun itDoesntThrowAnExceptionWhenCandidateFails() {
         val experiment = Experiment<Int>("test", NoopMetricsProvider())
-        val value = experiment.run({ safeFunction() }) { exceptionThrowingFunction() }
+        val value = experiment.run({ safeFunction() }, { exceptionThrowingFunction() })
         assertThat(value).isEqualTo(3)
     }
 
@@ -50,21 +50,21 @@ class ExperimentTest {
     fun itThrowsOnMismatch() {
         val experiment = Experiment<Int>("test", true, NoopMetricsProvider())
         assertThrows(MismatchException::class.java) {
-            experiment.run({ safeFunction() }) { safeFunctionWithDifferentResult() }
+            experiment.run({ safeFunction() }, { safeFunctionWithDifferentResult() })
         }
     }
 
     @Test
     fun itDoesNotThrowOnMatch() {
         val experiment = Experiment<Int>("test", true, NoopMetricsProvider())
-        val value = experiment.run({ safeFunction() }) { safeFunction() }
+        val value = experiment.run({ safeFunction() }, { safeFunction() })
         assertThat(value).isEqualTo(3)
     }
 
     @Test
     fun itHandlesNullValues() {
         val experiment = Experiment<Int?>("test", true, NoopMetricsProvider())
-        val value = experiment.run({ null }) { null }
+        val value = experiment.run({ null }, { null })
         assertThat(value).isNull()
     }
 
@@ -72,7 +72,7 @@ class ExperimentTest {
     fun nonAsyncRunsLongTime() {
         val experiment = Experiment<Int>("test", true, NoopMetricsProvider())
         val date1 = Date()
-        val value = experiment.runSync({ sleepFunction() }) { sleepFunction() }
+        val value = experiment.runSync({ sleepFunction() }, { sleepFunction() })
         val date2 = Date()
         val difference = date2.time - date1.time
         assertThat(difference).isGreaterThanOrEqualTo(2000)
@@ -82,14 +82,14 @@ class ExperimentTest {
     @Test
     fun itWorksWithAnExtendedClass() {
         val experiment: Experiment<Int> = TestPublishExperiment("test", NoopMetricsProvider())
-        experiment.run({ safeFunction() }) { safeFunction() }
+        experiment.run({ safeFunction() }, { safeFunction() })
     }
 
     @Test
     fun candidateExceptionsAreCounted_dropwizard() {
         val provider = DropwizardMetricsProvider()
         val experiment = Experiment<Int>("test", provider)
-        experiment.run({ 1 }) { exceptionThrowingFunction() }
+        experiment.run({ 1 }, { exceptionThrowingFunction() })
         val result = provider.registry.counters[MetricName.build("scientist", "test", "candidate", "exception")]
         assertThat(result!!.count).isEqualTo(1)
     }
@@ -98,7 +98,7 @@ class ExperimentTest {
     fun candidateExceptionsAreCounted_micrometer() {
         val provider = MicrometerMetricsProvider()
         val experiment = Experiment<Int>("test", provider)
-        experiment.run({ 1 }) { exceptionThrowingFunction() }
+        experiment.run({ 1 }, { exceptionThrowingFunction() })
         val result = provider.registry["scientist.test.candidate.exception"].counter()
         assertThat(result.count()).isEqualTo(1.0)
     }
@@ -113,7 +113,7 @@ class ExperimentTest {
                 .withComparator(comparator)
                 .withMetricsProvider(NoopMetricsProvider())
                 .build()
-        experiment.run({ 1 }) { 2 }
+        experiment.run({ 1 }, { 2 })
         verify(comparator).apply(1, 2)
     }
 }
