@@ -42,15 +42,15 @@ open class Experiment<T>(
         totalCount = metricsProvider.counter(NAMESPACE_PREFIX, name, "total")
     }
 
-    open fun run(control: () -> T?, candidate: () -> T?): T? {
+    open fun run(control: () -> T?, candidate: () -> T?, note: Note = Note()): T? {
         return if (isAsync) {
-            runAsync(control, candidate)
+            runAsync(control, candidate, note)
         } else {
-            runSync(control, candidate)
+            runSync(control, candidate, note)
         }
     }
 
-    open fun runSync(control: () -> T?, candidate: () -> T?): T? {
+    open fun runSync(control: () -> T?, candidate: () -> T?, note: Note = Note()): T? {
         val controlObservation: Observation<T> = executeControl(control)
         val candidateObservation = if (runIf() && enabled()) {
             executeCandidate(candidate)
@@ -59,12 +59,12 @@ open class Experiment<T>(
         }
 
         if (candidateObservation != null) {
-            publishResult(candidateObservation, controlObservation).handleComparisonMismatch()
+            publishResult(candidateObservation, controlObservation, note).handleComparisonMismatch()
         }
         return controlObservation.value
     }
 
-    open fun runAsync(control: () -> T?, candidate: () -> T?) =
+    open fun runAsync(control: () -> T?, candidate: () -> T?, note: Note = Note()) =
             runBlocking {
                 val deferredControlObservation = GlobalScope.async { executeControl(control) }
                 val deferredCandidateObservation = if (runIf() && enabled()) {
@@ -75,7 +75,7 @@ open class Experiment<T>(
 
                 val controlObservation = deferredControlObservation.await()
                 if (deferredCandidateObservation != null) {
-                    val deferred = GlobalScope.async { publishAsync(deferredCandidateObservation, controlObservation) }
+                    val deferred = GlobalScope.async { publishAsync(deferredCandidateObservation, controlObservation, note) }
                     if (raiseOnMismatch) {
                         deferred.await().handleComparisonMismatch()
                     }
@@ -83,15 +83,15 @@ open class Experiment<T>(
                 controlObservation.value
             }
 
-    private suspend fun publishAsync(deferredCandidateObservation: Deferred<Observation<T>>, controlObservation: Observation<T>): Result<T> {
+    private suspend fun publishAsync(deferredCandidateObservation: Deferred<Observation<T>>, controlObservation: Observation<T>, note: Note = Note()): Result<T> {
         deferredCandidateObservation.await().also { candidateObservation ->
-            return publishResult(candidateObservation, controlObservation)
+            return publishResult(candidateObservation, controlObservation, note)
         }
     }
 
-    private fun publishResult(candidateObservation: Observation<T>, controlObservation: Observation<T>): Result<T> {
+    private fun publishResult(candidateObservation: Observation<T>, controlObservation: Observation<T>, note: Note = Note()): Result<T> {
         countExceptions(candidateObservation, candidateExceptionCount)
-        return Result(this@Experiment, controlObservation, candidateObservation, context).apply {
+        return Result(this@Experiment, controlObservation, candidateObservation, context, note).apply {
             publish(this)
         }
     }
@@ -112,7 +112,7 @@ open class Experiment<T>(
         val observation = Observation<T>(name, timer)
         observation.time {
             try {
-                observation.value = function.invoke()
+                observation.setValue(function.invoke())
             } catch (e: Exception) {
                 observation.setException(e)
             }

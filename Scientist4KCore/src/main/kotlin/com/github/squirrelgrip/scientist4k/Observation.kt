@@ -7,14 +7,21 @@ class Observation<T>(
         private val timer: Timer
 ) {
     private var _exception: Exception? = null
+    private var _value: T? = null
 
     val exception: Exception? by lazy {
         _exception
     }
-    var value: T? = null
+    val value: T? by lazy {
+        _value
+    }
 
-    fun setException(e: Exception) {
-        _exception = e
+    fun setException(exception: Exception) {
+        _exception = exception
+    }
+
+    fun setValue(value: T?) {
+        _value = value
     }
 
     val duration: Long

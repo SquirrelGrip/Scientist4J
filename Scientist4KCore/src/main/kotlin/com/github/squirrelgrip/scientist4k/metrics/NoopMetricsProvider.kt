@@ -1,7 +1,7 @@
 package com.github.squirrelgrip.scientist4k.metrics
 
 /**
- * A  minimal in-memory [MetricsProvider] implementation, suitable for test environments.
+ * A  minimal in-memory [MetricsProvider] implementation, suitable for test environments or if no metrics required.
  */
 class NoopMetricsProvider : MetricsProvider<Any> {
     override fun timer(vararg nameComponents: String): Timer {
@@ -12,7 +12,6 @@ class NoopMetricsProvider : MetricsProvider<Any> {
                 runnable.invoke()
                 duration = System.nanoTime() - now
             }
-
         }
     }
 

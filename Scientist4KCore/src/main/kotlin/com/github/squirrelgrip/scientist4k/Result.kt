@@ -6,7 +6,9 @@ class Result<T>(
         private val experiment: Experiment<T>,
         val control: Observation<T>,
         val candidate: Observation<T>?,
-        val context: Map<String, Any> = emptyMap()) {
+        val context: Map<String, Any> = emptyMap(),
+        val note: Note = Note()
+) {
     val match: Boolean = if (candidate != null) {
         experiment.compare(control, candidate)
     } else {
