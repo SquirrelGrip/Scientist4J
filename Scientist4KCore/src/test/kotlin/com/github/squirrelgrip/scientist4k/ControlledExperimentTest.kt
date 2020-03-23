@@ -14,7 +14,7 @@ import org.mockito.Mockito.verify
 import java.util.*
 import java.util.function.BiFunction
 
-class ExperimentTest {
+class ControlledExperimentTest {
     private fun exceptionThrowingFunction(): Int {
         throw ExpectingAnException("throw an exception")
     }
@@ -35,42 +35,48 @@ class ExperimentTest {
     @Test
     fun itThrowsAnExceptionWhenControlFails() {
         assertThrows(ExpectingAnException::class.java) {
-            Experiment<Int>("test", NoopMetricsProvider()).run({ exceptionThrowingFunction() }) { exceptionThrowingFunction() }
+            ControlledExperiment<Int>("test", NoopMetricsProvider()).run({ exceptionThrowingFunction() }, { exceptionThrowingFunction() })
         }
     }
 
     @Test
+    fun itDoesntThrowsAnExceptionWhenSecondaryControlFails() {
+        val experiment = ControlledExperiment<Int>("test", NoopMetricsProvider())
+        val value = experiment.run({ safeFunction() }, { exceptionThrowingFunction() }, { exceptionThrowingFunction() })
+        assertThat(value).isEqualTo(3)
+    }
+
+    @Test
     fun itDoesntThrowAnExceptionWhenCandidateFails() {
-        val experiment = Experiment<Int>("test", NoopMetricsProvider())
-        val value = experiment.run({ safeFunction() }) { exceptionThrowingFunction() }
+        val experiment = ControlledExperiment<Int>("test", NoopMetricsProvider())
+        val value = experiment.run({ safeFunction() }, { exceptionThrowingFunction() })
         assertThat(value).isEqualTo(3)
     }
 
     @Test
     fun itThrowsOnMismatch() {
-        val experiment = Experiment<Int>("test", true, NoopMetricsProvider())
         assertThrows(MismatchException::class.java) {
-            experiment.run({ safeFunction() }) { safeFunctionWithDifferentResult() }
+            ControlledExperiment<Int>("test", true, NoopMetricsProvider()).run({ safeFunction() }) { safeFunctionWithDifferentResult() }
         }
     }
 
     @Test
     fun itDoesNotThrowOnMatch() {
-        val experiment = Experiment<Int>("test", true, NoopMetricsProvider())
+        val experiment = ControlledExperiment<Int>("test", true, NoopMetricsProvider())
         val value = experiment.run({ safeFunction() }) { safeFunction() }
         assertThat(value).isEqualTo(3)
     }
 
     @Test
     fun itHandlesNullValues() {
-        val experiment = Experiment<Int?>("test", true, NoopMetricsProvider())
+        val experiment = ControlledExperiment<Int?>("test", true, NoopMetricsProvider())
         val value = experiment.run({ null }) { null }
         assertThat(value).isNull()
     }
 
     @Test
     fun nonAsyncRunsLongTime() {
-        val experiment = Experiment<Int>("test", true, NoopMetricsProvider())
+        val experiment = ControlledExperiment<Int>("test", true, NoopMetricsProvider())
         val date1 = Date()
         val value = experiment.runSync({ sleepFunction() }) { sleepFunction() }
         val date2 = Date()
@@ -81,14 +87,14 @@ class ExperimentTest {
 
     @Test
     fun itWorksWithAnExtendedClass() {
-        val experiment: Experiment<Int> = TestPublishExperiment("test", NoopMetricsProvider())
+        val experiment: ControlledExperiment<Int> = TestPublishControlledExperiment("test", NoopMetricsProvider())
         experiment.run({ safeFunction() }) { safeFunction() }
     }
 
     @Test
     fun candidateExceptionsAreCounted_dropwizard() {
         val provider = DropwizardMetricsProvider()
-        val experiment = Experiment<Int>("test", provider)
+        val experiment = ControlledExperiment<Int>("test", provider)
         experiment.run({ 1 }) { exceptionThrowingFunction() }
         val result = provider.registry.counters[MetricName.build("scientist", "test", "candidate", "exception")]
         assertThat(result!!.count).isEqualTo(1)
@@ -97,7 +103,7 @@ class ExperimentTest {
     @Test
     fun candidateExceptionsAreCounted_micrometer() {
         val provider = MicrometerMetricsProvider()
-        val experiment = Experiment<Int>("test", provider)
+        val experiment = ControlledExperiment<Int>("test", provider)
         experiment.run({ 1 }) { exceptionThrowingFunction() }
         val result = provider.registry["scientist.test.candidate.exception"].counter()
         assertThat(result.count()).isEqualTo(1.0)
@@ -106,14 +112,18 @@ class ExperimentTest {
     @Suppress("UNCHECKED_CAST")
     @Test
     fun shouldUseCustomComparator() {
-        val comparator: BiFunction<Int?, Int?, Boolean> = Mockito.mock<BiFunction<*, *, *>>(BiFunction::class.java) as BiFunction<Int?, Int?, Boolean>
+        val comparator: BiFunction<Int?, Int?, Boolean> = Mockito.mock(BiFunction::class.java) as BiFunction<Int?, Int?, Boolean>
+        given(comparator.apply(1, 1)).willReturn(true)
         given(comparator.apply(1, 2)).willReturn(false)
         val experiment = ExperimentBuilder<Int>()
                 .withName("test")
                 .withComparator(comparator)
                 .withMetricsProvider(NoopMetricsProvider())
-                .build()
-        experiment.run({ 1 }) { 2 }
+                .buildControlled()
+        experiment.run({ 1 }, { 2 })
+        sleepFunction()
+        verify(comparator).apply(1, 1)
         verify(comparator).apply(1, 2)
     }
 }
+
