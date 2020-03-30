@@ -1,4 +1,4 @@
-package com.github.squirrelgrip.scientist4k
+package com.github.squirrelgrip.scientist4k.model
 
 import java.time.Instant
 

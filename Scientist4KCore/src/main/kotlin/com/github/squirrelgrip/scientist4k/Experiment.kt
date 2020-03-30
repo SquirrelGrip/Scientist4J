@@ -4,6 +4,10 @@ import com.github.squirrelgrip.scientist4k.metrics.Counter
 import com.github.squirrelgrip.scientist4k.metrics.DropwizardMetricsProvider
 import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
 import com.github.squirrelgrip.scientist4k.metrics.Timer
+import com.github.squirrelgrip.scientist4k.model.Observation
+import com.github.squirrelgrip.scientist4k.model.Result
+import com.github.squirrelgrip.scientist4k.model.Sample
+import com.github.squirrelgrip.scientist4k.model.sample.SampleFactory
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async

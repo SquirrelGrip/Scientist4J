@@ -1,4 +1,4 @@
-package com.github.squirrelgrip.scientist4k
+package com.github.squirrelgrip.scientist4k.model.sample
 
 import java.util.concurrent.atomic.AtomicLong
 

@@ -2,6 +2,10 @@ package com.github.squirrelgrip.scientist4k
 
 import com.github.squirrelgrip.scientist4k.metrics.DropwizardMetricsProvider
 import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
+import com.github.squirrelgrip.scientist4k.model.ControlledResult
+import com.github.squirrelgrip.scientist4k.model.Result
+import com.github.squirrelgrip.scientist4k.model.Sample
+import com.github.squirrelgrip.scientist4k.model.sample.SampleFactory
 import java.util.function.BiFunction
 
 open class ControlledExperiment<T>(

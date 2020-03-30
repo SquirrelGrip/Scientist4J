@@ -1,4 +1,4 @@
-package com.github.squirrelgrip.scientist4k
+package com.github.squirrelgrip.scientist4k.model
 
 class ControlledResult<T>(
         val sample: Sample,
