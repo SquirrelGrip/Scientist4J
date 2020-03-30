@@ -9,15 +9,17 @@ open class ControlledExperiment<T>(
         context: Map<String, Any> = emptyMap(),
         raiseOnMismatch: Boolean,
         metricsProvider: MetricsProvider<*> = DropwizardMetricsProvider(),
-        comparator: BiFunction<T?, T?, Boolean> = BiFunction { a: T?, b: T? -> a == b }
+        comparator: BiFunction<T?, T?, Boolean> = BiFunction { a: T?, b: T? -> a == b },
+        sampleFactory: SampleFactory = SampleFactory()
 ) : Experiment<T>(
         name,
         context,
         raiseOnMismatch,
         metricsProvider,
-        comparator
+        comparator,
+        sampleFactory
 ) {
-    constructor(metricsProvider: MetricsProvider<*>) : this("AdvancedExperiment", metricsProvider)
+    constructor(metricsProvider: MetricsProvider<*>) : this("ControlledExperiment", metricsProvider)
     constructor(name: String, metricsProvider: MetricsProvider<*>) : this(name, false, metricsProvider)
     constructor(name: String, context: Map<String, Any>, metricsProvider: MetricsProvider<*>) : this(name, context, false, metricsProvider)
     constructor(name: String, raiseOnMismatch: Boolean, metricsProvider: MetricsProvider<*>) : this(name, mapOf<String, Any>(), raiseOnMismatch, metricsProvider)
@@ -28,7 +30,7 @@ open class ControlledExperiment<T>(
         }
     }
 
-    fun run(controlPrimary: () -> T?, controlSecondary: () -> T?, candidate: () -> T?, sample: Sample = Sample()): T? {
+    fun run(controlPrimary: () -> T?, controlSecondary: () -> T?, candidate: () -> T?, sample: Sample = sampleFactory.create()): T? {
         return if (isAsync) {
             runAsync(controlPrimary, controlSecondary, candidate, sample)
         } else {
@@ -40,7 +42,7 @@ open class ControlledExperiment<T>(
         return run(control, control, candidate, sample)
     }
 
-    fun runSync(controlPrimary: () -> T?, controlSecondary: () -> T?, candidate: () -> T?, sample: Sample = Sample()): T? {
+    fun runSync(controlPrimary: () -> T?, controlSecondary: () -> T?, candidate: () -> T?, sample: Sample = sampleFactory.create()): T? {
         return super.runSync({ controlExperiment.runSync(controlPrimary, controlSecondary, sample) }, candidate, sample)
     }
 
@@ -48,7 +50,7 @@ open class ControlledExperiment<T>(
         return runSync(control, control, candidate, sample)
     }
 
-    fun runAsync(controlPrimary: () -> T?, controlSecondary: () -> T?, candidate: () -> T?, sample: Sample = Sample()): T? {
+    fun runAsync(controlPrimary: () -> T?, controlSecondary: () -> T?, candidate: () -> T?, sample: Sample = sampleFactory.create()): T? {
         return super.runAsync({ controlExperiment.runAsync(controlPrimary, controlSecondary, sample) }, candidate, sample)
     }
 

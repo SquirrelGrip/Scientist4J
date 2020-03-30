@@ -7,7 +7,7 @@ class Result<T>(
         val control: Observation<T>,
         val candidate: Observation<T>?,
         val context: Map<String, Any> = emptyMap(),
-        val sample: Sample = Sample()
+        val sample: Sample
 ) {
     val match: Boolean = if (candidate != null) {
         experiment.compare(control, candidate)

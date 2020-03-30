@@ -15,7 +15,8 @@ open class Experiment<T>(
         val context: Map<String, Any> = emptyMap(),
         val raiseOnMismatch: Boolean,
         metricsProvider: MetricsProvider<*> = DropwizardMetricsProvider(),
-        val comparator: BiFunction<T?, T?, Boolean> = BiFunction { a: T?, b: T? -> a == b }
+        val comparator: BiFunction<T?, T?, Boolean> = BiFunction { a: T?, b: T? -> a == b },
+        val sampleFactory: SampleFactory = SampleFactory()
 ) {
     /**
      * Note that if `raiseOnMismatch` is true, [.runAsync] will block waiting for
@@ -42,7 +43,7 @@ open class Experiment<T>(
         totalCount = metricsProvider.counter(NAMESPACE_PREFIX, name, "total")
     }
 
-    open fun run(control: () -> T?, candidate: () -> T?, sample: Sample = Sample()): T? {
+    open fun run(control: () -> T?, candidate: () -> T?, sample: Sample = sampleFactory.create()): T? {
         return if (isAsync) {
             runAsync(control, candidate, sample)
         } else {
@@ -50,7 +51,7 @@ open class Experiment<T>(
         }
     }
 
-    open fun runSync(control: () -> T?, candidate: () -> T?, sample: Sample = Sample()): T? {
+    open fun runSync(control: () -> T?, candidate: () -> T?, sample: Sample = sampleFactory.create()): T? {
         val controlObservation: Observation<T> = executeControl(control)
         val candidateObservation = if (runIf() && enabled()) {
             executeCandidate(candidate)
@@ -64,7 +65,7 @@ open class Experiment<T>(
         return controlObservation.value
     }
 
-    open fun runAsync(control: () -> T?, candidate: () -> T?, sample: Sample = Sample()) =
+    open fun runAsync(control: () -> T?, candidate: () -> T?, sample: Sample = sampleFactory.create()) =
             runBlocking {
                 val deferredControlObservation = GlobalScope.async { executeControl(control) }
                 val deferredCandidateObservation = if (runIf() && enabled()) {
@@ -83,13 +84,13 @@ open class Experiment<T>(
                 controlObservation.value
             }
 
-    private suspend fun publishAsync(deferredCandidateObservation: Deferred<Observation<T>>, controlObservation: Observation<T>, sample: Sample = Sample()): Result<T> {
+    private suspend fun publishAsync(deferredCandidateObservation: Deferred<Observation<T>>, controlObservation: Observation<T>, sample: Sample = sampleFactory.create()): Result<T> {
         deferredCandidateObservation.await().also { candidateObservation ->
             return publishResult(candidateObservation, controlObservation, sample)
         }
     }
 
-    private fun publishResult(candidateObservation: Observation<T>, controlObservation: Observation<T>, sample: Sample = Sample()): Result<T> {
+    private fun publishResult(candidateObservation: Observation<T>, controlObservation: Observation<T>, sample: Sample = sampleFactory.create()): Result<T> {
         countExceptions(candidateObservation, candidateExceptionCount)
         return Result(this@Experiment, controlObservation, candidateObservation, context, sample).apply {
             publish(this)
