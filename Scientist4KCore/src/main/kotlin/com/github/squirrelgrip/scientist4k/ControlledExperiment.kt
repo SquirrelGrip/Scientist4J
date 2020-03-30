@@ -60,7 +60,7 @@ open class ControlledExperiment<T>(
         processResult(result, false)
     }
 
-    private val matchingMap = mutableMapOf<Long, Result<T>>()
+    private val matchingMap = mutableMapOf<String, Result<T>>()
 
     private fun processResult(result: Result<T>, control: Boolean) {
         synchronized(matchingMap) {
