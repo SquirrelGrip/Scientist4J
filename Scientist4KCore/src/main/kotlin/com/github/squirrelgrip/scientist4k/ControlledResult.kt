@@ -1,7 +1,7 @@
 package com.github.squirrelgrip.scientist4k
 
 class ControlledResult<T>(
-        val note: Note,
+        val sample: Sample,
         val controlResult: Result<T>,
         val candidateResult: Result<T>
 ) {
