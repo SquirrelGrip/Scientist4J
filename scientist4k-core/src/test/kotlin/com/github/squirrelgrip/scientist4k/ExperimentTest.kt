@@ -1,9 +1,10 @@
 package com.github.squirrelgrip.scientist4k
 
 import com.github.squirrelgrip.scientist4k.exceptions.MismatchException
-import com.github.squirrelgrip.scientist4k.metrics.DropwizardMetricsProvider
-import com.github.squirrelgrip.scientist4k.metrics.MicrometerMetricsProvider
 import com.github.squirrelgrip.scientist4k.metrics.NoopMetricsProvider
+import com.github.squirrelgrip.scientist4k.metrics.dropwizard.DropwizardMetricsProvider
+import com.github.squirrelgrip.scientist4k.metrics.micrometer.MicrometerMetricsProvider
+import com.github.squirrelgrip.scientist4k.model.ExperimentComparator
 import io.dropwizard.metrics5.MetricName
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertThrows
@@ -12,11 +13,10 @@ import org.mockito.BDDMockito.given
 import org.mockito.Mockito
 import org.mockito.Mockito.verify
 import java.util.*
-import java.util.function.BiFunction
 
 class ExperimentTest {
     private fun exceptionThrowingFunction(): Int {
-        throw ExpectingAnException("throw an exception")
+        throw Exception("throw an exception")
     }
 
     private fun safeFunction(): Int {
@@ -34,7 +34,7 @@ class ExperimentTest {
 
     @Test
     fun itThrowsAnExceptionWhenControlFails() {
-        assertThrows(ExpectingAnException::class.java) {
+        assertThrows(Exception::class.java) {
             Experiment<Int>("test", NoopMetricsProvider()).run({ exceptionThrowingFunction() }, { exceptionThrowingFunction() })
         }
     }
@@ -106,14 +106,14 @@ class ExperimentTest {
     @Suppress("UNCHECKED_CAST")
     @Test
     fun shouldUseCustomComparator() {
-        val comparator: BiFunction<Int?, Int?, Boolean> = Mockito.mock<BiFunction<*, *, *>>(BiFunction::class.java) as BiFunction<Int?, Int?, Boolean>
-        given(comparator.apply(1, 2)).willReturn(false)
+        val comparator: ExperimentComparator<Int> = Mockito.mock(ExperimentComparator::class.java) as ExperimentComparator<Int>
+        given(comparator.invoke(1, 2)).willReturn(false)
         val experiment = ExperimentBuilder<Int>()
                 .withName("test")
                 .withComparator(comparator)
                 .withMetricsProvider(NoopMetricsProvider())
                 .build()
         experiment.run({ 1 }, { 2 })
-        verify(comparator).apply(1, 2)
+        verify(comparator).invoke(1, 2)
     }
 }

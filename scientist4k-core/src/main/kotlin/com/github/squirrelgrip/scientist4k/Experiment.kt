@@ -1,25 +1,21 @@
 package com.github.squirrelgrip.scientist4k
 
 import com.github.squirrelgrip.scientist4k.metrics.Counter
-import com.github.squirrelgrip.scientist4k.metrics.DropwizardMetricsProvider
 import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
 import com.github.squirrelgrip.scientist4k.metrics.Timer
-import com.github.squirrelgrip.scientist4k.model.Observation
-import com.github.squirrelgrip.scientist4k.model.Result
-import com.github.squirrelgrip.scientist4k.model.Sample
+import com.github.squirrelgrip.scientist4k.model.*
 import com.github.squirrelgrip.scientist4k.model.sample.SampleFactory
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
-import java.util.function.BiFunction
 
 open class Experiment<T>(
         name: String,
+        val raiseOnMismatch: Boolean = false,
+        val metrics: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD"),
         val context: Map<String, Any> = emptyMap(),
-        val raiseOnMismatch: Boolean,
-        metricsProvider: MetricsProvider<*> = DropwizardMetricsProvider(),
-        val comparator: BiFunction<T?, T?, Boolean> = BiFunction { a: T?, b: T? -> a == b },
+        val comparator: ExperimentComparator<T> = DefaultExperimentComparator(),
         val sampleFactory: SampleFactory = SampleFactory()
 ) {
     /**
@@ -28,23 +24,30 @@ open class Experiment<T>(
      * In situations where the candidate function may be significantly slower than the control,
      * it is *not* recommended to raise on mismatch.
      */
+    private val publishers = mutableListOf<Publisher<T>>()
     private val controlTimer: Timer
     private val candidateTimer: Timer
     private val mismatchCount: Counter
     private val candidateExceptionCount: Counter
     private val totalCount: Counter
 
-    constructor(metricsProvider: MetricsProvider<*>) : this("Experiment", metricsProvider)
-    constructor(name: String, metricsProvider: MetricsProvider<*>) : this(name, false, metricsProvider)
-    constructor(name: String, context: Map<String, Any>, metricsProvider: MetricsProvider<*>) : this(name, context, false, metricsProvider)
-    constructor(name: String, raiseOnMismatch: Boolean, metricsProvider: MetricsProvider<*>) : this(name, mapOf<String, Any>(), raiseOnMismatch, metricsProvider)
+    constructor(metrics: MetricsProvider<*>) : this("Experiment", metrics)
+    constructor(name: String, metrics: MetricsProvider<*>) : this(name, false, metrics)
 
     init {
-        controlTimer = metricsProvider.timer(NAMESPACE_PREFIX, name, "control")
-        candidateTimer = metricsProvider.timer(NAMESPACE_PREFIX, name, "candidate")
-        mismatchCount = metricsProvider.counter(NAMESPACE_PREFIX, name, "mismatch")
-        candidateExceptionCount = metricsProvider.counter(NAMESPACE_PREFIX, name, "candidate.exception")
-        totalCount = metricsProvider.counter(NAMESPACE_PREFIX, name, "total")
+        controlTimer = metrics.timer(NAMESPACE_PREFIX, name, "control")
+        candidateTimer = metrics.timer(NAMESPACE_PREFIX, name, "candidate")
+        mismatchCount = metrics.counter(NAMESPACE_PREFIX, name, "mismatch")
+        candidateExceptionCount = metrics.counter(NAMESPACE_PREFIX, name, "candidate.exception")
+        totalCount = metrics.counter(NAMESPACE_PREFIX, name, "total")
+    }
+
+    fun addPublisher(publisher: Publisher<T>) {
+        publishers.add(publisher)
+    }
+
+    fun removePublisher(publisher: Publisher<T>) {
+        publishers.remove(publisher)
     }
 
     open fun run(control: () -> T?, candidate: () -> T?, sample: Sample = sampleFactory.create()): T? {
@@ -129,12 +132,8 @@ open class Experiment<T>(
         return observation
     }
 
-    private fun compareResults(control: T?, candidate: T?): Boolean {
-        return comparator.apply(control, candidate)
-    }
-
     fun compare(control: Observation<T>, candidate: Observation<T>): Boolean {
-        val resultsMatch = candidate.exception == null && compareResults(control.value, candidate.value)
+        val resultsMatch = candidate.exception == null && comparator.invoke(control.value, candidate.value)
         totalCount.increment()
         if (!resultsMatch) {
             mismatchCount.increment()
@@ -142,8 +141,6 @@ open class Experiment<T>(
         }
         return true
     }
-
-    open fun publish(result: Result<T>) {}
 
     open fun runIf(): Boolean {
         return true
@@ -155,6 +152,10 @@ open class Experiment<T>(
 
     open val isAsync: Boolean
         get() = true
+
+    open fun publish(result: Result<T>) {
+        publishers.forEach { it.publish(result) }
+    }
 
     companion object {
         private const val NAMESPACE_PREFIX = "scientist"

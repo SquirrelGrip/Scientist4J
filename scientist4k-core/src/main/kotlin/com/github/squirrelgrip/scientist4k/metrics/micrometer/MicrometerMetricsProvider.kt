@@ -1,5 +1,8 @@
-package com.github.squirrelgrip.scientist4k.metrics
+package com.github.squirrelgrip.scientist4k.metrics.micrometer
 
+import com.github.squirrelgrip.scientist4k.metrics.Counter
+import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
+import com.github.squirrelgrip.scientist4k.metrics.Timer
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry
 import java.util.concurrent.TimeUnit

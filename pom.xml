@@ -303,6 +303,7 @@
     <modules>
         <module>scientist4k-core</module>
         <module>scientist4k-controlled</module>
+        <module>scientist4k-http</module>
     </modules>
 
     <profiles>

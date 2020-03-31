@@ -1,10 +1,14 @@
-package com.github.squirrelgrip.scientist4k.metrics
+package com.github.squirrelgrip.scientist4k.metrics.dropwizard
 
+import com.github.squirrelgrip.scientist4k.metrics.Counter
+import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
+import com.github.squirrelgrip.scientist4k.metrics.Timer
 import io.dropwizard.metrics5.MetricRegistry
 
 class DropwizardMetricsProvider(
         override val registry: MetricRegistry = MetricRegistry()
 ) : MetricsProvider<MetricRegistry> {
+
     override fun timer(vararg nameComponents: String): Timer {
         return object : Timer {
             private var durationVariable: Long = 0
