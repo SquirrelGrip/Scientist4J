@@ -8,6 +8,7 @@ import com.github.squirrelgrip.scientist4k.metrics.micrometer.MicrometerMetricsP
 import com.github.squirrelgrip.scientist4k.model.ExperimentComparator
 import com.github.squirrelgrip.scientist4k.model.Publisher
 import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import io.dropwizard.metrics5.MetricName
@@ -15,7 +16,6 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
 import org.mockito.BDDMockito.given
-import org.mockito.Mockito
 import java.util.*
 
 class ExperimentTest {
@@ -110,7 +110,7 @@ class ExperimentTest {
     @Suppress("UNCHECKED_CAST")
     @Test
     fun shouldUseCustomComparator() {
-        val comparator: ExperimentComparator<Int> = Mockito.mock(ExperimentComparator::class.java) as ExperimentComparator<Int>
+        val comparator = mock<ExperimentComparator<Int>>()
         given(comparator.invoke(1, 2)).willReturn(false)
         val experiment = ExperimentBuilder<Int>()
                 .withName("test")
@@ -118,7 +118,7 @@ class ExperimentTest {
                 .withMetricsProvider(NoopMetricsProvider())
                 .build()
         experiment.run({ 1 }, { 2 })
-        verify(comparator).invoke(1, 2)
+        verify(comparator).invoke(eq(1), eq(2))
     }
 
     @Test
