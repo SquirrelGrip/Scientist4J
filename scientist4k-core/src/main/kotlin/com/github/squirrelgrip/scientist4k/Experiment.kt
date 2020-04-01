@@ -11,7 +11,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 
 open class Experiment<T>(
-        name: String,
+        val name: String,
         val raiseOnMismatch: Boolean = false,
         val metrics: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD"),
         val context: Map<String, Any> = emptyMap(),

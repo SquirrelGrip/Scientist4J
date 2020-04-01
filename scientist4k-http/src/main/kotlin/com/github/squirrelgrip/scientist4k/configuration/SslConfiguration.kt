@@ -1,4 +1,4 @@
-package com.github.squirrelgrip.scientist4k
+package com.github.squirrelgrip.scientist4k.configuration
 
 import com.github.squirrelgrip.extensions.file.toInputStream
 import java.io.File
@@ -8,7 +8,7 @@ import javax.net.ssl.KeyManagerFactory
 import javax.net.ssl.SSLContext
 import javax.net.ssl.TrustManagerFactory
 
-class SslConfiguration(
+data class SslConfiguration(
         val keyStorePath: String,
         val keyStorePassword: String,
         val keyStoreType: String = KeyStore.getDefaultType(),

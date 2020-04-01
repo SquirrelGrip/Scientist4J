@@ -1,14 +1,24 @@
 package com.github.squirrelgrip.scientist4k
 
+import com.github.squirrelgrip.scientist4k.configuration.ExperimentConfiguration
 import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
 import com.github.squirrelgrip.scientist4k.model.DefaultExperimentComparator
 import com.github.squirrelgrip.scientist4k.model.ExperimentComparator
+import com.github.squirrelgrip.scientist4k.model.sample.SampleFactory
 
-class ExperimentBuilder<T> {
-    private var name: String = "Test"
-    private var metricsProvider: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD")
+class ExperimentBuilder<T>(
+    private var name: String = "Test",
+    private var metricsProvider: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD"),
+    private var raiseOnMismatch: Boolean = false,
+    private var sampleFactory: SampleFactory = SampleFactory(),
     private var comparator: ExperimentComparator<T> = DefaultExperimentComparator()
-    private var raiseOnMismatch: Boolean = false
+) {
+    constructor(experimentConfiguration: ExperimentConfiguration): this(
+        experimentConfiguration.name,
+        experimentConfiguration.metrics,
+        experimentConfiguration.raiseOnMismatch,
+        experimentConfiguration.sampleFactory
+    )
 
     fun withName(name: String): ExperimentBuilder<T> {
         this.name = name
@@ -35,8 +45,13 @@ class ExperimentBuilder<T> {
         return this
     }
 
+    fun withSampleFactory(sampleFactory: SampleFactory): ExperimentBuilder<T> {
+        this.sampleFactory = sampleFactory
+        return this
+    }
+
     fun build(): Experiment<T> {
-        return Experiment(name, raiseOnMismatch, metricsProvider, mutableMapOf(), comparator)
+        return Experiment(name, raiseOnMismatch, metricsProvider, mutableMapOf(), comparator, sampleFactory)
     }
 
 }

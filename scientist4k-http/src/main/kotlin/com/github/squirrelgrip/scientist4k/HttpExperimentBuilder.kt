@@ -1,21 +1,36 @@
 package com.github.squirrelgrip.scientist4k
 
+import com.github.squirrelgrip.scientist4k.configuration.HttpExperimentConfiguration
+import com.github.squirrelgrip.scientist4k.configuration.SslConfiguration
 import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
 import com.github.squirrelgrip.scientist4k.model.ExperimentComparator
+import com.github.squirrelgrip.scientist4k.model.HttpResponseComparator
 import com.github.squirrelgrip.scientist4k.model.sample.SampleFactory
 import org.apache.http.HttpResponse
 
-class HttpExperimentBuilder {
-    private var sampleFactory: SampleFactory = SampleFactory()
-    private var controlUrl: String = ""
-    private var candidateUrl: String = ""
-    private var name: String = "Test"
-    private var metricsProvider: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD")
-    private var comparator: ExperimentComparator<HttpResponse> = HttpResponseComparator()
-    private var raiseOnMismatch: Boolean = false
-    private var allowedMethods: List<String> = listOf("GET")
-    private var controlSslConfiguration: SslConfiguration? = null
-    private var candidateSslConfiguration: SslConfiguration? = null
+class HttpExperimentBuilder(
+        private var name: String = "Test",
+        private var metrics: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD"),
+        private var raiseOnMismatch: Boolean = false,
+        private var sampleFactory: SampleFactory = SampleFactory(),
+        private var comparator: ExperimentComparator<HttpResponse> = HttpResponseComparator(),
+        private var controlUrl: String = "",
+        private var candidateUrl: String = "",
+        private var allowedMethods: List<String> = listOf("GET"),
+        private var controlSslConfiguration: SslConfiguration? = null,
+        private var candidateSslConfiguration: SslConfiguration? = null
+) {
+    constructor(httpExperimentConfiguration: HttpExperimentConfiguration) : this(
+            name = httpExperimentConfiguration.experimentConfig.name,
+            metrics = httpExperimentConfiguration.experimentConfig.metrics,
+            raiseOnMismatch = httpExperimentConfiguration.experimentConfig.raiseOnMismatch,
+            sampleFactory = httpExperimentConfiguration.experimentConfig.sampleFactory,
+            controlUrl = httpExperimentConfiguration.controlUrl,
+            candidateUrl = httpExperimentConfiguration.candidateUrl,
+            allowedMethods = httpExperimentConfiguration.allowedMethods,
+            controlSslConfiguration = httpExperimentConfiguration.controlSslConfiguration,
+            candidateSslConfiguration = httpExperimentConfiguration.candidateSslConfiguration
+    )
 
     fun withName(name: String): HttpExperimentBuilder {
         this.name = name
@@ -23,12 +38,12 @@ class HttpExperimentBuilder {
     }
 
     fun withMetricsProvider(metricsProvider: String): HttpExperimentBuilder {
-        this.metricsProvider = MetricsProvider.build(metricsProvider)
+        this.metrics = MetricsProvider.build(metricsProvider)
         return this
     }
 
     fun withMetricsProvider(metricsProvider: MetricsProvider<*>): HttpExperimentBuilder {
-        this.metricsProvider = metricsProvider
+        this.metrics = metricsProvider
         return this
     }
 
@@ -73,7 +88,7 @@ class HttpExperimentBuilder {
     }
 
     fun build(): HttpExperiment {
-        return HttpExperiment(name, raiseOnMismatch, metricsProvider, mutableMapOf(), comparator, sampleFactory, controlUrl, candidateUrl, allowedMethods, controlSslConfiguration, candidateSslConfiguration)
+        return HttpExperiment(name, raiseOnMismatch, metrics, mutableMapOf(), comparator, sampleFactory, controlUrl, candidateUrl, allowedMethods, controlSslConfiguration, candidateSslConfiguration)
     }
 
 }

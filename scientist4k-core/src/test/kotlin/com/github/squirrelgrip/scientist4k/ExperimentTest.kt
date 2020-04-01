@@ -1,17 +1,21 @@
 package com.github.squirrelgrip.scientist4k
 
+import com.github.squirrelgrip.scientist4k.configuration.ExperimentConfiguration
 import com.github.squirrelgrip.scientist4k.exceptions.MismatchException
 import com.github.squirrelgrip.scientist4k.metrics.NoopMetricsProvider
 import com.github.squirrelgrip.scientist4k.metrics.dropwizard.DropwizardMetricsProvider
 import com.github.squirrelgrip.scientist4k.metrics.micrometer.MicrometerMetricsProvider
 import com.github.squirrelgrip.scientist4k.model.ExperimentComparator
+import com.github.squirrelgrip.scientist4k.model.Publisher
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.verify
 import io.dropwizard.metrics5.MetricName
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
 import org.mockito.BDDMockito.given
 import org.mockito.Mockito
-import org.mockito.Mockito.verify
 import java.util.*
 
 class ExperimentTest {
@@ -115,5 +119,32 @@ class ExperimentTest {
                 .build()
         experiment.run({ 1 }, { 2 })
         verify(comparator).invoke(1, 2)
+    }
+
+    @Test
+    fun `build() using ExperimentConfiguration`() {
+        val experimentConfiguration = ExperimentConfiguration(
+                "name",
+                true,
+                "NOOP",
+                emptyMap(),
+                "prefix"
+        )
+        val experiment = ExperimentBuilder<Int>(experimentConfiguration).build()
+
+        assertThat(experiment.name).isEqualTo("name")
+        assertThat(experiment.raiseOnMismatch).isEqualTo(true)
+        assertThat(experiment.metrics.javaClass).isEqualTo(NoopMetricsProvider::class.java)
+        assertThat(experiment.context).containsAllEntriesOf(emptyMap())
+        assertThat(experiment.sampleFactory.prefix).isEqualTo("prefix")
+    }
+
+    @Test
+    fun `publisher is called`() {
+        val publisher = mock<Publisher<Int>>()
+        val experiment = ExperimentBuilder<Int>().withRaiseOnMismatch(true).build()
+        experiment.addPublisher(publisher)
+        experiment.run({safeFunction()}, {safeFunction()})
+        verify(publisher).publish(any())
     }
 }

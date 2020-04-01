@@ -1,6 +1,5 @@
-package com.github.squirrelgrip.scientist4k
+package com.github.squirrelgrip.scientist4k.model
 
-import com.github.squirrelgrip.scientist4k.model.ExperimentComparator
 import org.apache.http.Header
 import org.apache.http.HttpResponse
 import org.apache.http.StatusLine

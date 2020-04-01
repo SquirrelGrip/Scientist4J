@@ -1,7 +1,10 @@
 package com.github.squirrelgrip.scientist4k
 
+import com.github.squirrelgrip.scientist4k.configuration.HttpExperimentConfiguration
+import com.github.squirrelgrip.scientist4k.configuration.SslConfiguration
 import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
 import com.github.squirrelgrip.scientist4k.model.ExperimentComparator
+import com.github.squirrelgrip.scientist4k.model.HttpResponseComparator
 import com.github.squirrelgrip.scientist4k.model.sample.SampleFactory
 import org.apache.http.HttpResponse
 import org.apache.http.client.CookieStore
@@ -16,11 +19,10 @@ import org.apache.http.impl.client.HttpClients
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
-
 class HttpExperiment(
         name: String,
         raiseOnMismatch: Boolean,
-        metricsProvider: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD"),
+        metrics: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD"),
         context: Map<String, Any> = emptyMap(),
         comparator: ExperimentComparator<HttpResponse> = HttpResponseComparator(),
         sampleFactory: SampleFactory = SampleFactory(),
@@ -32,23 +34,22 @@ class HttpExperiment(
 ) : Experiment<HttpResponse>(
         name,
         raiseOnMismatch,
-        metricsProvider,
+        metrics,
         context,
         comparator,
         sampleFactory
 ) {
-    constructor(httpExperimentConfig: HttpExperimentConfig) : this(
-            httpExperimentConfig.name,
-            httpExperimentConfig.raiseOnMismatch,
-            MetricsProvider.build(httpExperimentConfig.metricsProvider),
-            httpExperimentConfig.context,
-            httpExperimentConfig.comparator,
-            SampleFactory(httpExperimentConfig.sampleFactory.prefix),
-            httpExperimentConfig.controlUrl,
-            httpExperimentConfig.candidateUrl,
-            httpExperimentConfig.allowedMethods,
-            httpExperimentConfig.controlSslConfiguration,
-            httpExperimentConfig.candidateSslConfiguration
+    constructor(httpExperimentConfiguration: HttpExperimentConfiguration) : this(
+            name = httpExperimentConfiguration.experimentConfig.name,
+            raiseOnMismatch = httpExperimentConfiguration.experimentConfig.raiseOnMismatch,
+            metrics = httpExperimentConfiguration.experimentConfig.metrics,
+            context = httpExperimentConfiguration.experimentConfig.context,
+            sampleFactory = httpExperimentConfiguration.experimentConfig.sampleFactory,
+            controlUrl = httpExperimentConfiguration.controlUrl,
+            candidateUrl = httpExperimentConfiguration.candidateUrl,
+            allowedMethods = httpExperimentConfiguration.allowedMethods,
+            controlSslConfiguration = httpExperimentConfiguration.controlSslConfiguration,
+            candidateSslConfiguration = httpExperimentConfiguration.candidateSslConfiguration
     )
 
     fun run(

@@ -1,14 +1,24 @@
 package com.github.squirrelgrip.scientist4k
 
+import com.github.squirrelgrip.scientist4k.configuration.ExperimentConfiguration
 import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
 import com.github.squirrelgrip.scientist4k.model.DefaultExperimentComparator
 import com.github.squirrelgrip.scientist4k.model.ExperimentComparator
+import com.github.squirrelgrip.scientist4k.model.sample.SampleFactory
 
-class ControlledExperimentBuilder<T> {
-    private var name: String = "Test"
-    private var metricsProvider: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD")
+class ControlledExperimentBuilder<T>(
+    private var name: String = "Test",
+    private var metricsProvider: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD"),
+    private var raiseOnMismatch: Boolean = false,
+    private var sampleFactory: SampleFactory = SampleFactory(),
     private var comparator: ExperimentComparator<T> = DefaultExperimentComparator()
-    private var raiseOnMismatch: Boolean = false
+) {
+    constructor(experimentConfiguration: ExperimentConfiguration): this(
+            experimentConfiguration.name,
+            experimentConfiguration.metrics,
+            experimentConfiguration.raiseOnMismatch,
+            experimentConfiguration.sampleFactory
+    )
 
     fun withName(name: String): ControlledExperimentBuilder<T> {
         this.name = name
@@ -30,8 +40,13 @@ class ControlledExperimentBuilder<T> {
         return this
     }
 
+    fun withSampleFactory(sampleFactory: SampleFactory): ControlledExperimentBuilder<T> {
+        this.sampleFactory = sampleFactory
+        return this
+    }
+
     fun build(): ControlledExperiment<T> {
-        return ControlledExperiment(name, raiseOnMismatch, metricsProvider, mutableMapOf(), comparator)
+        return ControlledExperiment(name, raiseOnMismatch, metricsProvider, mutableMapOf(), comparator, sampleFactory)
     }
 
 }
