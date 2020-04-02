@@ -15,7 +15,7 @@ data class SslConfiguration(
         val trustStorePath: String,
         val trustStorePassword: String,
         val trustStoreType: String = KeyStore.getDefaultType(),
-        val algorithm: String = "TLSv1.2"
+        val algorithm: String = "TLS"
 ) {
 
     fun sslContext(): SSLContext = SSLContext.getInstance(algorithm).apply {

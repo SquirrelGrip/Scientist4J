@@ -27,8 +27,9 @@
         <micrometer.version>1.4.0</micrometer.version>
         <mockito.version>3.3.3</mockito.version>
 
-        <extensions.version>1.0.5</extensions.version>
+        <extensions.version>1.0.6-SNAPSHOT</extensions.version>
         <slf4j.version>1.7.30</slf4j.version>
+        <spring-boot.version>2.2.6.RELEASE</spring-boot.version>
     </properties>
 
     <dependencyManagement>
@@ -42,6 +43,11 @@
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
                 <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.awaitility</groupId>
+                <artifactId>awaitility</artifactId>
+                <version>4.0.2</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.module</groupId>
@@ -102,6 +108,11 @@
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-inline</artifactId>
                 <version>${mockito.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-jetty</artifactId>
+                <version>${spring-boot.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

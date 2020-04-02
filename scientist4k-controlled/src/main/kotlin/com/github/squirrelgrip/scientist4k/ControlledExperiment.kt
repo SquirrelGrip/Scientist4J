@@ -2,6 +2,7 @@ package com.github.squirrelgrip.scientist4k
 
 import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
 import com.github.squirrelgrip.scientist4k.model.*
+import com.github.squirrelgrip.scientist4k.model.sample.Sample
 import com.github.squirrelgrip.scientist4k.model.sample.SampleFactory
 
 open class ControlledExperiment<T>(
@@ -78,11 +79,11 @@ open class ControlledExperiment<T>(
     }
 
     private fun retrieveOrStoreResult(result: Result<T>): Result<T>? {
-        val matchingResult = matchingMap[result.sample.sampleId]
+        val matchingResult = matchingMap[result.sample.id]
         if (matchingResult == null) {
-            matchingMap[result.sample.sampleId] = result
+            matchingMap[result.sample.id] = result
         } else {
-            matchingMap.remove(result.sample.sampleId)
+            matchingMap.remove(result.sample.id)
         }
         return matchingResult
     }

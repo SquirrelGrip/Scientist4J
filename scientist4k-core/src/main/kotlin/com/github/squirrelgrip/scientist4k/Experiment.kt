@@ -4,6 +4,7 @@ import com.github.squirrelgrip.scientist4k.metrics.Counter
 import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
 import com.github.squirrelgrip.scientist4k.metrics.Timer
 import com.github.squirrelgrip.scientist4k.model.*
+import com.github.squirrelgrip.scientist4k.model.sample.Sample
 import com.github.squirrelgrip.scientist4k.model.sample.SampleFactory
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.GlobalScope
@@ -65,7 +66,6 @@ open class Experiment<T>(
         } else {
             null
         }
-
         if (candidateObservation != null) {
             publishResult(candidateObservation, controlObservation, sample).handleComparisonMismatch()
         }
@@ -155,9 +155,11 @@ open class Experiment<T>(
 
     open fun publish(result: Result<T>) {
         publishers.forEach { it.publish(result) }
+        result.sample.published.set(true)
     }
 
     companion object {
         private const val NAMESPACE_PREFIX = "scientist"
     }
+
 }

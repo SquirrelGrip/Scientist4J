@@ -29,6 +29,6 @@ data class ExperimentConfiguration(
 
     companion object {
         fun loadFromFile(file: File)=
-                file.toInstance(ExperimentConfiguration::class.java)
+                file.toInstance<ExperimentConfiguration>()
     }
 }

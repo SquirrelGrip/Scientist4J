@@ -16,7 +16,7 @@ data class HttpExperimentConfiguration(
 
     companion object {
         fun loadFromFile(file: File) =
-                file.toInstance(HttpExperimentConfiguration::class.java)
+                file.toInstance<HttpExperimentConfiguration>()
     }
 
 }

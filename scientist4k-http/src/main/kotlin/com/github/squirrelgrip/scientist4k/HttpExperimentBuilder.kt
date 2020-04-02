@@ -2,29 +2,30 @@ package com.github.squirrelgrip.scientist4k
 
 import com.github.squirrelgrip.scientist4k.configuration.EndPointConfiguration
 import com.github.squirrelgrip.scientist4k.configuration.HttpExperimentConfiguration
+import com.github.squirrelgrip.scientist4k.exceptions.LaboratoryException
 import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
 import com.github.squirrelgrip.scientist4k.model.ExperimentComparator
 import com.github.squirrelgrip.scientist4k.model.HttpResponseComparator
 import com.github.squirrelgrip.scientist4k.model.sample.SampleFactory
 import org.apache.http.HttpResponse
 
-class HttpExperimentBuilder(
-        private var name: String = "Test",
-        private var metrics: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD"),
-        private var raiseOnMismatch: Boolean = false,
-        private var sampleFactory: SampleFactory = SampleFactory(),
-        private var comparator: ExperimentComparator<HttpResponse> = HttpResponseComparator(),
-        private var controlConfig: EndPointConfiguration,
-        private var candidateConfig: EndPointConfiguration
-) {
-    constructor(httpExperimentConfiguration: HttpExperimentConfiguration) : this(
-            name = httpExperimentConfiguration.experiment.name,
-            metrics = httpExperimentConfiguration.experiment.metrics,
-            raiseOnMismatch = httpExperimentConfiguration.experiment.raiseOnMismatch,
-            sampleFactory = httpExperimentConfiguration.experiment.sampleFactory,
-            controlConfig = httpExperimentConfiguration.control,
-            candidateConfig = httpExperimentConfiguration.candidate
-    )
+class HttpExperimentBuilder() {
+    private var name: String = "Test"
+    private var metrics: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD")
+    private var raiseOnMismatch: Boolean = false
+    private var sampleFactory: SampleFactory = SampleFactory()
+    private var comparator: ExperimentComparator<HttpResponse> = HttpResponseComparator()
+    private var controlConfig: EndPointConfiguration? = null
+    private var candidateConfig: EndPointConfiguration? = null
+
+    constructor(httpExperimentConfiguration: HttpExperimentConfiguration) : this() {
+        name = httpExperimentConfiguration.experiment.name
+        metrics = httpExperimentConfiguration.experiment.metrics
+        raiseOnMismatch = httpExperimentConfiguration.experiment.raiseOnMismatch
+        sampleFactory = httpExperimentConfiguration.experiment.sampleFactory
+        controlConfig = httpExperimentConfiguration.control
+        candidateConfig = httpExperimentConfiguration.candidate
+    }
 
     fun withName(name: String): HttpExperimentBuilder {
         this.name = name
@@ -67,7 +68,10 @@ class HttpExperimentBuilder(
     }
 
     fun build(): HttpExperiment {
-        return HttpExperiment(name, raiseOnMismatch, metrics, mutableMapOf(), comparator, sampleFactory, controlConfig, candidateConfig)
+        if (controlConfig != null && candidateConfig != null) {
+            return HttpExperiment(name, raiseOnMismatch, metrics, mutableMapOf(), comparator, sampleFactory, controlConfig!!, candidateConfig!!)
+        }
+        throw LaboratoryException("Both control and candidate configurations must be set")
     }
 
 }

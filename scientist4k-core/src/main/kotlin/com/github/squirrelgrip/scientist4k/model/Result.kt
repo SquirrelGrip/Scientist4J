@@ -2,6 +2,7 @@ package com.github.squirrelgrip.scientist4k.model
 
 import com.github.squirrelgrip.scientist4k.Experiment
 import com.github.squirrelgrip.scientist4k.exceptions.MismatchException
+import com.github.squirrelgrip.scientist4k.model.sample.Sample
 
 class Result<T>(
         private val experiment: Experiment<T>,

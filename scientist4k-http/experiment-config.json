@@ -1,0 +1,41 @@
+{
+  "experiment": {
+    "name": "name",
+    "context": {},
+    "raiseOnMismatch": false,
+    "metricsProvider": "DROPWIZARD",
+    "sampleFactory": {
+      "prefix": ""
+    }
+  },
+  "control": {
+    "url": "https://adrian-macbook-pro.local:9002",
+    "sslConfiguration": {
+      "keyStorePath": "keystore.jks",
+      "keyStorePassword": "password",
+      "keyStoreType": "JKS",
+      "trustStorePath": "keystore.jks",
+      "trustStorePassword": "password",
+      "trustStoreType": "JKS",
+      "algorithm": "TLSv1.2"
+    },
+    "allowedMethods": [
+      "*"
+    ]
+  },
+  "candidate": {
+    "url": "https://adrian-macbook-pro.local:9012",
+    "sslConfiguration": {
+      "keyStorePath": "keystore.jks",
+      "keyStorePassword": "password",
+      "keyStoreType": "JKS",
+      "trustStorePath": "keystore.jks",
+      "trustStorePassword": "password",
+      "trustStoreType": "JKS",
+      "algorithm": "TLSv1.2"
+    },
+    "allowedMethods": [
+      "GET"
+    ]
+  }
+}

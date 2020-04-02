@@ -19,7 +19,7 @@ internal class ExperimentConfigurationTest {
                 "prefix"
         )
         val json = experimentConfiguration1.toJson()
-        val experimentConfiguration2 = json.toInstance(ExperimentConfiguration::class.java)
+        val experimentConfiguration2 = json.toInstance<ExperimentConfiguration>()
         assertThat(experimentConfiguration2.name).isEqualTo(experimentConfiguration1.name)
         assertThat(experimentConfiguration2.raiseOnMismatch).isEqualTo(experimentConfiguration1.raiseOnMismatch)
         assertThat(experimentConfiguration2.metrics.javaClass).isEqualTo(experimentConfiguration1.metrics.javaClass)
