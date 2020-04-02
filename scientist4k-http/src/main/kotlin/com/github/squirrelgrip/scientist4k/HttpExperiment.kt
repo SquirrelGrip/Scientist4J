@@ -1,5 +1,6 @@
 package com.github.squirrelgrip.scientist4k
 
+import com.github.squirrelgrip.scientist4k.configuration.EndPointConfiguration
 import com.github.squirrelgrip.scientist4k.configuration.HttpExperimentConfiguration
 import com.github.squirrelgrip.scientist4k.configuration.SslConfiguration
 import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
@@ -26,11 +27,8 @@ class HttpExperiment(
         context: Map<String, Any> = emptyMap(),
         comparator: ExperimentComparator<HttpResponse> = HttpResponseComparator(),
         sampleFactory: SampleFactory = SampleFactory(),
-        val controlUrl: String,
-        val candidateUrl: String,
-        val allowedMethods: List<String> = listOf("GET"),
-        val controlSslConfiguration: SslConfiguration? = null,
-        val candidateSslConfiguration: SslConfiguration? = null
+        val controlConfig: EndPointConfiguration,
+        val candidateConfig: EndPointConfiguration
 ) : Experiment<HttpResponse>(
         name,
         raiseOnMismatch,
@@ -39,19 +37,6 @@ class HttpExperiment(
         comparator,
         sampleFactory
 ) {
-    constructor(httpExperimentConfiguration: HttpExperimentConfiguration) : this(
-            name = httpExperimentConfiguration.experimentConfig.name,
-            raiseOnMismatch = httpExperimentConfiguration.experimentConfig.raiseOnMismatch,
-            metrics = httpExperimentConfiguration.experimentConfig.metrics,
-            context = httpExperimentConfiguration.experimentConfig.context,
-            sampleFactory = httpExperimentConfiguration.experimentConfig.sampleFactory,
-            controlUrl = httpExperimentConfiguration.controlUrl,
-            candidateUrl = httpExperimentConfiguration.candidateUrl,
-            allowedMethods = httpExperimentConfiguration.allowedMethods,
-            controlSslConfiguration = httpExperimentConfiguration.controlSslConfiguration,
-            candidateSslConfiguration = httpExperimentConfiguration.candidateSslConfiguration
-    )
-
     fun run(
             inboundRequest: HttpServletRequest,
             inboundResponse: HttpServletResponse
@@ -59,7 +44,7 @@ class HttpExperiment(
         try {
             val sample = sampleFactory.create()
             sample.add(inboundRequest.requestURI)
-            val controlResponse = if (allowedMethods.contains("*") or allowedMethods.contains(inboundRequest.method)) {
+            val controlResponse = if (controlConfig.allowedMethods.contains("*") or controlConfig.allowedMethods.contains(inboundRequest.method)) {
                 run(createControlRequest(inboundRequest), createCandidateRequest(inboundRequest), sample)
             } else {
                 createControlRequest(inboundRequest).invoke()
@@ -89,11 +74,11 @@ class HttpExperiment(
     }
 
     private fun createControlRequest(request: HttpServletRequest): () -> HttpResponse {
-        return createRequest(request, controlUrl, "CONTROL_COOKIE_STORE", controlSslConfiguration)
+        return createRequest(request, controlConfig.url, "CONTROL_COOKIE_STORE", controlConfig.sslConfiguration)
     }
 
     private fun createCandidateRequest(request: HttpServletRequest): () -> HttpResponse {
-        return createRequest(request, candidateUrl, "CANDIDATE_COOKIE_STORE", candidateSslConfiguration)
+        return createRequest(request, candidateConfig.url, "CANDIDATE_COOKIE_STORE", candidateConfig.sslConfiguration)
     }
 
     private fun createRequest(

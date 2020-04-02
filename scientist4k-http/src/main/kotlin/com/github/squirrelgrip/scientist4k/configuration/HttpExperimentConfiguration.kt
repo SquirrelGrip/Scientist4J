@@ -6,12 +6,9 @@ import com.github.squirrelgrip.extensions.json.toInstance
 import java.io.File
 
 data class HttpExperimentConfiguration(
-        val experimentConfig: ExperimentConfiguration,
-        val controlUrl: String,
-        val candidateUrl: String,
-        val allowedMethods: List<String> = listOf("GET"),
-        val controlSslConfiguration: SslConfiguration? = null,
-        val candidateSslConfiguration: SslConfiguration? = null
+        val experiment: ExperimentConfiguration,
+        val control: EndPointConfiguration,
+        val candidate: EndPointConfiguration
 ) {
     fun saveToFile(file: File) {
         ObjectMapper().registerModule(KotlinModule()).writeValue(file, this)

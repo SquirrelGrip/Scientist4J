@@ -1,7 +1,7 @@
 package com.github.squirrelgrip.scientist4k
 
+import com.github.squirrelgrip.scientist4k.configuration.EndPointConfiguration
 import com.github.squirrelgrip.scientist4k.configuration.HttpExperimentConfiguration
-import com.github.squirrelgrip.scientist4k.configuration.SslConfiguration
 import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
 import com.github.squirrelgrip.scientist4k.model.ExperimentComparator
 import com.github.squirrelgrip.scientist4k.model.HttpResponseComparator
@@ -14,22 +14,16 @@ class HttpExperimentBuilder(
         private var raiseOnMismatch: Boolean = false,
         private var sampleFactory: SampleFactory = SampleFactory(),
         private var comparator: ExperimentComparator<HttpResponse> = HttpResponseComparator(),
-        private var controlUrl: String = "",
-        private var candidateUrl: String = "",
-        private var allowedMethods: List<String> = listOf("GET"),
-        private var controlSslConfiguration: SslConfiguration? = null,
-        private var candidateSslConfiguration: SslConfiguration? = null
+        private var controlConfig: EndPointConfiguration,
+        private var candidateConfig: EndPointConfiguration
 ) {
     constructor(httpExperimentConfiguration: HttpExperimentConfiguration) : this(
-            name = httpExperimentConfiguration.experimentConfig.name,
-            metrics = httpExperimentConfiguration.experimentConfig.metrics,
-            raiseOnMismatch = httpExperimentConfiguration.experimentConfig.raiseOnMismatch,
-            sampleFactory = httpExperimentConfiguration.experimentConfig.sampleFactory,
-            controlUrl = httpExperimentConfiguration.controlUrl,
-            candidateUrl = httpExperimentConfiguration.candidateUrl,
-            allowedMethods = httpExperimentConfiguration.allowedMethods,
-            controlSslConfiguration = httpExperimentConfiguration.controlSslConfiguration,
-            candidateSslConfiguration = httpExperimentConfiguration.candidateSslConfiguration
+            name = httpExperimentConfiguration.experiment.name,
+            metrics = httpExperimentConfiguration.experiment.metrics,
+            raiseOnMismatch = httpExperimentConfiguration.experiment.raiseOnMismatch,
+            sampleFactory = httpExperimentConfiguration.experiment.sampleFactory,
+            controlConfig = httpExperimentConfiguration.control,
+            candidateConfig = httpExperimentConfiguration.candidate
     )
 
     fun withName(name: String): HttpExperimentBuilder {
@@ -62,33 +56,18 @@ class HttpExperimentBuilder(
         return this
     }
 
-    fun withControlUrl(controlUrl: String): HttpExperimentBuilder {
-        this.controlUrl = controlUrl
+    fun withControlConfig(controlConfiguration: EndPointConfiguration): HttpExperimentBuilder {
+        this.controlConfig = controlConfiguration
         return this
     }
 
-    fun withCandidateUrl(candidateUrl: String): HttpExperimentBuilder {
-        this.candidateUrl = candidateUrl
-        return this
-    }
-
-    fun withAllowedMethods(allowedMethods: List<String>): HttpExperimentBuilder {
-        this.allowedMethods = allowedMethods
-        return this
-    }
-
-    fun withControlSslConfiguration(controlSslConfiguration: SslConfiguration): HttpExperimentBuilder {
-        this.controlSslConfiguration = controlSslConfiguration
-        return this
-    }
-
-    fun withCandidateSslConfiguration(candidateSslConfiguration: SslConfiguration): HttpExperimentBuilder {
-        this.candidateSslConfiguration = candidateSslConfiguration
+    fun withCandidateConfig(candidateConfiguration: EndPointConfiguration): HttpExperimentBuilder {
+        this.candidateConfig = candidateConfiguration
         return this
     }
 
     fun build(): HttpExperiment {
-        return HttpExperiment(name, raiseOnMismatch, metrics, mutableMapOf(), comparator, sampleFactory, controlUrl, candidateUrl, allowedMethods, controlSslConfiguration, candidateSslConfiguration)
+        return HttpExperiment(name, raiseOnMismatch, metrics, mutableMapOf(), comparator, sampleFactory, controlConfig, candidateConfig)
     }
 
 }
