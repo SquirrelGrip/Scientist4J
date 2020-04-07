@@ -42,7 +42,8 @@ class HttpExperimentTest {
                     "IP_ADDRESS" to getLocalAddress(),
                     "HOSTNAME" to getHostName()
             )
-            Cheti.execute(Cheti.loadConfiguration(chetiConfigurationTemplate, context))
+            val cheti = Cheti()
+            cheti.execute(cheti.loadConfiguration(chetiConfigurationTemplate, context))
 
             val controlServer = SecuredServer(9011, 9012, CandidateHandler(), sslConfiguration)
             val candidateServer = SecuredServer(9001, 9002, ControlHandler(), sslConfiguration)
