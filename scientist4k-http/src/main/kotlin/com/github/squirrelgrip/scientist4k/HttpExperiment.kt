@@ -1,0 +1,81 @@
+package com.github.squirrelgrip.scientist4k
+
+import com.github.squirrelgrip.scientist4k.configuration.EndPointConfiguration
+import com.github.squirrelgrip.scientist4k.factory.RequestFactory
+import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
+import com.github.squirrelgrip.scientist4k.model.ExperimentComparator
+import com.github.squirrelgrip.scientist4k.model.HttpResponseComparator
+import com.github.squirrelgrip.scientist4k.model.sample.Sample
+import com.github.squirrelgrip.scientist4k.model.sample.SampleFactory
+import org.apache.http.HttpResponse
+import javax.servlet.http.HttpServletRequest
+import javax.servlet.http.HttpServletResponse
+
+class HttpExperiment(
+        name: String,
+        raiseOnMismatch: Boolean,
+        metrics: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD"),
+        context: Map<String, Any> = emptyMap(),
+        comparator: ExperimentComparator<HttpResponse> = HttpResponseComparator(),
+        sampleFactory: SampleFactory = SampleFactory(),
+        private val controlConfig: EndPointConfiguration,
+        private val candidateConfig: EndPointConfiguration
+) : Experiment<HttpResponse>(
+        name,
+        raiseOnMismatch,
+        metrics,
+        context,
+        comparator,
+        sampleFactory
+) {
+    private val controlRequestFactory = RequestFactory(controlConfig, "CONTROL_COOKIE_STORE")
+    private val candidateRequestFactory = RequestFactory(candidateConfig, "CANDIDATE_COOKIE_STORE")
+
+    fun run(
+            inboundRequest: HttpServletRequest,
+            inboundResponse: HttpServletResponse,
+            sample: Sample = sampleFactory.create()
+    ) {
+        sample.addNote("uri", inboundRequest.requestURI)
+        try {
+            val controlResponse = if (controlConfig.allowedMethods.contains("*") or controlConfig.allowedMethods.contains(inboundRequest.method)) {
+                run(createControlRequest(inboundRequest), createCandidateRequest(inboundRequest), sample)
+            } else {
+                createControlRequest(inboundRequest).invoke()
+            }
+            processResponse(inboundResponse, controlResponse)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        inboundResponse.flushBuffer()
+        sample.awaitPublished()
+   }
+
+    private fun processResponse(
+            inboundResponse: HttpServletResponse,
+            controlResponse: HttpResponse?
+    ) {
+        if (controlResponse != null) {
+            val bytes = controlResponse.entity.content.readBytes()
+            inboundResponse.status = controlResponse.statusLine.statusCode
+            controlResponse.allHeaders.forEach {
+                inboundResponse.addHeader(it.name, it.value)
+            }
+            inboundResponse.outputStream.write(bytes)
+        } else {
+            inboundResponse.status = 500
+            inboundResponse.writer.println("Something went wrong with experiment")
+        }
+    }
+
+    private fun createControlRequest(request: HttpServletRequest): () -> HttpResponse {
+        return controlRequestFactory.create(request)
+    }
+
+    private fun createCandidateRequest(request: HttpServletRequest): () -> HttpResponse {
+        return candidateRequestFactory.create(request)
+    }
+
+}
+
+

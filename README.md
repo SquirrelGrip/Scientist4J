@@ -10,7 +10,7 @@ A port of Github's refactoring tool [Scientist](https://github.com/github/scient
 ```xml
 <dependency>
     <groupId>com.github.squirrelgrip</groupId>
-    <artifactId>Scientist4KCore</artifactId>
+    <artifactId>ccientist4k-core</artifactId>
     <version>0.1</version>
 </dependency>
 ```
