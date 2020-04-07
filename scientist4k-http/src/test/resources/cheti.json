@@ -1,0 +1,116 @@
+{
+  "common": {
+    "location": "bouncy-castle"
+  },
+  "certificates": [
+    {
+      "name": "RootCA",
+      "type": "ROOT",
+      "generate": "ALWAYS",
+      "location": "target/certs",
+      "validFor": "1D",
+      "subject": {
+        "cn": "RootCA",
+        "ou": "SquirrelGrip",
+        "o": "Github",
+        "st": "Singapore",
+        "l": "Singapore",
+        "c": "SG"
+      }
+    },
+    {
+      "name": "SigningCA",
+      "type": "SIGNING",
+      "generate": "ALWAYS",
+      "location": "target/certs",
+      "issuer": "RootCA",
+      "validFor": "1D",
+      "subject": {
+        "cn": "SigningCA",
+        "ou": "SquirrelGrip",
+        "o": "Github",
+        "st": "Singapore",
+        "l": "Singapore",
+        "c": "SG"
+      }
+    },
+    {
+      "name": "Server",
+      "type": "SERVER",
+      "generate": "ALWAYS",
+      "location": "target/certs",
+      "issuer": "SigningCA",
+      "validFor": "1D",
+      "subject": {
+        "cn": "Server"
+      },
+      "extensions": {
+        "altSubject": {
+          "critical": false,
+          "value": [
+            {
+              "type": "IPAddress",
+              "value": "${IP_ADDRESS}"
+            },
+            {
+              "type": "DNSName",
+              "value": "${HOSTNAME}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Client",
+      "type": "CLIENT",
+      "generate": "ALWAYS",
+      "location": "target/certs",
+      "issuer": "SigningCA",
+      "validFor": "1D",
+      "subject": {
+        "cn": "Client"
+      }
+    }
+  ],
+  "keystores": [
+    {
+      "name": "keystore.jks",
+      "type": "JKS",
+      "password": "password",
+      "location": "target/certs",
+      "chains": [
+        "Server",
+        "Client"
+      ]
+    },
+    {
+      "name": "keystore.p12",
+      "type": "PKCS12",
+      "password": "password",
+      "location": "target/certs",
+      "chains": [
+        "Server",
+        "Client"
+      ]
+    }
+  ],
+  "chains": [
+    {
+      "alias": "Server",
+      "chain": [
+        "Server",
+        "SigningCA",
+        "RootCA"
+      ]
+    },
+    {
+      "alias": "Client",
+      "chain": [
+        "Client",
+        "SigningCA",
+        "RootCA"
+      ]
+    }
+  ]
+
+}

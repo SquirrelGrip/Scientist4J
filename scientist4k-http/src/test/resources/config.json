@@ -11,19 +11,19 @@
     "GET"
   ],
   "controlSslConfiguration": {
-    "keyStorePath": "keystore.jks",
+    "keyStorePath": "target/certs/keystore.jks",
     "keyStorePassword": "password",
     "keyStoreType": "JKS",
-    "trustStorePath": "keystore.jks",
+    "trustStorePath": "target/certs/keystore.jks",
     "trustStorePassword": "password",
     "trustStoreType": "JKS",
     "algorithm": "TLSv1.2"
   },
   "candidateSslConfiguration": {
-    "keyStorePath": "keystore.jks",
+    "keyStorePath": "target/certs/keystore.jks",
     "keyStorePassword": "password",
     "keyStoreType": "JKS",
-    "trustStorePath": "keystore.jks",
+    "trustStorePath": "target/certs/keystore.jks",
     "trustStorePassword": "password",
     "trustStoreType": "JKS",
     "algorithm": "TLSv1.2"

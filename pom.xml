@@ -19,6 +19,7 @@
         <dokka.version>0.10.1</dokka.version>
 
         <assertj.version>3.15.0</assertj.version>
+        <cheti.version>1.0.2</cheti.version>
         <dropwizard-metrics.version>5.0.0</dropwizard-metrics.version>
         <jackson.version>2.10.3</jackson.version>
         <junit-jupiter.version>5.6.1</junit-jupiter.version>
@@ -27,7 +28,7 @@
         <micrometer.version>1.4.0</micrometer.version>
         <mockito.version>3.3.3</mockito.version>
 
-        <extensions.version>1.0.6-SNAPSHOT</extensions.version>
+        <extensions.version>1.0.6</extensions.version>
         <slf4j.version>1.7.30</slf4j.version>
         <spring-boot.version>2.2.6.RELEASE</spring-boot.version>
     </properties>
@@ -113,6 +114,11 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-jetty</artifactId>
                 <version>${spring-boot.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.squirrelgrip</groupId>
+                <artifactId>cheti</artifactId>
+                <version>${cheti.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

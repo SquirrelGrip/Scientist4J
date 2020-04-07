@@ -1,5 +1,8 @@
 package com.github.squirrelgrip.scientist4k
 
+import com.github.squirrelgrip.cheti.Cheti
+import com.github.squirrelgrip.cheti.getHostName
+import com.github.squirrelgrip.cheti.getLocalAddress
 import com.github.squirrelgrip.extensions.json.toInstance
 import com.github.squirrelgrip.scientist4k.configuration.HttpExperimentConfiguration
 import com.github.squirrelgrip.scientist4k.configuration.SslConfiguration
@@ -34,6 +37,13 @@ class HttpExperimentTest {
         @JvmStatic
         @BeforeAll
         fun beforeAll() {
+            val chetiConfigurationTemplate = Thread.currentThread().contextClassLoader.getResourceAsStream("cheti.json")
+            val context = mapOf(
+                    "IP_ADDRESS" to getLocalAddress(),
+                    "HOSTNAME" to getHostName()
+            )
+            Cheti.execute(Cheti.loadConfiguration(chetiConfigurationTemplate, context))
+
             val controlServer = SecuredServer(9011, 9012, CandidateHandler(), sslConfiguration)
             val candidateServer = SecuredServer(9001, 9002, ControlHandler(), sslConfiguration)
 

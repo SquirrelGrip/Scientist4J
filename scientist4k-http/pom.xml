@@ -12,6 +12,7 @@
     <properties>
         <httpclient.version>4.5.12</httpclient.version>
         <javax.servlet-api.version>4.0.1</javax.servlet-api.version>
+        <cheti.version>1.0.2-SNAPSHOT</cheti.version>
     </properties>
 
     <dependencies>
@@ -77,6 +78,10 @@
             <groupId>org.awaitility</groupId>
             <artifactId>awaitility</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.squirrelgrip</groupId>
+            <artifactId>cheti</artifactId>
         </dependency>
     </dependencies>
 
