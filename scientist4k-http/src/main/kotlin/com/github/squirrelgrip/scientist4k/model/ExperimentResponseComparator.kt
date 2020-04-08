@@ -1,19 +1,19 @@
 package com.github.squirrelgrip.scientist4k.model
 
 import org.apache.http.Header
-import org.apache.http.HttpResponse
 import org.apache.http.StatusLine
 
-class HttpResponseComparator(
+class ExperimentResponseComparator(
         val debug: Boolean = false
-) : ExperimentComparator<HttpResponse> {
+) : ExperimentComparator<ExperimentResponse> {
     private val statusLineComparator = StatusLineComparator()
     private val headersComparator = HeadersComparator()
 
-    override fun invoke(control: HttpResponse?, candidate: HttpResponse?): Boolean {
+    override fun invoke(control: ExperimentResponse?, candidate: ExperimentResponse?): Boolean {
         if (control != null && candidate != null) {
-            return statusLineComparator.invoke(control.statusLine, candidate.statusLine)
-                    && headersComparator.invoke(control.allHeaders, candidate.allHeaders)
+            val statusLineMatch = statusLineComparator.invoke(control.status, candidate.status)
+            val headerMatch = headersComparator.invoke(control.headers, candidate.headers)
+            return statusLineMatch && headerMatch
         }
         return control == null && candidate == null
     }
@@ -22,8 +22,9 @@ class HttpResponseComparator(
 class StatusLineComparator : ExperimentComparator<StatusLine> {
     override fun invoke(control: StatusLine?, candidate: StatusLine?): Boolean {
         if (control != null && candidate != null) {
-            return control.statusCode == candidate.statusCode
-                    && control.protocolVersion.isComparable(candidate.protocolVersion)
+            val statusCodeMatch = control.statusCode == candidate.statusCode
+            val protocolMatch = control.protocolVersion.isComparable(candidate.protocolVersion)
+            return statusCodeMatch && protocolMatch
         }
         return control == null && candidate == null
     }

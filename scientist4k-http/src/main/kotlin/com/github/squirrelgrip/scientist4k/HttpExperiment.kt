@@ -4,10 +4,10 @@ import com.github.squirrelgrip.scientist4k.configuration.EndPointConfiguration
 import com.github.squirrelgrip.scientist4k.factory.RequestFactory
 import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
 import com.github.squirrelgrip.scientist4k.model.ExperimentComparator
-import com.github.squirrelgrip.scientist4k.model.HttpResponseComparator
+import com.github.squirrelgrip.scientist4k.model.ExperimentResponse
+import com.github.squirrelgrip.scientist4k.model.ExperimentResponseComparator
 import com.github.squirrelgrip.scientist4k.model.sample.Sample
 import com.github.squirrelgrip.scientist4k.model.sample.SampleFactory
-import org.apache.http.HttpResponse
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
@@ -16,11 +16,11 @@ class HttpExperiment(
         raiseOnMismatch: Boolean,
         metrics: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD"),
         context: Map<String, Any> = emptyMap(),
-        comparator: ExperimentComparator<HttpResponse> = HttpResponseComparator(),
+        comparator: ExperimentComparator<ExperimentResponse> = ExperimentResponseComparator(),
         sampleFactory: SampleFactory = SampleFactory(),
         private val controlConfig: EndPointConfiguration,
         private val candidateConfig: EndPointConfiguration
-) : Experiment<HttpResponse>(
+) : Experiment<ExperimentResponse>(
         name,
         raiseOnMismatch,
         metrics,
@@ -47,32 +47,31 @@ class HttpExperiment(
         } catch (e: Exception) {
             e.printStackTrace()
         }
-        inboundResponse.flushBuffer()
         sample.awaitPublished()
    }
 
     private fun processResponse(
             inboundResponse: HttpServletResponse,
-            controlResponse: HttpResponse?
+            controlResponse: ExperimentResponse?
     ) {
         if (controlResponse != null) {
-            val bytes = controlResponse.entity.content.readBytes()
-            inboundResponse.status = controlResponse.statusLine.statusCode
-            controlResponse.allHeaders.forEach {
+            inboundResponse.status = controlResponse.status.statusCode
+            controlResponse.headers.forEach {
                 inboundResponse.addHeader(it.name, it.value)
             }
-            inboundResponse.outputStream.write(bytes)
+            inboundResponse.outputStream.write(controlResponse.content)
         } else {
             inboundResponse.status = 500
-            inboundResponse.writer.println("Something went wrong with experiment")
+            inboundResponse.writer.println("Something went wrong with the experiment")
         }
+        inboundResponse.flushBuffer()
     }
 
-    private fun createControlRequest(request: HttpServletRequest): () -> HttpResponse {
+    private fun createControlRequest(request: HttpServletRequest): () -> ExperimentResponse {
         return controlRequestFactory.create(request)
     }
 
-    private fun createCandidateRequest(request: HttpServletRequest): () -> HttpResponse {
+    private fun createCandidateRequest(request: HttpServletRequest): () -> ExperimentResponse {
         return candidateRequestFactory.create(request)
     }
 

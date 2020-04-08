@@ -1,8 +1,10 @@
 package com.github.squirrelgrip.scientist4k.factory
 
 import com.github.squirrelgrip.scientist4k.configuration.EndPointConfiguration
+import com.github.squirrelgrip.scientist4k.model.ExperimentResponse
 import org.apache.http.HttpResponse
 import org.apache.http.client.CookieStore
+import org.apache.http.client.ResponseHandler
 import org.apache.http.client.methods.HttpUriRequest
 import org.apache.http.client.methods.RequestBuilder
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory
@@ -19,7 +21,7 @@ class RequestFactory(
 ) {
     fun create(
             request: HttpServletRequest
-    ): () -> HttpResponse {
+    ): () -> ExperimentResponse {
         return {
             val session = getSession(request)
             val cookieStore = session.getAttribute(cookieStoreAttributeName) as CookieStore
@@ -27,7 +29,15 @@ class RequestFactory(
             createHttpClient(cookieStore).use {
                 val url = buildUrl(request)
                 val httpUriRequest: HttpUriRequest = createRequest(request, url)
-                val response = it.execute(httpUriRequest)
+
+                val responseHandler = ResponseHandler<ExperimentResponse> { response ->
+                    ExperimentResponse(
+                            response.statusLine,
+                            response.allHeaders,
+                            response.entity
+                    )
+                }
+                val response = it.execute(httpUriRequest, responseHandler)
                 session.setAttribute(cookieStoreAttributeName, cookieStore)
                 response
             }

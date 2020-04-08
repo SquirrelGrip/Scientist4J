@@ -5,6 +5,7 @@ import com.github.squirrelgrip.cheti.getHostName
 import com.github.squirrelgrip.cheti.getLocalAddress
 import com.github.squirrelgrip.extensions.json.toInstance
 import com.github.squirrelgrip.scientist4k.configuration.HttpExperimentConfiguration
+import com.github.squirrelgrip.scientist4k.model.ExperimentResponse
 import com.github.squirrelgrip.scientist4k.model.Publisher
 import com.github.squirrelgrip.scientist4k.model.Result
 import org.apache.http.HttpResponse
@@ -65,10 +66,10 @@ class HttpExperimentServerTest {
         }
      }
 
-    var actualResult: Result<HttpResponse>? = null
+    var actualResult: Result<ExperimentResponse>? = null
 
-    val publisher = object : Publisher<HttpResponse> {
-        override fun publish(result: Result<HttpResponse>) {
+    val publisher = object : Publisher<ExperimentResponse> {
+        override fun publish(result: Result<ExperimentResponse>) {
             actualResult = result
         }
     }
@@ -100,7 +101,7 @@ class HttpExperimentServerTest {
         testSubject.stop()
     }
 
-    private fun awaitResult(): Result<HttpResponse> {
+    private fun awaitResult(): Result<ExperimentResponse> {
         Awaitility.await().atMost(5, TimeUnit.SECONDS).until { actualResult != null }
         assertThat(actualResult).isNotNull()
         return actualResult!!
