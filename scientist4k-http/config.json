@@ -1,9 +1,0 @@
-{
-  "keyStorePath": "target/certs/keystore.jks",
-  "keyStorePassword": "password",
-  "keyStoreType": "JKS",
-  "trustStorePath": "target/certs/keystore.jks",
-  "trustStorePassword": "password",
-  "trustStoreType": "JKS",
-  "algorithm": "TLSv1.2"
-}

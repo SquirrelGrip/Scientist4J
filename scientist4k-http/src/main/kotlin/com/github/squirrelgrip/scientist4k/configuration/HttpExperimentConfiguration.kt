@@ -6,6 +6,7 @@ import com.github.squirrelgrip.extensions.json.toInstance
 import java.io.File
 
 data class HttpExperimentConfiguration(
+        val server: ServerConfiguration,
         val experiment: ExperimentConfiguration,
         val control: EndPointConfiguration,
         val candidate: EndPointConfiguration
