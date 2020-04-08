@@ -5,7 +5,6 @@ import com.github.squirrelgrip.cheti.getHostName
 import com.github.squirrelgrip.cheti.getLocalAddress
 import com.github.squirrelgrip.extensions.json.toInstance
 import com.github.squirrelgrip.scientist4k.configuration.HttpExperimentConfiguration
-import com.github.squirrelgrip.scientist4k.configuration.SslConfiguration
 import com.github.squirrelgrip.scientist4k.model.Publisher
 import com.github.squirrelgrip.scientist4k.model.Result
 import org.apache.http.HttpResponse
@@ -22,7 +21,7 @@ import java.io.File
 import java.util.concurrent.TimeUnit
 
 
-class HttpExperimentTest {
+class HttpExperimentServerTest {
 
     companion object {
         private val HTTP_CONTROL_URL = "http://${getLocalAddress()}:9001"
@@ -74,7 +73,7 @@ class HttpExperimentTest {
         }
     }
 
-    lateinit var experimentServer: SecuredServer
+    lateinit var testSubject: HttpExperimentServer
 
     @BeforeEach
     fun beforeEach() {
@@ -90,15 +89,15 @@ class HttpExperimentTest {
                 control = control,
                 candidate = candidate
         )
-        experimentServer = HttpExperimentServer(configuration)
-        (experimentServer.handler as ExperimentHandler).experiment.addPublisher(publisher)
-        experimentServer.start()
+        testSubject = HttpExperimentServer(configuration)
+        (testSubject.handler as ExperimentHandler).experiment.addPublisher(publisher)
+        testSubject.start()
         assertIsRunning(HTTP_EXPERIMENT_URL)
     }
 
     @AfterEach
     fun afterEach() {
-        experimentServer.stop()
+        testSubject.stop()
     }
 
     private fun awaitResult(): Result<HttpResponse> {
