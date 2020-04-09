@@ -50,6 +50,7 @@ class HttpExperiment(
     ) {
         val experimentRequest = ExperimentRequest.create(inboundRequest)
         sample.addNote("request", experimentRequest.toString())
+        sample.addNote("uri", experimentRequest.url)
         val controlResponse = if (candidateConfig.allowedMethods.contains("*") or candidateConfig.allowedMethods.contains(inboundRequest.method)) {
             run(createControlRequest(experimentRequest), createCandidateRequest(experimentRequest), sample)
         } else {
