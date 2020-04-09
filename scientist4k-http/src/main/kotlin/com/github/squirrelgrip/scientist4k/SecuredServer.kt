@@ -15,9 +15,9 @@ open class SecuredServer(
 
     init {
         val serverConnectors = serverConfiguration.getServerConnectors(server)
-        serverConnectors.forEach {
-            println(it.port)
-        }
+//        serverConnectors.forEach {
+//            println(it.port)
+//        }
         server.connectors = serverConnectors
         server.sessionIdManager = DefaultSessionIdManager(server)
         ContextHandler("/").also { contextHandler ->

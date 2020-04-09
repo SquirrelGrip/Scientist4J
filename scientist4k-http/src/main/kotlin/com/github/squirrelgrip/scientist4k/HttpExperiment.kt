@@ -3,6 +3,7 @@ package com.github.squirrelgrip.scientist4k
 import com.github.squirrelgrip.scientist4k.configuration.EndPointConfiguration
 import com.github.squirrelgrip.scientist4k.factory.RequestFactory
 import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
+import com.github.squirrelgrip.scientist4k.model.ExperimentRequest
 import com.github.squirrelgrip.scientist4k.model.ExperimentComparator
 import com.github.squirrelgrip.scientist4k.model.ExperimentResponse
 import com.github.squirrelgrip.scientist4k.model.ExperimentResponseComparator
@@ -38,10 +39,11 @@ class HttpExperiment(
     ) {
         sample.addNote("uri", inboundRequest.requestURI)
         try {
+            val experimentRequest = ExperimentRequest.create(inboundRequest)
             val controlResponse = if (candidateConfig.allowedMethods.contains("*") or candidateConfig.allowedMethods.contains(inboundRequest.method)) {
-                run(createControlRequest(inboundRequest), createCandidateRequest(inboundRequest), sample)
+                run(createControlRequest(experimentRequest), createCandidateRequest(experimentRequest), sample)
             } else {
-                createControlRequest(inboundRequest).invoke()
+                createControlRequest(experimentRequest).invoke()
             }
             processResponse(inboundResponse, controlResponse)
         } catch (e: Exception) {
@@ -67,11 +69,11 @@ class HttpExperiment(
         inboundResponse.flushBuffer()
     }
 
-    private fun createControlRequest(request: HttpServletRequest): () -> ExperimentResponse {
+    private fun createControlRequest(request: ExperimentRequest): () -> ExperimentResponse {
         return controlRequestFactory.create(request)
     }
 
-    private fun createCandidateRequest(request: HttpServletRequest): () -> ExperimentResponse {
+    private fun createCandidateRequest(request: ExperimentRequest): () -> ExperimentResponse {
         return candidateRequestFactory.create(request)
     }
 

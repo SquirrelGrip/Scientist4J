@@ -34,7 +34,7 @@ class ControlHandler : AbstractHandler() {
             request: HttpServletRequest,
             response: HttpServletResponse
     ) {
-        println("${request.method} ${request.requestURL}")
+//        println("${request.method} ${request.requestURL}")
         val out = response.writer
         when (target) {
             "/candidate" -> {
