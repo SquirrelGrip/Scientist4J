@@ -3,10 +3,7 @@ package com.github.squirrelgrip.scientist4k
 import com.github.squirrelgrip.scientist4k.configuration.EndPointConfiguration
 import com.github.squirrelgrip.scientist4k.factory.RequestFactory
 import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
-import com.github.squirrelgrip.scientist4k.model.ExperimentRequest
-import com.github.squirrelgrip.scientist4k.model.ExperimentComparator
-import com.github.squirrelgrip.scientist4k.model.ExperimentResponse
-import com.github.squirrelgrip.scientist4k.model.ExperimentResponseComparator
+import com.github.squirrelgrip.scientist4k.model.*
 import com.github.squirrelgrip.scientist4k.model.sample.Sample
 import com.github.squirrelgrip.scientist4k.model.sample.SampleFactory
 import javax.servlet.http.HttpServletRequest
@@ -32,25 +29,34 @@ class HttpExperiment(
     private val controlRequestFactory = RequestFactory(controlConfig, "CONTROL_COOKIE_STORE")
     private val candidateRequestFactory = RequestFactory(candidateConfig, "CANDIDATE_COOKIE_STORE")
 
+    init{
+        addPublisher(object: Publisher<ExperimentResponse> {
+            override fun publish(result: Result<ExperimentResponse>) {
+                println("${result.match} => ${result.sample.notes["uri"]}")
+                if (!result.match) {
+                    println("\t${result.sample.notes["request"]}")
+                    println("\t${result.control.value}")
+                    println("\t${result.candidate?.value}")
+                }
+            }
+
+        })
+    }
+
     fun run(
             inboundRequest: HttpServletRequest,
             inboundResponse: HttpServletResponse,
             sample: Sample = sampleFactory.create()
     ) {
-        sample.addNote("uri", inboundRequest.requestURI)
-        try {
-            val experimentRequest = ExperimentRequest.create(inboundRequest)
-            val controlResponse = if (candidateConfig.allowedMethods.contains("*") or candidateConfig.allowedMethods.contains(inboundRequest.method)) {
-                run(createControlRequest(experimentRequest), createCandidateRequest(experimentRequest), sample)
-            } else {
-                createControlRequest(experimentRequest).invoke()
-            }
-            processResponse(inboundResponse, controlResponse)
-        } catch (e: Exception) {
-            e.printStackTrace()
+        val experimentRequest = ExperimentRequest.create(inboundRequest)
+        sample.addNote("request", experimentRequest.toString())
+        val controlResponse = if (candidateConfig.allowedMethods.contains("*") or candidateConfig.allowedMethods.contains(inboundRequest.method)) {
+            run(createControlRequest(experimentRequest), createCandidateRequest(experimentRequest), sample)
+        } else {
+            createControlRequest(experimentRequest).invoke()
         }
-        sample.awaitPublished()
-   }
+        processResponse(inboundResponse, controlResponse)
+    }
 
     private fun processResponse(
             inboundResponse: HttpServletResponse,
