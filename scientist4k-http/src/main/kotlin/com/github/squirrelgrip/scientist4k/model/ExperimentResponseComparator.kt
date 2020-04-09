@@ -43,10 +43,14 @@ class HeadersComparator : ExperimentComparator<Array<Header>> {
     private val headerComparator = HeaderComparator()
     override fun invoke(control: Array<Header>?, candidate: Array<Header>?): Boolean {
         if (control != null && candidate != null) {
-            val controlMap = control.map {
+            val controlMap = control.filter {
+                it.name != "Set-Cookie"
+            }.map {
                 it.name to it
             }.toMap()
-            val candidateMap = candidate.map {
+            val candidateMap = candidate.filter {
+                it.name != "Set-Cookie"
+            }.map {
                 it.name to it
             }.toMap()
             return controlMap.filter { (key: String, header: Header) ->
