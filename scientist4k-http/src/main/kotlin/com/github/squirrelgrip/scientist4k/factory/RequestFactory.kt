@@ -13,7 +13,9 @@ import org.apache.http.entity.InputStreamEntity
 import org.apache.http.impl.client.BasicCookieStore
 import org.apache.http.impl.client.CloseableHttpClient
 import org.apache.http.impl.client.HttpClients
+import org.apache.http.protocol.HTTP.CONTENT_LEN
 import javax.servlet.http.HttpServletRequest
+import javax.servlet.http.HttpSession
 
 class RequestFactory(
         val endPointConfig: EndPointConfiguration,
@@ -23,14 +25,13 @@ class RequestFactory(
             request: HttpServletRequest
     ): () -> ExperimentResponse {
         return {
-            val session = getSession(request)
-            val cookieStore = session.getAttribute(cookieStoreAttributeName) as CookieStore
-
+            val session: HttpSession? = getSession(request)
+            val cookieStore: CookieStore? = session?.getAttribute(cookieStoreAttributeName) as CookieStore
             createHttpClient(cookieStore).use {
                 val url = buildUrl(request)
                 val httpUriRequest: HttpUriRequest = createRequest(request, url)
 
-                val responseHandler = ResponseHandler<ExperimentResponse> { response ->
+                val responseHandler = ResponseHandler { response ->
                     ExperimentResponse(
                             response.statusLine,
                             response.allHeaders,
@@ -38,7 +39,9 @@ class RequestFactory(
                     )
                 }
                 val response = it.execute(httpUriRequest, responseHandler)
-                session.setAttribute(cookieStoreAttributeName, cookieStore)
+                if (cookieStore != null) {
+                    getSession(request)?.setAttribute(cookieStoreAttributeName, cookieStore)
+                }
                 response
             }
         }
@@ -56,14 +59,19 @@ class RequestFactory(
         return RequestBuilder.create(request.method).apply {
             setUri(url)
             request.headerNames.iterator().forEach { headerName ->
-                setHeader(headerName, request.getHeader(headerName))
+                if (headerName != CONTENT_LEN) {
+                    setHeader(headerName, request.getHeader(headerName))
+                }
             }
             entity = InputStreamEntity(request.inputStream, request.contentLengthLong, ContentType.getByMimeType(request.contentType))
         }.build()
     }
 
-    private fun createHttpClient(cookieStore: CookieStore): CloseableHttpClient {
-        val clientBuilder = HttpClients.custom().setDefaultCookieStore(cookieStore)
+    private fun createHttpClient(cookieStore: CookieStore?): CloseableHttpClient {
+        val clientBuilder = HttpClients.custom()
+        if (cookieStore != null) {
+            clientBuilder.setDefaultCookieStore(cookieStore)
+        }
         if (endPointConfig.sslConfiguration != null) {
             clientBuilder.setSSLSocketFactory(
                     SSLConnectionSocketFactory(
@@ -75,11 +83,16 @@ class RequestFactory(
         return clientBuilder.build()
     }
 
-    private fun getSession(request: HttpServletRequest) =
-            request.session.apply {
+    private fun getSession(request: HttpServletRequest): HttpSession? {
+        val session = request.getSession(false)
+        if (session != null) {
+            return session.apply {
                 if (getAttribute(cookieStoreAttributeName) == null) {
                     setAttribute(cookieStoreAttributeName, BasicCookieStore())
                 }
             }
+        }
+        return null
+    }
 
 }

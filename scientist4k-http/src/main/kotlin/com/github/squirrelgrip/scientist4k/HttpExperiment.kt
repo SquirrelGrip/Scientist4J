@@ -38,7 +38,7 @@ class HttpExperiment(
     ) {
         sample.addNote("uri", inboundRequest.requestURI)
         try {
-            val controlResponse = if (controlConfig.allowedMethods.contains("*") or controlConfig.allowedMethods.contains(inboundRequest.method)) {
+            val controlResponse = if (candidateConfig.allowedMethods.contains("*") or candidateConfig.allowedMethods.contains(inboundRequest.method)) {
                 run(createControlRequest(inboundRequest), createCandidateRequest(inboundRequest), sample)
             } else {
                 createControlRequest(inboundRequest).invoke()
