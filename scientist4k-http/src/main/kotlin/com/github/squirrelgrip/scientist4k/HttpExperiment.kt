@@ -32,11 +32,13 @@ class HttpExperiment(
     init{
         addPublisher(object: Publisher<ExperimentResponse> {
             override fun publish(result: Result<ExperimentResponse>) {
-                println("${result.match} => ${result.sample.notes["uri"]}")
-                if (!result.match) {
-                    println("\t${result.sample.notes["request"]}")
+                println("${result.match.matches} => ${result.sample.notes["uri"]}")
+                if (!result.match.matches) {
                     println("\t${result.control.value}")
                     println("\t${result.candidate?.value}")
+                    result.match.failureReasons.forEach {
+                        println("\t\t${it}")
+                    }
                 }
             }
 

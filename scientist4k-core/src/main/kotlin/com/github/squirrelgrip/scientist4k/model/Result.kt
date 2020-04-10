@@ -11,14 +11,15 @@ class Result<T>(
         val context: Map<String, Any> = emptyMap(),
         val sample: Sample
 ) {
-    val match: Boolean = if (candidate != null) {
-        experiment.compare(control, candidate)
-    } else {
-        false
-    }
+    val match =
+        if (candidate == null) {
+            ComparisonResult((listOf("Candidate observation is null")))
+        } else {
+            experiment.compare(control, candidate)
+        }
 
     fun handleComparisonMismatch() {
-        if (experiment.raiseOnMismatch && candidate != null && !match) {
+        if (experiment.raiseOnMismatch && candidate != null && !match.matches) {
             val exception = candidate.exception
             val msg = if (exception != null) {
                 val stackTrace = exception.stackTrace.toString()

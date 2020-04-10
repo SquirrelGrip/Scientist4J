@@ -117,7 +117,7 @@ class HttpExperimentServerTest {
 
         assertThat(isRunning("${HTTPS_EXPERIMENT_URL}/ok")).isTrue()
 
-        assertThat(awaitResult().match).isTrue()
+        assertThat(awaitResult().match.matches).isTrue()
     }
 
     @Test
@@ -126,7 +126,7 @@ class HttpExperimentServerTest {
 
         assertThat(isRunning("${HTTPS_EXPERIMENT_URL}/control")).isFalse()
 
-        assertThat(awaitResult().match).isFalse()
+        assertThat(awaitResult().match.matches).isFalse()
     }
 
     @Test
@@ -135,7 +135,7 @@ class HttpExperimentServerTest {
 
         assertThat(isRunning("${HTTPS_EXPERIMENT_URL}/candidate")).isTrue()
 
-        assertThat(awaitResult().match).isFalse()
+        assertThat(awaitResult().match.matches).isFalse()
     }
 
 }

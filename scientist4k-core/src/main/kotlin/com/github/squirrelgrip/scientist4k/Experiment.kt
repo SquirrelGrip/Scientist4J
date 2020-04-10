@@ -132,14 +132,17 @@ open class Experiment<T>(
         return observation
     }
 
-    fun compare(control: Observation<T>, candidate: Observation<T>): Boolean {
-        val resultsMatch = candidate.exception == null && comparator.invoke(control.value, candidate.value)
-        totalCount.increment()
-        if (!resultsMatch) {
-            mismatchCount.increment()
-            return false
+    fun compare(control: Observation<T>, candidate: Observation<T>): ComparisonResult {
+        return if (candidate.exception != null) {
+            ComparisonResult("Candidate threw an exception.")
+        } else {
+            comparator.invoke(control.value, candidate.value)
+        }.apply {
+            totalCount.increment()
+            if (!matches) {
+                mismatchCount.increment()
+            }
         }
-        return true
     }
 
     open fun runIf(): Boolean {

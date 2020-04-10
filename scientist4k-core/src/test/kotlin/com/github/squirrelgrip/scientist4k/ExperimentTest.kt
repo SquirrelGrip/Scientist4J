@@ -5,6 +5,7 @@ import com.github.squirrelgrip.scientist4k.exceptions.MismatchException
 import com.github.squirrelgrip.scientist4k.metrics.NoopMetricsProvider
 import com.github.squirrelgrip.scientist4k.metrics.dropwizard.DropwizardMetricsProvider
 import com.github.squirrelgrip.scientist4k.metrics.micrometer.MicrometerMetricsProvider
+import com.github.squirrelgrip.scientist4k.model.ComparisonResult
 import com.github.squirrelgrip.scientist4k.model.ExperimentComparator
 import com.github.squirrelgrip.scientist4k.model.Publisher
 import com.nhaarman.mockitokotlin2.any
@@ -111,7 +112,7 @@ class ExperimentTest {
     @Test
     fun shouldUseCustomComparator() {
         val comparator = mock<ExperimentComparator<Int>>()
-        given(comparator.invoke(1, 2)).willReturn(false)
+        given(comparator.invoke(1, 2)).willReturn(ComparisonResult("An error"))
         val experiment = ExperimentBuilder<Int>()
                 .withName("test")
                 .withComparator(comparator)
