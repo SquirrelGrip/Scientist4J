@@ -25,12 +25,12 @@ import java.util.concurrent.TimeUnit
 class HttpExperimentServerTest {
 
     companion object {
-        private val HTTP_CONTROL_URL = "http://${getLocalAddress()}:9001"
-        private val HTTPS_CONTROL_URL = "https://${getLocalAddress()}:9002"
-        private val HTTP_CANDIDATE_URL = "http://${getLocalAddress()}:9011"
-        private val HTTPS_CANDIDATE_URL = "https://${getLocalAddress()}:9012"
-        private val HTTP_EXPERIMENT_URL = "http://${getLocalAddress()}:8999"
-        private val HTTPS_EXPERIMENT_URL = "https://${getLocalAddress()}:9000"
+        private val HTTP_CONTROL_URL = "http://localhost:9001"
+        private val HTTPS_CONTROL_URL = "https://localhost:9002"
+        private val HTTP_CANDIDATE_URL = "http://localhost:9011"
+        private val HTTPS_CANDIDATE_URL = "https://localhost:9012"
+        private val HTTP_EXPERIMENT_URL = "http://localhost:8999"
+        private val HTTPS_EXPERIMENT_URL = "https://localhost:9000"
 
         val httpExperimentConfiguration = File("experiment-config.json").toInstance<HttpExperimentConfiguration>()
 

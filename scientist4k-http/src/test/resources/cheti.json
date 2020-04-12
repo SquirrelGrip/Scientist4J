@@ -50,7 +50,11 @@
           "value": [
             {
               "type": "IPAddress",
-              "value": "${IP_ADDRESS}"
+              "value": "127.0.0.1"
+            },
+            {
+              "type": "DNSName",
+              "value": "localhost"
             }
           ]
         }
