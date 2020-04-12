@@ -1,22 +1,40 @@
 package com.github.squirrelgrip.scientist4k
 
-import com.github.squirrelgrip.extensions.json.toInstance
+import com.github.squirrelgrip.scientist4k.configuration.ConnectorConfiguration
+import com.github.squirrelgrip.scientist4k.configuration.ServerConfiguration
 import com.github.squirrelgrip.scientist4k.configuration.SslConfiguration
 import org.eclipse.jetty.server.Request
 import org.eclipse.jetty.server.handler.AbstractHandler
-import java.io.File
 import javax.servlet.http.Cookie
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 class ControlHandler : AbstractHandler() {
+    companion object {
+        val serverConfiguration = ServerConfiguration(
+                listOf(
+                        ConnectorConfiguration(9001),
+                        ConnectorConfiguration(9002,
+                                SslConfiguration("target/certs/keystore.jks",
+                                        "password",
+                                        "JKS",
+                                        "target/certs/keystore.jks",
+                                        "password",
+                                        "JKS",
+                                        "TLSv1.2"
+                                )
+                        )
+                )
+        )
+    }
+
     override fun handle(
             target: String,
             baseRequest: Request,
             request: HttpServletRequest,
             response: HttpServletResponse
     ) {
-        println("${request.method} ${request.requestURL}")
+//        println("${request.method} ${request.requestURL}")
         val out = response.writer
         when (target) {
             "/candidate" -> {
@@ -76,8 +94,7 @@ class ControlHandler : AbstractHandler() {
 }
 
 fun main() {
-    val sslConfiguration = File("config.json").toInstance<SslConfiguration>()
-    val server = SecuredServer(9001, 9002, ControlHandler(), sslConfiguration)
-    server.start();
-    server.join();
+    val server = SecuredServer(ControlHandler.serverConfiguration, CandidateHandler())
+    server.start()
+    server.join()
 }

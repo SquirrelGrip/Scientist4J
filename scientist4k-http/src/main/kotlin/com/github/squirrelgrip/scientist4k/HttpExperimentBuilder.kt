@@ -5,16 +5,16 @@ import com.github.squirrelgrip.scientist4k.configuration.HttpExperimentConfigura
 import com.github.squirrelgrip.scientist4k.exceptions.LaboratoryException
 import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
 import com.github.squirrelgrip.scientist4k.model.ExperimentComparator
-import com.github.squirrelgrip.scientist4k.model.HttpResponseComparator
+import com.github.squirrelgrip.scientist4k.model.ExperimentResponse
+import com.github.squirrelgrip.scientist4k.model.ExperimentResponseComparator
 import com.github.squirrelgrip.scientist4k.model.sample.SampleFactory
-import org.apache.http.HttpResponse
 
 class HttpExperimentBuilder() {
     private var name: String = "Test"
     private var metrics: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD")
     private var raiseOnMismatch: Boolean = false
     private var sampleFactory: SampleFactory = SampleFactory()
-    private var comparator: ExperimentComparator<HttpResponse> = HttpResponseComparator()
+    private var comparator: ExperimentComparator<ExperimentResponse> = ExperimentResponseComparator()
     private var controlConfig: EndPointConfiguration? = null
     private var candidateConfig: EndPointConfiguration? = null
 
@@ -42,7 +42,7 @@ class HttpExperimentBuilder() {
         return this
     }
 
-    fun withComparator(comparator: ExperimentComparator<HttpResponse>): HttpExperimentBuilder {
+    fun withComparator(comparator: ExperimentComparator<ExperimentResponse>): HttpExperimentBuilder {
         this.comparator = comparator
         return this
     }

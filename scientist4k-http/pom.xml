@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.github.squirrelgrip</groupId>
         <artifactId>scientist4k</artifactId>
-        <version>0.4.1</version>
+        <version>0.4.2</version>
     </parent>
     <name>${project.groupId}:${project.artifactId}</name>
 
@@ -69,12 +69,16 @@
         <dependency>
             <groupId>org.awaitility</groupId>
             <artifactId>awaitility</artifactId>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.github.squirrelgrip</groupId>
             <artifactId>cheti</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
+
     </dependencies>
 
     <build>

@@ -5,8 +5,7 @@ import com.github.squirrelgrip.cheti.getHostName
 import com.github.squirrelgrip.cheti.getLocalAddress
 import com.github.squirrelgrip.extensions.json.toInstance
 import com.github.squirrelgrip.scientist4k.configuration.HttpExperimentConfiguration
-import com.github.squirrelgrip.scientist4k.configuration.SslConfiguration
-import com.github.squirrelgrip.scientist4k.handler.ExperimentHandler
+import com.github.squirrelgrip.scientist4k.model.ExperimentResponse
 import com.github.squirrelgrip.scientist4k.model.Publisher
 import com.github.squirrelgrip.scientist4k.model.Result
 import org.apache.http.HttpResponse
@@ -15,24 +14,25 @@ import org.apache.http.conn.ssl.SSLConnectionSocketFactory
 import org.apache.http.impl.client.HttpClients
 import org.assertj.core.api.AssertionsForInterfaceTypes.assertThat
 import org.awaitility.Awaitility
-import org.junit.jupiter.api.*
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import java.io.File
 import java.util.concurrent.TimeUnit
 
 
-class HttpExperimentTest {
+class HttpExperimentServerTest {
 
     companion object {
-        private val HTTP_CONTROL_URL = "http://adrian-macbook-pro.local:9001"
-        private val HTTPS_CONTROL_URL = "https://adrian-macbook-pro.local:9002"
-        private val HTTP_CANDIDATE_URL = "http://adrian-macbook-pro.local:9011"
-        private val HTTPS_CANDIDATE_URL = "https://adrian-macbook-pro.local:9012"
-        private val HTTP_EXPERIMENT_URL = "http://adrian-macbook-pro.local:8999"
-        private val HTTPS_EXPERIMENT_URL = "https://adrian-macbook-pro.local:9000"
+        private val HTTP_CONTROL_URL = "http://localhost:9001"
+        private val HTTPS_CONTROL_URL = "https://localhost:9002"
+        private val HTTP_CANDIDATE_URL = "http://localhost:9011"
+        private val HTTPS_CANDIDATE_URL = "https://localhost:9012"
+        private val HTTP_EXPERIMENT_URL = "http://localhost:8999"
+        private val HTTPS_EXPERIMENT_URL = "https://localhost:9000"
 
-        val sslConfiguration = File("config.json").toInstance<SslConfiguration>()
         val httpExperimentConfiguration = File("experiment-config.json").toInstance<HttpExperimentConfiguration>()
-
 
         @JvmStatic
         @BeforeAll
@@ -45,18 +45,18 @@ class HttpExperimentTest {
             val cheti = Cheti()
             cheti.execute(cheti.loadConfiguration(chetiConfigurationTemplate, context))
 
-            val controlServer = SecuredServer(9011, 9012, CandidateHandler(), sslConfiguration)
-            val candidateServer = SecuredServer(9001, 9002, ControlHandler(), sslConfiguration)
+            val controlServer = SecuredServer(CandidateHandler.serverConfiguration, CandidateHandler())
+            val candidateServer = SecuredServer(ControlHandler.serverConfiguration, ControlHandler())
 
             controlServer.start()
             candidateServer.start()
         }
 
         fun isRunning(url: String): Boolean {
-            val sslConfiguration = File("config.json").toInstance<SslConfiguration>()
+            val sslConfiguration = httpExperimentConfiguration.candidate.sslConfiguration
             val httpClient = HttpClients.custom().setSSLSocketFactory(
                     SSLConnectionSocketFactory(
-                            sslConfiguration.sslContext(),
+                            sslConfiguration!!.sslContext(),
                             SSLConnectionSocketFactory.getDefaultHostnameVerifier()
                     )
             ).build()
@@ -66,15 +66,15 @@ class HttpExperimentTest {
         }
      }
 
-    var actualResult: Result<HttpResponse>? = null
+    var actualResult: Result<ExperimentResponse>? = null
 
-    val publisher = object : Publisher<HttpResponse> {
-        override fun publish(result: Result<HttpResponse>) {
+    val publisher = object : Publisher<ExperimentResponse> {
+        override fun publish(result: Result<ExperimentResponse>) {
             actualResult = result
         }
     }
 
-    lateinit var experimentServer: SecuredServer
+    lateinit var testSubject: HttpExperimentServer
 
     @BeforeEach
     fun beforeEach() {
@@ -90,26 +90,25 @@ class HttpExperimentTest {
                 control = control,
                 candidate = candidate
         )
-        val experimentHandler = ExperimentHandler(configuration)
-        experimentHandler.experiment.addPublisher(publisher)
-        experimentServer = SecuredServer(8999, 9000, experimentHandler, sslConfiguration)
-        experimentServer.start()
+        testSubject = HttpExperimentServer(configuration)
+        (testSubject.handler as ExperimentHandler).experiment.addPublisher(publisher)
+        testSubject.start()
         assertIsRunning(HTTP_EXPERIMENT_URL)
     }
 
     @AfterEach
     fun afterEach() {
-        experimentServer.stop()
+        testSubject.stop()
     }
 
-    private fun awaitResult(): Result<HttpResponse> {
+    private fun awaitResult(): Result<ExperimentResponse> {
         Awaitility.await().atMost(5, TimeUnit.SECONDS).until { actualResult != null }
         assertThat(actualResult).isNotNull()
         return actualResult!!
     }
 
     private fun assertIsRunning(url: String) {
-        Awaitility.await().atMost(5, TimeUnit.SECONDS).ignoreExceptions().until { isRunning("${url}/ok") }
+        Awaitility.await().atMost(5, TimeUnit.SECONDS).until { isRunning("${url}/ok") }
     }
 
     @Test
@@ -118,7 +117,7 @@ class HttpExperimentTest {
 
         assertThat(isRunning("${HTTPS_EXPERIMENT_URL}/ok")).isTrue()
 
-        assertThat(awaitResult().match).isTrue()
+        assertThat(awaitResult().match.matches).isTrue()
     }
 
     @Test
@@ -127,7 +126,7 @@ class HttpExperimentTest {
 
         assertThat(isRunning("${HTTPS_EXPERIMENT_URL}/control")).isFalse()
 
-        assertThat(awaitResult().match).isFalse()
+        assertThat(awaitResult().match.matches).isFalse()
     }
 
     @Test
@@ -136,7 +135,7 @@ class HttpExperimentTest {
 
         assertThat(isRunning("${HTTPS_EXPERIMENT_URL}/candidate")).isTrue()
 
-        assertThat(awaitResult().match).isFalse()
+        assertThat(awaitResult().match.matches).isFalse()
     }
 
 }

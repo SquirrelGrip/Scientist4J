@@ -4,6 +4,7 @@ import com.github.squirrelgrip.scientist4k.exceptions.MismatchException
 import com.github.squirrelgrip.scientist4k.metrics.NoopMetricsProvider
 import com.github.squirrelgrip.scientist4k.metrics.dropwizard.DropwizardMetricsProvider
 import com.github.squirrelgrip.scientist4k.metrics.micrometer.MicrometerMetricsProvider
+import com.github.squirrelgrip.scientist4k.model.ComparisonResult
 import com.github.squirrelgrip.scientist4k.model.ExperimentComparator
 import io.dropwizard.metrics5.MetricName
 import org.assertj.core.api.Assertions.assertThat
@@ -113,8 +114,8 @@ class ControlledExperimentTest {
     @Test
     fun shouldUseCustomComparator() {
         val comparator: ExperimentComparator<Int> = Mockito.mock(ExperimentComparator::class.java) as ExperimentComparator<Int>
-        given(comparator.invoke(1, 1)).willReturn(true)
-        given(comparator.invoke(1, 2)).willReturn(false)
+        given(comparator.invoke(1, 1)).willReturn(ComparisonResult.SUCCESS)
+        given(comparator.invoke(1, 2)).willReturn(ComparisonResult("Do not match"))
         val experiment: ControlledExperiment<Int> = ControlledExperimentBuilder<Int>()
                 .withName("test")
                 .withComparator(comparator)

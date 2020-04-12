@@ -1,4 +1,23 @@
 {
+  "server": {
+    "connectors": [
+      {
+        "port": 8999
+      },
+      {
+        "port": 9000,
+        "sslConfiguration": {
+          "keyStorePath": "target/certs/keystore.jks",
+          "keyStorePassword": "password",
+          "keyStoreType": "JKS",
+          "trustStorePath": "target/certs/keystore.jks",
+          "trustStorePassword": "password",
+          "trustStoreType": "JKS",
+          "algorithm": "TLSv1.2"
+        }
+      }
+    ]
+  },
   "experiment": {
     "name": "name",
     "context": {},
@@ -9,7 +28,7 @@
     }
   },
   "control": {
-    "url": "https://adrian-macbook-pro.local:9002",
+    "url": "https://10.0.1.200:9002",
     "sslConfiguration": {
       "keyStorePath": "target/certs/keystore.jks",
       "keyStorePassword": "password",
@@ -24,7 +43,7 @@
     ]
   },
   "candidate": {
-    "url": "https://adrian-macbook-pro.local:9012",
+    "url": "https://10.0.1.200:9012",
     "sslConfiguration": {
       "keyStorePath": "target/certs/keystore.jks",
       "keyStorePassword": "password",
