@@ -51,10 +51,6 @@
             {
               "type": "IPAddress",
               "value": "${IP_ADDRESS}"
-            },
-            {
-              "type": "DNSName",
-              "value": "${HOSTNAME}"
             }
           ]
         }
