@@ -2,6 +2,8 @@ package com.github.squirrelgrip.scientist4k
 
 import com.github.squirrelgrip.scientist4k.configuration.EndPointConfiguration
 import com.github.squirrelgrip.scientist4k.factory.RequestFactory
+import com.github.squirrelgrip.scientist4k.factory.RequestFactory.Companion.CONTROL_COOKIE_STORE
+import com.github.squirrelgrip.scientist4k.factory.RequestFactory.Companion.CANDIDATE_COOKIE_STORE
 import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
 import com.github.squirrelgrip.scientist4k.model.*
 import com.github.squirrelgrip.scientist4k.model.sample.Sample
@@ -26,8 +28,8 @@ class HttpExperiment(
         comparator,
         sampleFactory
 ) {
-    private val controlRequestFactory = RequestFactory(controlConfig, "CONTROL_COOKIE_STORE")
-    private val candidateRequestFactory = RequestFactory(candidateConfig, "CANDIDATE_COOKIE_STORE")
+    private val controlRequestFactory = RequestFactory(controlConfig, CONTROL_COOKIE_STORE)
+    private val candidateRequestFactory = RequestFactory(candidateConfig, CANDIDATE_COOKIE_STORE)
 
     init{
         addPublisher(object: Publisher<ExperimentResponse> {

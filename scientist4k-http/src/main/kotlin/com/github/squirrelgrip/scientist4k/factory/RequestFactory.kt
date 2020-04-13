@@ -9,20 +9,24 @@ import org.apache.http.client.ResponseHandler
 import org.apache.http.client.methods.HttpUriRequest
 import org.apache.http.client.methods.RequestBuilder
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory
-import org.apache.http.cookie.Cookie
 import org.apache.http.entity.ByteArrayEntity
 import org.apache.http.entity.ContentType
 import org.apache.http.impl.client.BasicCookieStore
 import org.apache.http.impl.client.CloseableHttpClient
 import org.apache.http.impl.client.HttpClients
-import org.apache.http.impl.cookie.BasicClientCookie
 import org.apache.http.protocol.HTTP.CONTENT_LEN
-import javax.servlet.http.HttpSession
 
 class RequestFactory(
         val endPointConfig: EndPointConfiguration,
         val cookieStoreAttributeName: String
 ) {
+    companion object {
+        val CONTROL_COOKIE_STORE = "CONTROL_COOKIE_STORE"
+        val CANDIDATE_COOKIE_STORE = "CANDIDATE_COOKIE_STORE"
+    }
+
+    val sessions: MutableMap<String, MutableMap<String, CookieStore>> = mutableMapOf()
+
     fun create(
             request: ExperimentRequest
     ): () -> ExperimentResponse {
@@ -43,14 +47,18 @@ class RequestFactory(
                 cookieStore.cookies.forEach {cookie ->
                     println("${cookie.name}=${cookie.value}")
                 }
-                getSession(request).setAttribute(cookieStoreAttributeName, cookieStore)
+                setCookieStore(request, cookieStore)
                 response
             }
         }
     }
 
+    private fun setCookieStore(request: ExperimentRequest, cookieStore: CookieStore) {
+        getSession(request)[cookieStoreAttributeName] = cookieStore
+    }
+
     private fun getCookieStore(request: ExperimentRequest): CookieStore =
-        getSession(request).getAttribute(cookieStoreAttributeName) as CookieStore
+            getSession(request)[cookieStoreAttributeName]!!
 
     private fun buildUrl(request: ExperimentRequest): String = "${endPointConfig.url}${request.url}"
 
@@ -79,18 +87,14 @@ class RequestFactory(
         return clientBuilder.build()
     }
 
-    private fun getSession(request: ExperimentRequest): HttpSession =
-            request.session.apply {
-                if (this.getAttribute(cookieStoreAttributeName) == null) {
-                    val cookieStore = BasicCookieStore()
-                    request.cookies.forEach {
-                        val cookie = BasicClientCookie(it.name, it.value)
-                        cookie.domain = it.domain
-                        cookie.path = it.path
-                        cookieStore.cookies.add(cookie)
-                    }
-                    this.setAttribute(cookieStoreAttributeName, cookieStore)
-                }
-            }
+    private fun getSession(request: ExperimentRequest): MutableMap<String, CookieStore> {
+        return sessions.computeIfAbsent(request.session.id) {
+            mutableMapOf(
+                    CONTROL_COOKIE_STORE to BasicCookieStore(),
+                    CANDIDATE_COOKIE_STORE to BasicCookieStore()
+            )
+        }
+
+    }
 
 }
