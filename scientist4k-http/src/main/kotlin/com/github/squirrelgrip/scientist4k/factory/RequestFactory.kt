@@ -12,9 +12,12 @@ import org.apache.http.client.methods.RequestBuilder
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory
 import org.apache.http.entity.ByteArrayEntity
 import org.apache.http.entity.ContentType
+import org.apache.http.impl.client.BasicCookieStore
 import org.apache.http.impl.client.CloseableHttpClient
 import org.apache.http.impl.client.HttpClients
 import org.apache.http.protocol.HTTP.CONTENT_LEN
+import javax.servlet.http.HttpServletRequest
+import javax.servlet.http.HttpSession
 
 class RequestFactory(
         val endPointConfig: EndPointConfiguration,
@@ -24,8 +27,7 @@ class RequestFactory(
             request: ExperimentRequest
     ): () -> ExperimentResponse {
         return {
-//            val cookieStore: CookieStore? = getCookieStore(request)
-            val cookieStore: CookieStore? = null
+            val cookieStore: CookieStore? = getCookieStore(request)
             createHttpClient(cookieStore).use {
                 val url = buildUrl(request)
                 val httpUriRequest: HttpUriRequest = createRequest(request, url)
@@ -38,22 +40,22 @@ class RequestFactory(
                     )
                 }
                 val response = it.execute(httpUriRequest, responseHandler)
-//                if (cookieStore != null) {
-//                    getSession(request)?.setAttribute(cookieStoreAttributeName, cookieStore)
-//                }
+                if (cookieStore != null) {
+                    getSession(request)?.setAttribute(cookieStoreAttributeName, cookieStore)
+                }
                 response
             }
         }
     }
 
-//    private fun getCookieStore(request: HttpServletRequest): CookieStore? {
-//        val session: HttpSession? = getSession(request)
-//        return if (session != null) {
-//            session.getAttribute(cookieStoreAttributeName) as CookieStore
-//        } else {
-//            null
-//        }
-//    }
+    private fun getCookieStore(request: ExperimentRequest): CookieStore? {
+        val session: HttpSession? = getSession(request)
+        return if (session != null) {
+            session.getAttribute(cookieStoreAttributeName) as CookieStore
+        } else {
+            null
+        }
+    }
 
     private fun buildUrl(request: ExperimentRequest): String {
         return "${endPointConfig.url}${request.url}"
@@ -74,9 +76,9 @@ class RequestFactory(
 
     private fun createHttpClient(cookieStore: CookieStore?): CloseableHttpClient {
         val clientBuilder = HttpClients.custom()
-//        if (cookieStore != null) {
-//            clientBuilder.setDefaultCookieStore(cookieStore)
-//        }
+        if (cookieStore != null) {
+            clientBuilder.setDefaultCookieStore(cookieStore)
+        }
         if (endPointConfig.sslConfiguration != null) {
             clientBuilder.setSSLSocketFactory(
                     SSLConnectionSocketFactory(
@@ -88,16 +90,16 @@ class RequestFactory(
         return clientBuilder.build()
     }
 
-//    private fun getSession(request: HttpServletRequest): HttpSession? {
-//        val session = request.getSession(false)
-//        if (session != null) {
-//            return session.apply {
-//                if (getAttribute(cookieStoreAttributeName) == null) {
-//                    setAttribute(cookieStoreAttributeName, BasicCookieStore())
-//                }
-//            }
-//        }
-//        return null
-//    }
+    private fun getSession(request: ExperimentRequest): HttpSession? {
+        val session = request.session
+        if (session != null) {
+            return session.apply {
+                if (this.getAttribute(cookieStoreAttributeName) == null) {
+                    this.setAttribute(cookieStoreAttributeName, BasicCookieStore())
+                }
+            }
+        }
+        return null
+    }
 
 }

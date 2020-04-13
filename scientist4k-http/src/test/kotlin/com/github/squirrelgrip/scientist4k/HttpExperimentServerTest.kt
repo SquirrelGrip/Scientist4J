@@ -38,12 +38,8 @@ class HttpExperimentServerTest {
         @BeforeAll
         fun beforeAll() {
             val chetiConfigurationTemplate = Thread.currentThread().contextClassLoader.getResourceAsStream("cheti.json")
-            val context = mapOf(
-                    "IP_ADDRESS" to getLocalAddress(),
-                    "HOSTNAME" to getHostName()
-            )
             val cheti = Cheti()
-            cheti.execute(cheti.loadConfiguration(chetiConfigurationTemplate, context))
+            cheti.execute(cheti.loadConfiguration(chetiConfigurationTemplate))
 
             val controlServer = SecuredServer(CandidateHandler.serverConfiguration, CandidateHandler())
             val candidateServer = SecuredServer(ControlHandler.serverConfiguration, ControlHandler())
