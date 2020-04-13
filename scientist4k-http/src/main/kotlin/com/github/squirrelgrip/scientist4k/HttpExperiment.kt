@@ -17,7 +17,7 @@ class HttpExperiment(
         raiseOnMismatch: Boolean,
         metrics: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD"),
         context: Map<String, Any> = emptyMap(),
-        comparator: ExperimentComparator<ExperimentResponse> = ExperimentResponseComparator(),
+        comparator: ExperimentComparator<ExperimentResponse?> = ExperimentResponseComparator(),
         sampleFactory: SampleFactory = SampleFactory(),
         private val mappings: List<MappingConfiguration> = emptyList(),
         private val controlConfig: EndPointConfiguration,

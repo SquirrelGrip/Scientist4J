@@ -16,7 +16,7 @@ open class Experiment<T>(
         val raiseOnMismatch: Boolean = false,
         val metrics: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD"),
         val context: Map<String, Any> = emptyMap(),
-        val comparator: ExperimentComparator<T> = DefaultExperimentComparator(),
+        val comparator: ExperimentComparator<T?> = DefaultExperimentComparator(),
         val sampleFactory: SampleFactory = SampleFactory()
 ) {
     /**

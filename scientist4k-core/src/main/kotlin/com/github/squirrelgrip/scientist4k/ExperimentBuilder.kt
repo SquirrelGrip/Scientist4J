@@ -11,7 +11,7 @@ class ExperimentBuilder<T>(
     private var metricsProvider: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD"),
     private var raiseOnMismatch: Boolean = false,
     private var sampleFactory: SampleFactory = SampleFactory(),
-    private var comparator: ExperimentComparator<T> = DefaultExperimentComparator()
+    private var comparator: ExperimentComparator<T?> = DefaultExperimentComparator()
 ) {
     constructor(experimentConfiguration: ExperimentConfiguration): this(
         experimentConfiguration.name,
@@ -35,7 +35,7 @@ class ExperimentBuilder<T>(
         return this
     }
 
-    fun withComparator(comparator: ExperimentComparator<T>): ExperimentBuilder<T> {
+    fun withComparator(comparator: ExperimentComparator<T?>): ExperimentBuilder<T> {
         this.comparator = comparator
         return this
     }

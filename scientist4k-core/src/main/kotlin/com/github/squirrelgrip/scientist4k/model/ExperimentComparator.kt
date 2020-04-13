@@ -3,7 +3,7 @@ package com.github.squirrelgrip.scientist4k.model
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-interface ExperimentComparator<T> : (T?, T?) -> ComparisonResult
+interface ExperimentComparator<T> : (T, T) -> ComparisonResult
 
 data class ComparisonResult(
         val failureReasons: List<String>
@@ -19,7 +19,7 @@ data class ComparisonResult(
     }
 }
 
-class DefaultExperimentComparator<T> : ExperimentComparator<T> {
+class DefaultExperimentComparator<T> : ExperimentComparator<T?> {
     companion object {
         val LOGGER: Logger = LoggerFactory.getLogger(DefaultExperimentComparator::class.java)
     }

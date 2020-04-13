@@ -111,7 +111,7 @@ class ExperimentTest {
     @Suppress("UNCHECKED_CAST")
     @Test
     fun shouldUseCustomComparator() {
-        val comparator = mock<ExperimentComparator<Int>>()
+        val comparator = mock<ExperimentComparator<Int?>>()
         given(comparator.invoke(1, 2)).willReturn(ComparisonResult("An error"))
         val experiment = ExperimentBuilder<Int>()
                 .withName("test")

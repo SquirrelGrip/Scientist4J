@@ -16,7 +16,7 @@ class HttpExperimentBuilder() {
     private var metrics: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD")
     private var raiseOnMismatch: Boolean = false
     private var sampleFactory: SampleFactory = SampleFactory()
-    private var comparator: ExperimentComparator<ExperimentResponse> = ExperimentResponseComparator()
+    private var comparator: ExperimentComparator<ExperimentResponse?> = ExperimentResponseComparator()
     private var context: Map<String, String> = emptyMap()
     private var controlConfig: EndPointConfiguration? = null
     private var candidateConfig: EndPointConfiguration? = null
@@ -48,7 +48,7 @@ class HttpExperimentBuilder() {
         return this
     }
 
-    fun withComparator(comparator: ExperimentComparator<ExperimentResponse>): HttpExperimentBuilder {
+    fun withComparator(comparator: ExperimentComparator<ExperimentResponse?>): HttpExperimentBuilder {
         this.comparator = comparator
         return this
     }
