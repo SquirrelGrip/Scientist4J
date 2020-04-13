@@ -3,8 +3,8 @@ package com.github.squirrelgrip.scientist4k.factory
 import com.github.squirrelgrip.scientist4k.configuration.EndPointConfiguration
 import com.github.squirrelgrip.scientist4k.model.ExperimentRequest
 import com.github.squirrelgrip.scientist4k.model.ExperimentResponse
+import org.apache.http.HttpRequest
 import org.apache.http.HttpVersion.HTTP_1_1
-import org.apache.http.ProtocolVersion
 import org.apache.http.client.CookieStore
 import org.apache.http.client.ResponseHandler
 import org.apache.http.client.methods.HttpUriRequest
@@ -16,7 +16,6 @@ import org.apache.http.impl.client.BasicCookieStore
 import org.apache.http.impl.client.CloseableHttpClient
 import org.apache.http.impl.client.HttpClients
 import org.apache.http.protocol.HTTP.CONTENT_LEN
-import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpSession
 
 class RequestFactory(
@@ -27,7 +26,7 @@ class RequestFactory(
             request: ExperimentRequest
     ): () -> ExperimentResponse {
         return {
-            val cookieStore: CookieStore? = getCookieStore(request)
+            val cookieStore: CookieStore = getCookieStore(request)
             createHttpClient(cookieStore).use {
                 val url = buildUrl(request)
                 val httpUriRequest: HttpUriRequest = createRequest(request, url)
@@ -40,39 +39,28 @@ class RequestFactory(
                     )
                 }
                 val response = it.execute(httpUriRequest, responseHandler)
-                if (cookieStore != null) {
-                    getSession(request)?.setAttribute(cookieStoreAttributeName, cookieStore)
-                }
+                getSession(request).setAttribute(cookieStoreAttributeName, cookieStore)
                 response
             }
         }
     }
 
-    private fun getCookieStore(request: ExperimentRequest): CookieStore? {
-        val session: HttpSession? = getSession(request)
-        return if (session != null) {
-            session.getAttribute(cookieStoreAttributeName) as CookieStore
-        } else {
-            null
-        }
-    }
+    private fun getCookieStore(request: ExperimentRequest): CookieStore =
+        getSession(request).getAttribute(cookieStoreAttributeName) as CookieStore
 
-    private fun buildUrl(request: ExperimentRequest): String {
-        return "${endPointConfig.url}${request.url}"
-    }
+    private fun buildUrl(request: ExperimentRequest): String = "${endPointConfig.url}${request.url}"
 
-    private fun createRequest(request: ExperimentRequest, url: String): HttpUriRequest {
-        return RequestBuilder.create(request.method).apply {
-            setUri(url)
-            version = HTTP_1_1
-            request.headers.forEach { (headerName, headerValue) ->
-                if (headerName != CONTENT_LEN) {
-                    setHeader(headerName, headerValue)
+    private fun createRequest(request: ExperimentRequest, url: String): HttpUriRequest =
+            RequestBuilder.create(request.method).apply {
+                setUri(url)
+                version = HTTP_1_1
+                request.headers.forEach { (headerName, headerValue) ->
+                    if (headerName != CONTENT_LEN) {
+                        setHeader(headerName, headerValue)
+                    }
                 }
-            }
-            entity = ByteArrayEntity(request.body, ContentType.getByMimeType(request.contentType))
-        }.build()
-    }
+                entity = ByteArrayEntity(request.body, ContentType.getByMimeType(request.contentType))
+            }.build()
 
     private fun createHttpClient(cookieStore: CookieStore?): CloseableHttpClient {
         val clientBuilder = HttpClients.custom()
@@ -90,16 +78,11 @@ class RequestFactory(
         return clientBuilder.build()
     }
 
-    private fun getSession(request: ExperimentRequest): HttpSession? {
-        val session = request.session
-        if (session != null) {
-            return session.apply {
+    private fun getSession(request: ExperimentRequest): HttpSession =
+            request.session.apply {
                 if (this.getAttribute(cookieStoreAttributeName) == null) {
                     this.setAttribute(cookieStoreAttributeName, BasicCookieStore())
                 }
             }
-        }
-        return null
-    }
 
 }
