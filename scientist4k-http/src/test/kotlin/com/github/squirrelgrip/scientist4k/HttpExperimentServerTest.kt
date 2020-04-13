@@ -57,7 +57,7 @@ class HttpExperimentServerTest {
             val response = httpClient.execute(request)
             return response.statusLine.statusCode == 200
         }
-     }
+    }
 
     var actualResult: Result<ExperimentResponse>? = null
 
@@ -78,7 +78,7 @@ class HttpExperimentServerTest {
         assertIsRunning(controlUrl)
         assertIsRunning(candidateUrl)
         val control = httpExperimentConfiguration.control.copy(url = controlUrl)
-        val candidate = httpExperimentConfiguration.candidate.copy(url  = candidateUrl)
+        val candidate = httpExperimentConfiguration.candidate.copy(url = candidateUrl)
         val configuration = httpExperimentConfiguration.copy(
                 control = control,
                 candidate = candidate
@@ -101,7 +101,7 @@ class HttpExperimentServerTest {
     }
 
     private fun assertIsRunning(url: String) {
-//        Awaitility.await().atMost(5, TimeUnit.SECONDS).until { isRunning("${url}/ok") }
+        Awaitility.await().atMost(5, TimeUnit.SECONDS).until { isRunning("${url}/ok") }
     }
 
     @Test
@@ -110,25 +110,63 @@ class HttpExperimentServerTest {
 
         assertThat(isRunning("${HTTPS_EXPERIMENT_URL}/ok")).isTrue()
 
-        assertThat(awaitResult().match.matches).isTrue()
+        val result = awaitResult()
+        assertThat(result.match.matches).isTrue()
+        assertThat(result.match.failureReasons).isEmpty()
+    }
+
+    @Test
+    fun `requests with different status`() {
+        createExperimentServer(HTTPS_CONTROL_URL, HTTPS_CANDIDATE_URL)
+
+        assertThat(isRunning("${HTTPS_EXPERIMENT_URL}/status")).isTrue()
+
+        val result = awaitResult()
+        assertThat(result.match.matches).isFalse()
+        assertThat(result.match.failureReasons).containsExactlyInAnyOrder(
+                "Control returned status 200 and Candidate returned status 201."
+        )
     }
 
     @Test
     fun `requests should be different when candidate doesn't exist`() {
         createExperimentServer(HTTPS_CONTROL_URL, HTTPS_CANDIDATE_URL)
 
-        assertThat(isRunning("${HTTPS_EXPERIMENT_URL}/control")).isFalse()
+        assertThat(isRunning("${HTTPS_EXPERIMENT_URL}/control")).isTrue()
 
-        assertThat(awaitResult().match.matches).isFalse()
+        val result = awaitResult()
+        assertThat(result.match.matches).isFalse()
+        assertThat(result.match.failureReasons).containsExactlyInAnyOrder(
+                "Control returned status 200 and Candidate returned status 404.",
+                "Header[Content-Type] is only in Control.",
+                "Contents different."
+        )
+    }
+
+    @Test
+    fun `request is mapped to another uri`() {
+        createExperimentServer(HTTPS_CONTROL_URL, HTTPS_CANDIDATE_URL)
+
+        assertThat(isRunning("${HTTPS_EXPERIMENT_URL}/mappedControl")).isTrue()
+
+        val result = awaitResult()
+        assertThat(result.match.matches).isTrue()
+        assertThat(result.match.failureReasons).isEmpty()
     }
 
     @Test
     fun `requests should be different when control doesn't exist`() {
         createExperimentServer(HTTPS_CONTROL_URL, HTTPS_CANDIDATE_URL)
 
-        assertThat(isRunning("${HTTPS_EXPERIMENT_URL}/candidate")).isTrue()
+        assertThat(isRunning("${HTTPS_EXPERIMENT_URL}/candidate")).isFalse()
 
-        assertThat(awaitResult().match.matches).isFalse()
+        val result = awaitResult()
+        assertThat(result.match.matches).isFalse()
+        assertThat(result.match.failureReasons).containsExactlyInAnyOrder(
+                "Control returned status 404 and Candidate returned status 200.",
+                "Header[Content-Type] is only in Candidate.",
+                "Contents different."
+        )
     }
 
 }

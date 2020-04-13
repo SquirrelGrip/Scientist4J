@@ -37,31 +37,41 @@ class ControlHandler : AbstractHandler() {
 //        println("${request.method} ${request.requestURL}")
         val out = response.writer
         when (target) {
-            "/candidate" -> {
-                response.contentType = "text/html;charset=utf-8"
+            "/control" -> {
+                response.contentType = "text/plain;charset=utf-8"
                 response.status = HttpServletResponse.SC_OK
-                out.println("<h1>Hello</h1>")
+                out.println("Control")
             }
             "/ok" -> {
                 response.contentType = "text/html;charset=utf-8"
                 response.status = HttpServletResponse.SC_OK
-                out.println("<h1>Hello</h1>")
+                out.println("<h1>OK</h1>")
+            }
+            "/differentContent" -> {
+                response.contentType = "text/plain;charset=utf-8"
+                response.status = HttpServletResponse.SC_OK
+                out.println("Control Content")
+            }
+            "/mappedControl" -> {
+                response.contentType = "text/plain;charset=utf-8"
+                response.status = HttpServletResponse.SC_OK
+                out.println("mapped")
             }
             "/status" -> {
                 response.contentType = "text/html;charset=utf-8"
                 response.status = HttpServletResponse.SC_OK
-                out.println("<h1>Hello</h1>")
+                out.println("<h1>status</h1>")
             }
             "/contentType" -> {
                 response.contentType = "text/html;charset=utf-8"
                 response.status = HttpServletResponse.SC_OK
-                out.println("<h1>Hello</h1>")
+                out.println("<h1>content type</h1>")
             }
             "/cookie" -> {
                 response.contentType = "text/html;charset=utf-8"
                 response.status = HttpServletResponse.SC_OK
                 response.addCookie(Cookie("name", "value"))
-                out.println("<h1>Hello</h1>")
+                out.println("<h1>cookie</h1>")
             }
             "/addcookie" -> {
                 response.contentType = "text/html;charset=utf-8"

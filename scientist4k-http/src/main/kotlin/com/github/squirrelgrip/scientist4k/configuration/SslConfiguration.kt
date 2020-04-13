@@ -33,8 +33,8 @@ data class SslConfiguration(
             }
 
     fun trustStore(): KeyStore {
-        if (keyStoreType == "Windows-ROOT") {
-            return KeyStore.getInstance(keyStoreType).apply {
+        if (trustStoreType == "Windows-ROOT") {
+            return KeyStore.getInstance(trustStoreType).apply {
                 load(null, null)
             }
         }

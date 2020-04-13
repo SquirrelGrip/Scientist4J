@@ -9,15 +9,11 @@ data class HttpExperimentConfiguration(
         val server: ServerConfiguration,
         val experiment: ExperimentConfiguration,
         val control: EndPointConfiguration,
-        val candidate: EndPointConfiguration
+        val candidate: EndPointConfiguration,
+        val mappings: Map<String, String> = emptyMap()
 ) {
     fun saveToFile(file: File) {
         ObjectMapper().registerModule(KotlinModule()).writeValue(file, this)
-    }
-
-    companion object {
-        fun loadFromFile(file: File) =
-                file.toInstance<HttpExperimentConfiguration>()
     }
 
 }

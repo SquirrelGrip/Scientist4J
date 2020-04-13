@@ -113,7 +113,7 @@ class ControlledExperimentTest {
     @Suppress("UNCHECKED_CAST")
     @Test
     fun shouldUseCustomComparator() {
-        val comparator: ExperimentComparator<Int> = Mockito.mock(ExperimentComparator::class.java) as ExperimentComparator<Int>
+        val comparator: ExperimentComparator<Int?> = Mockito.mock(ExperimentComparator::class.java) as ExperimentComparator<Int?>
         given(comparator.invoke(1, 1)).willReturn(ComparisonResult.SUCCESS)
         given(comparator.invoke(1, 2)).willReturn(ComparisonResult("Do not match"))
         val experiment: ControlledExperiment<Int> = ControlledExperimentBuilder<Int>()

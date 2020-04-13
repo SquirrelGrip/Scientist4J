@@ -1,6 +1,8 @@
 package com.github.squirrelgrip.scientist4k.factory
 
+import com.github.squirrelgrip.cheti.exception.InvalidConfigurationException
 import com.github.squirrelgrip.scientist4k.configuration.EndPointConfiguration
+import com.github.squirrelgrip.scientist4k.configuration.MappingConfiguration
 import com.github.squirrelgrip.scientist4k.model.ExperimentRequest
 import com.github.squirrelgrip.scientist4k.model.ExperimentResponse
 import org.apache.http.HttpVersion.HTTP_1_1
@@ -18,7 +20,8 @@ import org.apache.http.protocol.HTTP.CONTENT_LEN
 
 class RequestFactory(
         val endPointConfig: EndPointConfiguration,
-        val cookieStoreAttributeName: String
+        val cookieStoreAttributeName: String,
+        val mappingConfiguration: List<MappingConfiguration> = emptyList()
 ) {
     companion object {
         val CONTROL_COOKIE_STORE = "CONTROL_COOKIE_STORE"
@@ -60,7 +63,16 @@ class RequestFactory(
     private fun getCookieStore(request: ExperimentRequest): CookieStore =
             getSession(request)[cookieStoreAttributeName]!!
 
-    private fun buildUrl(request: ExperimentRequest): String = "${endPointConfig.url}${request.url}"
+    private fun buildUrl(request: ExperimentRequest): String {
+        var url = request.url
+        val replacements = mappingConfiguration.filter {
+            it.matches(url)
+        }
+        replacements.forEach {
+            url = it.replace(url)
+        }
+        return "${endPointConfig.url}$url"
+    }
 
     private fun createRequest(request: ExperimentRequest, url: String): HttpUriRequest =
             RequestBuilder.create(request.method).apply {

@@ -11,7 +11,8 @@ class ControlledExperimentBuilder<T>(
     private var metricsProvider: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD"),
     private var raiseOnMismatch: Boolean = false,
     private var sampleFactory: SampleFactory = SampleFactory(),
-    private var comparator: ExperimentComparator<T> = DefaultExperimentComparator()
+    private var comparator: ExperimentComparator<T?> = DefaultExperimentComparator(),
+    private var context: Map<String, String> = emptyMap()
 ) {
     constructor(experimentConfiguration: ExperimentConfiguration): this(
             experimentConfiguration.name,
@@ -30,7 +31,7 @@ class ControlledExperimentBuilder<T>(
         return this
     }
 
-    fun withComparator(comparator: ExperimentComparator<T>): ControlledExperimentBuilder<T> {
+    fun withComparator(comparator: ExperimentComparator<T?>): ControlledExperimentBuilder<T> {
         this.comparator = comparator
         return this
     }
@@ -40,13 +41,18 @@ class ControlledExperimentBuilder<T>(
         return this
     }
 
+    fun withContext(context: Map<String, String>): ControlledExperimentBuilder<T> {
+        this.context = context
+        return this
+    }
+
     fun withSampleFactory(sampleFactory: SampleFactory): ControlledExperimentBuilder<T> {
         this.sampleFactory = sampleFactory
         return this
     }
 
     fun build(): ControlledExperiment<T> {
-        return ControlledExperiment(name, raiseOnMismatch, metricsProvider, mutableMapOf(), comparator, sampleFactory)
+        return ControlledExperiment(name, raiseOnMismatch, metricsProvider, context, comparator, sampleFactory)
     }
 
 }
