@@ -28,7 +28,7 @@ data class ExperimentRequest(
                     getUrl(inboundRequest),
                     inboundRequest.protocol,
                     headers,
-                    inboundRequest.cookies,
+                    inboundRequest.cookies ?: emptyArray(),
                     inboundRequest.contentType,
                     inboundRequest.inputStream.readBytes(),
                     inboundRequest.getSession(true)

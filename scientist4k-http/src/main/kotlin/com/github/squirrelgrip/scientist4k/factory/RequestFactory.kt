@@ -66,11 +66,8 @@ class RequestFactory(
                 entity = ByteArrayEntity(request.body, ContentType.getByMimeType(request.contentType))
             }.build()
 
-    private fun createHttpClient(cookieStore: CookieStore?): CloseableHttpClient {
-        val clientBuilder = HttpClients.custom()
-        if (cookieStore != null) {
-            clientBuilder.setDefaultCookieStore(cookieStore)
-        }
+    private fun createHttpClient(cookieStore: CookieStore): CloseableHttpClient {
+        val clientBuilder = HttpClients.custom().setDefaultCookieStore(cookieStore)
         if (endPointConfig.sslConfiguration != null) {
             clientBuilder.setSSLSocketFactory(
                     SSLConnectionSocketFactory(
