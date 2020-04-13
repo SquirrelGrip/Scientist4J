@@ -67,11 +67,11 @@ class HeadersComparator : ExperimentComparator<Array<Header>> {
         val entriesDiffering = diff.entriesDiffering().map {(headerName, headerValue) ->
             "Header[$headerName] value is different: ${headerValue.leftValue()} != ${headerValue.rightValue()}."
         }.toComparisonResult()
-        val entriesOnlyInControl = diff.entriesOnlyOnLeft().map {(headerName, headerValue) ->
-            "Header[$headerName] is only in Control."
+        val entriesOnlyInControl = diff.entriesOnlyOnLeft().keys.map {
+            "Header[$it] is only in Control."
         }.toComparisonResult()
-        val entriesOnlyInCandidate = diff.entriesOnlyOnRight().map {(headerName, headerValue) ->
-            "Header[$headerName] is only in Candidate."
+        val entriesOnlyInCandidate = diff.entriesOnlyOnRight().keys.map {
+            "Header[$it] is only in Candidate."
         }.toComparisonResult()
         return ComparisonResult(entriesDiffering, entriesOnlyInControl, entriesOnlyInCandidate)
     }

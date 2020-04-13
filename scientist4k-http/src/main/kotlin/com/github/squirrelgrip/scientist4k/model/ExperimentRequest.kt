@@ -1,6 +1,8 @@
 package com.github.squirrelgrip.scientist4k.model
 
+import javax.servlet.http.Cookie
 import javax.servlet.http.HttpServletRequest
+import javax.servlet.http.HttpSession
 
 /**
  * TODO Handle Headers with multiple values
@@ -11,8 +13,10 @@ data class ExperimentRequest(
         val url: String,
         val protocol: String,
         val headers: Map<String, String> = emptyMap(),
+        val cookies: Array<Cookie> = emptyArray(),
         val contentType: String?,
-        val body: ByteArray = ByteArray(0)
+        val body: ByteArray = ByteArray(0),
+        val session: HttpSession
 ) {
     companion object {
         fun create(inboundRequest: HttpServletRequest): ExperimentRequest {
@@ -24,8 +28,10 @@ data class ExperimentRequest(
                     getUrl(inboundRequest),
                     inboundRequest.protocol,
                     headers,
+                    inboundRequest.cookies ?: emptyArray(),
                     inboundRequest.contentType,
-                    inboundRequest.inputStream.readBytes()
+                    inboundRequest.inputStream.readBytes(),
+                    inboundRequest.getSession(true)
             )
         }
 
@@ -48,6 +54,7 @@ data class ExperimentRequest(
         if (url != other.url) return false
         if (protocol != other.protocol) return false
         if (headers != other.headers) return false
+        if (!cookies.contentEquals(other.cookies)) return false
         if (!body.contentEquals(other.body)) return false
 
         return true
@@ -58,6 +65,7 @@ data class ExperimentRequest(
         result = 31 * result + url.hashCode()
         result = 31 * result + protocol.hashCode()
         result = 31 * result + headers.hashCode()
+        result = 31 * result + cookies.contentHashCode()
         result = 31 * result + body.contentHashCode()
         return result
     }
