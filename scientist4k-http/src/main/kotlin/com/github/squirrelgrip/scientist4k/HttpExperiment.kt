@@ -31,8 +31,8 @@ class HttpExperiment(
     private val controlRequestFactory = RequestFactory(controlConfig, CONTROL_COOKIE_STORE)
     private val candidateRequestFactory = RequestFactory(candidateConfig, CANDIDATE_COOKIE_STORE)
 
-    init{
-        addPublisher(object: Publisher<ExperimentResponse> {
+    init {
+        addPublisher(object : Publisher<ExperimentResponse> {
             override fun publish(result: Result<ExperimentResponse>) {
                 println("${result.match.matches} => ${result.sample.notes["uri"]}")
                 if (!result.match.matches) {
@@ -69,9 +69,13 @@ class HttpExperiment(
     ) {
         if (controlResponse != null) {
             inboundResponse.status = controlResponse.status.statusCode
-            controlResponse.headers.forEach {
-                inboundResponse.addHeader(it.name, it.value)
-            }
+            controlResponse.headers
+                    .filter {
+                        it.name != "Set-Cookie"
+                    }
+                    .forEach {
+                        inboundResponse.addHeader(it.name, it.value)
+                    }
             inboundResponse.outputStream.write(controlResponse.content)
         } else {
             inboundResponse.status = 500
