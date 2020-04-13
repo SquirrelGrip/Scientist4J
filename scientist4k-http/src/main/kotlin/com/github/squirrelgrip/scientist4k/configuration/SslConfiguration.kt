@@ -32,11 +32,25 @@ data class SslConfiguration(
                 init(keyStore(), keyStorePassword.toCharArray())
             }
 
-    fun trustStore(): KeyStore =
-            File(trustStorePath).toKeyStore(trustStorePassword, trustStoreType)
+    fun trustStore(): KeyStore {
+        if (keyStoreType == "Windows-ROOT") {
+            return KeyStore.getInstance(keyStoreType).apply {
+                load(null, null)
+            }
+        }
+        return File(trustStorePath).toKeyStore(trustStorePassword, trustStoreType)
+    }
 
-    fun keyStore(): KeyStore =
-            File(keyStorePath).toKeyStore(keyStorePassword, keyStoreType)
+    fun keyStore(): KeyStore {
+        if (keyStoreType == "Windows-MY") {
+            return KeyStore.getInstance(keyStoreType).apply {
+                load(null, null)
+            }
+        }
+        return File(keyStorePath).toKeyStore(keyStorePassword, keyStoreType)
+    }
+
+
 }
 
 fun File.toKeyStore(password: String, keyStoreType: String = KeyStore.getDefaultType()): KeyStore =

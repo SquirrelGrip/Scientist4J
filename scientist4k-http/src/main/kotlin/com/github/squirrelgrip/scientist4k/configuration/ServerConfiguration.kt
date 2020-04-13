@@ -30,11 +30,9 @@ data class ServerConfiguration(
             addCustomizer(SecureRequestCustomizer())
         }
         val sslContextFactory = SslContextFactory.Server().apply {
-            keyStorePath = sslConfiguration.keyStorePath
-            trustStorePath = sslConfiguration.trustStorePath
-            setKeyStorePassword(sslConfiguration.keyStorePassword)
+            keyStore = sslConfiguration.keyStore()
+            trustStore = sslConfiguration.trustStore()
             setKeyManagerPassword(sslConfiguration.keyStorePassword)
-            setTrustStorePassword(sslConfiguration.trustStorePassword)
         }
         return ServerConnector(server,
                 SslConnectionFactory(sslContextFactory, "http/1.1"),
