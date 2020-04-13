@@ -10,7 +10,7 @@ open class ControlledExperiment<T>(
         raiseOnMismatch: Boolean,
         metricsProvider: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD"),
         context: Map<String, Any> = emptyMap(),
-        comparator: ExperimentComparator<T> = DefaultExperimentComparator(),
+        comparator: ExperimentComparator<T?> = DefaultExperimentComparator(),
         sampleFactory: SampleFactory = SampleFactory()
 ) : Experiment<T>(
         name,
