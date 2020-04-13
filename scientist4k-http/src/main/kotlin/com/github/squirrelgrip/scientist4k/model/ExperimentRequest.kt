@@ -31,7 +31,7 @@ data class ExperimentRequest(
                     inboundRequest.cookies,
                     inboundRequest.contentType,
                     inboundRequest.inputStream.readBytes(),
-                    inboundRequest.getSession(false)
+                    inboundRequest.getSession(true)
             )
         }
 

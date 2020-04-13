@@ -3,18 +3,19 @@ package com.github.squirrelgrip.scientist4k.factory
 import com.github.squirrelgrip.scientist4k.configuration.EndPointConfiguration
 import com.github.squirrelgrip.scientist4k.model.ExperimentRequest
 import com.github.squirrelgrip.scientist4k.model.ExperimentResponse
-import org.apache.http.HttpRequest
 import org.apache.http.HttpVersion.HTTP_1_1
 import org.apache.http.client.CookieStore
 import org.apache.http.client.ResponseHandler
 import org.apache.http.client.methods.HttpUriRequest
 import org.apache.http.client.methods.RequestBuilder
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory
+import org.apache.http.cookie.Cookie
 import org.apache.http.entity.ByteArrayEntity
 import org.apache.http.entity.ContentType
 import org.apache.http.impl.client.BasicCookieStore
 import org.apache.http.impl.client.CloseableHttpClient
 import org.apache.http.impl.client.HttpClients
+import org.apache.http.impl.cookie.BasicClientCookie
 import org.apache.http.protocol.HTTP.CONTENT_LEN
 import javax.servlet.http.HttpSession
 
@@ -39,6 +40,9 @@ class RequestFactory(
                     )
                 }
                 val response = it.execute(httpUriRequest, responseHandler)
+                cookieStore.cookies.forEach {cookie ->
+                    println("${cookie.name}=${cookie.value}")
+                }
                 getSession(request).setAttribute(cookieStoreAttributeName, cookieStore)
                 response
             }
@@ -81,7 +85,14 @@ class RequestFactory(
     private fun getSession(request: ExperimentRequest): HttpSession =
             request.session.apply {
                 if (this.getAttribute(cookieStoreAttributeName) == null) {
-                    this.setAttribute(cookieStoreAttributeName, BasicCookieStore())
+                    val cookieStore = BasicCookieStore()
+                    request.cookies.forEach {
+                        val cookie = BasicClientCookie(it.name, it.value)
+                        cookie.domain = it.domain
+                        cookie.path = it.path
+                        cookieStore.cookies.add(cookie)
+                    }
+                    this.setAttribute(cookieStoreAttributeName, cookieStore)
                 }
             }
 
