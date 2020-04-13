@@ -114,12 +114,30 @@ class HttpExperimentServerTest {
     }
 
     @Test
+    fun `requests with different status`() {
+        createExperimentServer(HTTPS_CONTROL_URL, HTTPS_CANDIDATE_URL)
+
+        assertThat(isRunning("${HTTPS_EXPERIMENT_URL}/status")).isTrue()
+
+        assertThat(awaitResult().match.matches).isFalse()
+    }
+
+    @Test
     fun `requests should be different when candidate doesn't exist`() {
         createExperimentServer(HTTPS_CONTROL_URL, HTTPS_CANDIDATE_URL)
 
         assertThat(isRunning("${HTTPS_EXPERIMENT_URL}/control")).isFalse()
 
         assertThat(awaitResult().match.matches).isFalse()
+    }
+
+    @Test
+    fun `request is mapped to another uri`() {
+        createExperimentServer(HTTPS_CONTROL_URL, HTTPS_CANDIDATE_URL)
+
+        assertThat(isRunning("${HTTPS_EXPERIMENT_URL}/mappedControl")).isTrue()
+
+        assertThat(awaitResult().match.matches).isTrue()
     }
 
     @Test

@@ -27,8 +27,11 @@
       "prefix": ""
     }
   },
+  "mappings": {
+    "/mappedControl": "/mappedCandidate"
+  },
   "control": {
-    "url": "https://10.0.1.200:9002",
+    "url": "https://localhost:9002",
     "sslConfiguration": {
       "keyStorePath": "target/certs/keystore.jks",
       "keyStorePassword": "password",
@@ -43,7 +46,7 @@
     ]
   },
   "candidate": {
-    "url": "https://10.0.1.200:9012",
+    "url": "https://localhost:9012",
     "sslConfiguration": {
       "keyStorePath": "target/certs/keystore.jks",
       "keyStorePassword": "password",
