@@ -50,7 +50,6 @@ data class SslConfiguration(
         return File(keyStorePath).toKeyStore(keyStorePassword, keyStoreType)
     }
 
-
 }
 
 fun File.toKeyStore(password: String, keyStoreType: String = KeyStore.getDefaultType()): KeyStore =
