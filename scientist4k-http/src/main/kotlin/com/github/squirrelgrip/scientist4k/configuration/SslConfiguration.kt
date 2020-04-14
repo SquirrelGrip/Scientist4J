@@ -1,5 +1,7 @@
 package com.github.squirrelgrip.scientist4k.configuration
 
+import com.github.squirrelgrip.cheti.exception.InvalidConfigurationException
+import com.github.squirrelgrip.cheti.extension.password
 import com.github.squirrelgrip.extensions.file.toInputStream
 import java.io.File
 import java.security.KeyStore
@@ -29,7 +31,7 @@ data class SslConfiguration(
 
     fun keyManagerFactory(): KeyManagerFactory =
             KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm()).apply {
-                init(keyStore(), keyStorePassword.toCharArray())
+                init(keyStore(), keyStorePassword.password())
             }
 
     fun trustStore(): KeyStore {
@@ -54,5 +56,5 @@ data class SslConfiguration(
 
 fun File.toKeyStore(password: String, keyStoreType: String = KeyStore.getDefaultType()): KeyStore =
         KeyStore.getInstance(keyStoreType).also {
-            it.load(this.toInputStream(), password.toCharArray())
+            it.load(this.toInputStream(), password.password())
         }

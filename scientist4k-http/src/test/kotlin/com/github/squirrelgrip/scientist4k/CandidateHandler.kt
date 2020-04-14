@@ -17,10 +17,10 @@ class CandidateHandler : AbstractHandler() {
                         ConnectorConfiguration(9011),
                         ConnectorConfiguration(9012,
                                 SslConfiguration("target/certs/keystore.jks",
-                                        "password",
+                                        "pass:password",
                                         "JKS",
                                         "target/certs/keystore.jks",
-                                        "password",
+                                        "pass:password",
                                         "JKS",
                                         "TLSv1.2"
                                 )

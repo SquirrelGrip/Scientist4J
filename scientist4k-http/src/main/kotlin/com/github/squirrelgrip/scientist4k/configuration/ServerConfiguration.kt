@@ -1,5 +1,6 @@
 package com.github.squirrelgrip.scientist4k.configuration
 
+import com.github.squirrelgrip.cheti.extension.password
 import org.eclipse.jetty.server.*
 import org.eclipse.jetty.util.ssl.SslContextFactory
 
@@ -32,7 +33,7 @@ data class ServerConfiguration(
         val sslContextFactory = SslContextFactory.Server().apply {
             keyStore = sslConfiguration.keyStore()
             trustStore = sslConfiguration.trustStore()
-            setKeyManagerPassword(sslConfiguration.keyStorePassword)
+            setKeyManagerPassword(String(sslConfiguration.keyStorePassword.password()))
         }
         return ServerConnector(server,
                 SslConnectionFactory(sslContextFactory, "http/1.1"),

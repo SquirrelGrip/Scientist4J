@@ -16,10 +16,10 @@ class ControlHandler : AbstractHandler() {
                         ConnectorConfiguration(9001),
                         ConnectorConfiguration(9002,
                                 SslConfiguration("target/certs/keystore.jks",
-                                        "password",
+                                        "pass:password",
                                         "JKS",
                                         "target/certs/keystore.jks",
-                                        "password",
+                                        "pass:password",
                                         "JKS",
                                         "TLSv1.2"
                                 )
