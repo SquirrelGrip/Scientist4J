@@ -21,7 +21,7 @@ jobs:
     - stage: startRelease
       script: mvn --batch-mode -U clean jgitflow:release-start -PgitflowStart
     - stage: finishRelease
-      script: mvn --batch-mode -U clean jgitflow:release-finish -PgitflowFinish
+      script: mvn --batch-mode -U clean jgitflow:release-finish
 stages:
   - name: build
     if: branch !~ ^release.*$
