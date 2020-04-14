@@ -76,7 +76,7 @@
     {
       "name": "keystore.jks",
       "type": "JKS",
-      "password": "password",
+      "password": "pass:password",
       "location": "target/certs",
       "chains": [
         "Server",
@@ -86,7 +86,7 @@
     {
       "name": "keystore.p12",
       "type": "PKCS12",
-      "password": "password",
+      "password": "pass:password",
       "location": "target/certs",
       "chains": [
         "Server",
