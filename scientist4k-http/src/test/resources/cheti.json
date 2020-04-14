@@ -1,14 +1,16 @@
 {
   "common": {
-    "location": "bouncy-castle"
+    "location": "target/certs",
+    "generate": "ALWAYS",
+    "validFor": "1D",
+    "issuer": "SigningCA",
+    "password": "pass:password"
   },
   "certificates": [
     {
       "name": "RootCA",
       "type": "ROOT",
-      "generate": "ALWAYS",
-      "location": "target/certs",
-      "validFor": "1D",
+      "issuer": "",
       "subject": {
         "cn": "RootCA",
         "ou": "SquirrelGrip",
@@ -21,10 +23,7 @@
     {
       "name": "SigningCA",
       "type": "SIGNING",
-      "generate": "ALWAYS",
-      "location": "target/certs",
       "issuer": "RootCA",
-      "validFor": "1D",
       "subject": {
         "cn": "SigningCA",
         "ou": "SquirrelGrip",
@@ -37,10 +36,6 @@
     {
       "name": "Server",
       "type": "SERVER",
-      "generate": "ALWAYS",
-      "location": "target/certs",
-      "issuer": "SigningCA",
-      "validFor": "1D",
       "subject": {
         "cn": "Server"
       },
@@ -63,10 +58,6 @@
     {
       "name": "Client",
       "type": "CLIENT",
-      "generate": "ALWAYS",
-      "location": "target/certs",
-      "issuer": "SigningCA",
-      "validFor": "1D",
       "subject": {
         "cn": "Client"
       }
@@ -76,8 +67,6 @@
     {
       "name": "keystore.jks",
       "type": "JKS",
-      "password": "pass:password",
-      "location": "target/certs",
       "chains": [
         "Server",
         "Client"
@@ -86,8 +75,6 @@
     {
       "name": "keystore.p12",
       "type": "PKCS12",
-      "password": "pass:password",
-      "location": "target/certs",
       "chains": [
         "Server",
         "Client"
