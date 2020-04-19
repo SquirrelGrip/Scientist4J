@@ -11,7 +11,7 @@ cache:
   directories:
     - "$HOME/.m2"
 before_install:
-  - openssl aes-256-cbc -K $encrypted_404964577bd1_key -iv $encrypted_404964577bd1_iv -in travis/all.gpg.enc -out travis/all.gpg -d
+  - openssl aes-256-cbc -K $encrypted_b9bec049d0a5_key -iv $encrypted_b9bec049d0a5_iv -in travis/all.gpg.enc -out travis/all.gpg -d
   - gpg --import travis/all.gpg
   - cp travis/settings.xml $HOME/.m2/settings.xml
 jobs:
