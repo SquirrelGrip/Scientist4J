@@ -4,7 +4,7 @@
 
     <groupId>com.github.squirrelgrip</groupId>
     <artifactId>scientist4k</artifactId>
-    <version>0.5.4</version>
+    <version>0.5.5</version>
     <packaging>pom</packaging>
 
     <name>${project.groupId}:${project.artifactId}</name>
@@ -35,10 +35,16 @@
         <spring-boot.version>2.2.6.RELEASE</spring-boot.version>
         <mockito-kotlin.version>2.2.0</mockito-kotlin.version>
         <guava.version>29.0-jre</guava.version>
+        <configuration.version>1.0.0</configuration.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>com.github.squirrelgrip</groupId>
+                <artifactId>configuration</artifactId>
+                <version>${configuration.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.jetbrains.kotlin</groupId>
                 <artifactId>kotlin-stdlib</artifactId>

@@ -89,5 +89,5 @@ Users can optionally override the following functions:
 * `runIf` (to enforce conditional behavior on who should be exposed to the new code path)
 * `isAsync` (force using the async for legacy code or move to `runAsync` method)
 
-
 License: MIT
+
