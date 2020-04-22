@@ -1,8 +1,8 @@
 package com.github.squirrelgrip.scientist4k
 
-import com.github.squirrelgrip.configuration.ssl.SslConfiguration
 import com.github.squirrelgrip.scientist4k.configuration.ConnectorConfiguration
 import com.github.squirrelgrip.scientist4k.configuration.ServerConfiguration
+import com.github.squirrelgrip.scientist4k.configuration.SslConfiguration
 import org.eclipse.jetty.server.Request
 import org.eclipse.jetty.server.handler.AbstractHandler
 import javax.servlet.http.Cookie
