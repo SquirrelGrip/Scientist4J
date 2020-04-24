@@ -1,6 +1,5 @@
 package com.github.squirrelgrip.scientist4k.factory
 
-import com.github.squirrelgrip.cheti.exception.InvalidConfigurationException
 import com.github.squirrelgrip.scientist4k.configuration.EndPointConfiguration
 import com.github.squirrelgrip.scientist4k.configuration.MappingConfiguration
 import com.github.squirrelgrip.scientist4k.model.ExperimentRequest
@@ -17,6 +16,8 @@ import org.apache.http.impl.client.BasicCookieStore
 import org.apache.http.impl.client.CloseableHttpClient
 import org.apache.http.impl.client.HttpClients
 import org.apache.http.protocol.HTTP.CONTENT_LEN
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 class RequestFactory(
         val endPointConfig: EndPointConfiguration,
@@ -24,6 +25,7 @@ class RequestFactory(
         val mappingConfiguration: List<MappingConfiguration> = emptyList()
 ) {
     companion object {
+        private val LOGGER: Logger = LoggerFactory.getLogger(RequestFactory::class.java)
         val CONTROL_COOKIE_STORE = "CONTROL_COOKIE_STORE"
         val CANDIDATE_COOKIE_STORE = "CANDIDATE_COOKIE_STORE"
     }
@@ -40,6 +42,7 @@ class RequestFactory(
                 val httpUriRequest: HttpUriRequest = createRequest(request, url)
 
                 val responseHandler = ResponseHandler { response ->
+                    LOGGER.debug("Response received for request {}", url)
                     ExperimentResponse(
                             response.statusLine,
                             response.allHeaders,
@@ -47,8 +50,11 @@ class RequestFactory(
                     )
                 }
                 val response = it.execute(httpUriRequest, responseHandler)
-                cookieStore.cookies.forEach {cookie ->
-                    println("${cookie.name}=${cookie.value}")
+                if (LOGGER.isDebugEnabled) {
+                    LOGGER.debug("${request.url}=>${response.status}")
+                    cookieStore.cookies.forEach { cookie ->
+                        LOGGER.debug("${cookie.name}=${cookie.value}")
+                    }
                 }
                 setCookieStore(request, cookieStore)
                 response

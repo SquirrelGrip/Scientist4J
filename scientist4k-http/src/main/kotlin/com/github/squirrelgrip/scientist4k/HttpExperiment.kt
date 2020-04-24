@@ -1,14 +1,17 @@
 package com.github.squirrelgrip.scientist4k
 
+import com.github.squirrelgrip.scientist4k.comparator.ExperimentResponseComparator
 import com.github.squirrelgrip.scientist4k.configuration.EndPointConfiguration
 import com.github.squirrelgrip.scientist4k.configuration.MappingConfiguration
 import com.github.squirrelgrip.scientist4k.factory.RequestFactory
-import com.github.squirrelgrip.scientist4k.factory.RequestFactory.Companion.CONTROL_COOKIE_STORE
 import com.github.squirrelgrip.scientist4k.factory.RequestFactory.Companion.CANDIDATE_COOKIE_STORE
+import com.github.squirrelgrip.scientist4k.factory.RequestFactory.Companion.CONTROL_COOKIE_STORE
 import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
 import com.github.squirrelgrip.scientist4k.model.*
 import com.github.squirrelgrip.scientist4k.model.sample.Sample
 import com.github.squirrelgrip.scientist4k.model.sample.SampleFactory
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
@@ -33,15 +36,18 @@ class HttpExperiment(
     private val controlRequestFactory = RequestFactory(controlConfig, CONTROL_COOKIE_STORE)
     private val candidateRequestFactory = RequestFactory(candidateConfig, CANDIDATE_COOKIE_STORE, mappings)
 
+    companion object {
+        private val LOGGER: Logger = LoggerFactory.getLogger(HttpExperiment::class.java)
+    }
     init {
         addPublisher(object : Publisher<ExperimentResponse> {
             override fun publish(result: Result<ExperimentResponse>) {
-                println("${result.match.matches} => ${result.sample.notes["uri"]}")
+                LOGGER.info("${result.match.matches} => ${result.sample.notes["uri"]}")
                 if (!result.match.matches) {
-                    println("\t${result.control.value}")
-                    println("\t${result.candidate?.value}")
+                    LOGGER.info("\t${result.control.value}")
+                    LOGGER.info("\t${result.candidate?.value}")
                     result.match.failureReasons.forEach {
-                        println("\t\t${it}")
+                        LOGGER.info("\t\t${it}")
                     }
                 }
             }
@@ -68,6 +74,7 @@ class HttpExperiment(
             inboundResponse: HttpServletResponse,
             controlResponse: ExperimentResponse?
     ) {
+        LOGGER.debug("processing response {}", controlResponse)
         if (controlResponse != null) {
             inboundResponse.status = controlResponse.status.statusCode
             controlResponse.headers
@@ -79,6 +86,7 @@ class HttpExperiment(
                     }
             inboundResponse.outputStream.write(controlResponse.content)
         } else {
+            LOGGER.warn("Control Response is null")
             inboundResponse.status = 500
             inboundResponse.writer.println("Something went wrong with the experiment")
         }
