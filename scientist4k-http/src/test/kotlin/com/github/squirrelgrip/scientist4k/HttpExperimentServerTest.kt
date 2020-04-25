@@ -12,6 +12,7 @@ import org.apache.http.impl.client.HttpClients
 import org.assertj.core.api.AssertionsForInterfaceTypes.assertThat
 import org.awaitility.Awaitility
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -59,11 +60,12 @@ class HttpExperimentServerTest {
         }
     }
 
-    var actualResult: Result<ExperimentResponse>? = null
+    var actualResult: MutableList<Result<ExperimentResponse>> = mutableListOf()
 
     val publisher = object : Publisher<ExperimentResponse> {
         override fun publish(result: Result<ExperimentResponse>) {
-            actualResult = result
+            println(result.sample.notes["request"])
+            actualResult.add(result)
         }
     }
 
@@ -71,7 +73,7 @@ class HttpExperimentServerTest {
 
     @BeforeEach
     fun beforeEach() {
-        actualResult = null
+        actualResult.clear()
     }
 
     private fun createExperimentServer(controlUrl: String, candidateUrl: String) {
@@ -94,10 +96,19 @@ class HttpExperimentServerTest {
         testSubject.stop()
     }
 
-    private fun awaitResult(): Result<ExperimentResponse> {
-        Awaitility.await().atMost(5, TimeUnit.SECONDS).until { actualResult != null }
-        assertThat(actualResult).isNotNull()
-        return actualResult!!
+    private fun getResult(uri: String): Result<ExperimentResponse>? {
+        return actualResult.firstOrNull {
+            it.sample.notes["uri"] == uri
+        }
+    }
+
+    private fun awaitResult(url: String): Result<ExperimentResponse> {
+        Awaitility.await().atMost(5, TimeUnit.SECONDS).until {
+            getResult(url) != null
+        }
+        val result = getResult(url)
+        assertNotNull(result)
+        return result!!
     }
 
     private fun assertIsRunning(url: String) {
@@ -110,7 +121,7 @@ class HttpExperimentServerTest {
 
         assertThat(isRunning("${HTTPS_EXPERIMENT_URL}/ok")).isTrue()
 
-        val result = awaitResult()
+        val result = awaitResult("/ok")
         assertThat(result.match.matches).isTrue()
         assertThat(result.match.failureReasons).isEmpty()
     }
@@ -121,7 +132,7 @@ class HttpExperimentServerTest {
 
         assertThat(isRunning("${HTTPS_EXPERIMENT_URL}/status")).isTrue()
 
-        val result = awaitResult()
+        val result = awaitResult("/status")
         assertThat(result.match.matches).isFalse()
         assertThat(result.match.failureReasons).containsExactlyInAnyOrder(
                 "Control returned status 200 and Candidate returned status 201."
@@ -134,12 +145,11 @@ class HttpExperimentServerTest {
 
         assertThat(isRunning("${HTTPS_EXPERIMENT_URL}/control")).isTrue()
 
-        val result = awaitResult()
+        val result = awaitResult("/control")
         assertThat(result.match.matches).isFalse()
         assertThat(result.match.failureReasons).containsExactlyInAnyOrder(
                 "Control returned status 200 and Candidate returned status 404.",
-                "Header[Content-Type] is only in Control.",
-                "Contents different."
+                "Content-Type is different: text/plain != null."
         )
     }
 
@@ -149,7 +159,7 @@ class HttpExperimentServerTest {
 
         assertThat(isRunning("${HTTPS_EXPERIMENT_URL}/mappedControl")).isTrue()
 
-        val result = awaitResult()
+        val result = awaitResult("/mappedControl")
         assertThat(result.match.matches).isTrue()
         assertThat(result.match.failureReasons).isEmpty()
     }
@@ -160,13 +170,36 @@ class HttpExperimentServerTest {
 
         assertThat(isRunning("${HTTPS_EXPERIMENT_URL}/candidate")).isFalse()
 
-        val result = awaitResult()
+        val result = awaitResult("/candidate")
         assertThat(result.match.matches).isFalse()
         assertThat(result.match.failureReasons).containsExactlyInAnyOrder(
                 "Control returned status 404 and Candidate returned status 200.",
-                "Header[Content-Type] is only in Candidate.",
-                "Contents different."
+                "Content-Type is different: null != text/plain."
         )
+    }
+
+    @Test
+    fun `requests with json response is different`() {
+        createExperimentServer(HTTPS_CONTROL_URL, HTTPS_CANDIDATE_URL)
+
+        assertThat(isRunning("${HTTPS_EXPERIMENT_URL}/jsonDifferent")).isTrue()
+
+        val result = awaitResult("/jsonDifferent")
+        assertThat(result.match.matches).isFalse()
+        assertThat(result.match.failureReasons).containsExactlyInAnyOrder(
+                "1 in control, not in candidate",
+                "5 in candidate, not in control"
+        )
+    }
+
+    @Test
+    fun `requests with json response is same`() {
+        createExperimentServer(HTTPS_CONTROL_URL, HTTPS_CANDIDATE_URL)
+
+        assertThat(isRunning("${HTTPS_EXPERIMENT_URL}/json")).isTrue()
+
+        val result = awaitResult("/json")
+        assertThat(result.match.matches).isTrue()
     }
 
 }

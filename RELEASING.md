@@ -1,7 +1,7 @@
 # Releasing
 ```
 travis login --com --github-token $GIT_TOKEN
-export SLUG=SquirrelGrip%2F$scientist4k
+export SLUG=SquirrelGrip%2Fscientist4k
 export TRAVIS_TOKEN=`travis token --no-interactive --com`
 export BODY='{
     "request": {

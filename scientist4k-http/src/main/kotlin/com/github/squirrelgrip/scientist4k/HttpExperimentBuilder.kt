@@ -7,7 +7,7 @@ import com.github.squirrelgrip.scientist4k.exceptions.LaboratoryException
 import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
 import com.github.squirrelgrip.scientist4k.model.ExperimentComparator
 import com.github.squirrelgrip.scientist4k.model.ExperimentResponse
-import com.github.squirrelgrip.scientist4k.model.ExperimentResponseComparator
+import com.github.squirrelgrip.scientist4k.comparator.ExperimentResponseComparator
 import com.github.squirrelgrip.scientist4k.model.sample.SampleFactory
 
 class HttpExperimentBuilder() {

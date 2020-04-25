@@ -7,7 +7,8 @@ import org.apache.http.StatusLine
 data class ExperimentResponse(
         val status: StatusLine,
         val headers: Array<Header>,
-        val entity: HttpEntity) {
+        val entity: HttpEntity
+) {
 
     val content: ByteArray = entity.content?.readBytes() ?: ByteArray(0)
 

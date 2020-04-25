@@ -1,7 +1,6 @@
 package com.github.squirrelgrip.scientist4k.configuration
 
 import com.github.squirrelgrip.cheti.extension.password
-import com.github.squirrelgrip.configuration.ssl.SslConfiguration
 import org.eclipse.jetty.server.*
 import org.eclipse.jetty.util.ssl.SslContextFactory
 

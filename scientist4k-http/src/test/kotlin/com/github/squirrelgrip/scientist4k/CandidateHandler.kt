@@ -1,10 +1,14 @@
 package com.github.squirrelgrip.scientist4k
 
-import com.github.squirrelgrip.configuration.ssl.SslConfiguration
+import com.github.squirrelgrip.extensions.json.toJson
 import com.github.squirrelgrip.scientist4k.configuration.ConnectorConfiguration
 import com.github.squirrelgrip.scientist4k.configuration.ServerConfiguration
+import com.github.squirrelgrip.scientist4k.configuration.SslConfiguration
+import com.google.common.net.MediaType
 import org.eclipse.jetty.server.Request
 import org.eclipse.jetty.server.handler.AbstractHandler
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import javax.servlet.http.Cookie
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
@@ -28,7 +32,7 @@ class CandidateHandler : AbstractHandler() {
                         )
                 )
         )
-
+        private val LOGGER: Logger = LoggerFactory.getLogger(CandidateHandler::class.java)
     }
 
     override fun handle(
@@ -37,7 +41,7 @@ class CandidateHandler : AbstractHandler() {
             request: HttpServletRequest,
             response: HttpServletResponse
     ) {
-//        println("${request.method} ${request.requestURL}")
+        LOGGER.info("CandidateHandler received request: ${request.method} ${request.requestURL}")
         val out = response.writer
         when (target) {
             "/candidate" -> {
@@ -96,6 +100,16 @@ class CandidateHandler : AbstractHandler() {
             }
             "/redirect" -> {
                 response.sendRedirect("/ok")
+            }
+            "/json" -> {
+                response.contentType = MediaType.JSON_UTF_8.toString()
+                response.status = HttpServletResponse.SC_OK
+                out.println(mapOf("1" to "AAA", "2" to listOf("BBB", "CCC"), "3" to mapOf("4" to listOf("DDD", "EEE"))).toJson())
+            }
+             "/jsonDifferent" -> {
+                response.contentType = MediaType.JSON_UTF_8.toString()
+                response.status = HttpServletResponse.SC_OK
+                out.println(mapOf("5" to "AAA", "2" to listOf("BBB", "CCC"), "3" to mapOf("4" to listOf("DDD", "EEE"))).toJson())
             }
             else -> {
                 response.status = HttpServletResponse.SC_NOT_FOUND

@@ -10,6 +10,8 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 open class Experiment<T>(
         val name: String,
@@ -43,6 +45,11 @@ open class Experiment<T>(
         totalCount = metrics.counter(NAMESPACE_PREFIX, name, "total")
     }
 
+    companion object {
+        private const val NAMESPACE_PREFIX = "scientist"
+        private val LOGGER: Logger = LoggerFactory.getLogger(Experiment::class.java)
+    }
+
     fun addPublisher(publisher: Publisher<T>) {
         publishers.add(publisher)
     }
@@ -53,8 +60,10 @@ open class Experiment<T>(
 
     open fun run(control: () -> T?, candidate: () -> T?, sample: Sample = sampleFactory.create()): T? {
         return if (isAsync) {
+            LOGGER.trace("Running async")
             runAsync(control, candidate, sample)
         } else {
+            LOGGER.trace("Running sync")
             runSync(control, candidate, sample)
         }
     }
@@ -74,16 +83,24 @@ open class Experiment<T>(
 
     open fun runAsync(control: () -> T?, candidate: () -> T?, sample: Sample = sampleFactory.create()) =
             runBlocking {
-                val deferredControlObservation = GlobalScope.async { executeControl(control) }
+                val deferredControlObservation = GlobalScope.async {
+                    executeControl(control)
+                }
                 val deferredCandidateObservation = if (runIf() && enabled()) {
-                    GlobalScope.async { executeCandidate(candidate) }
+                    GlobalScope.async {
+                        executeCandidate(candidate)
+                    }
                 } else {
                     null
                 }
 
+                LOGGER.debug("Awaiting deferredControlObservation...")
                 val controlObservation = deferredControlObservation.await()
+                LOGGER.debug("deferredControlObservation is {}", controlObservation)
                 if (deferredCandidateObservation != null) {
-                    val deferred = GlobalScope.async { publishAsync(deferredCandidateObservation, controlObservation, sample) }
+                    val deferred = GlobalScope.async {
+                        publishAsync(deferredCandidateObservation, controlObservation, sample)
+                    }
                     if (raiseOnMismatch) {
                         deferred.await().handleComparisonMismatch()
                     }
@@ -92,16 +109,19 @@ open class Experiment<T>(
             }
 
     private suspend fun publishAsync(deferredCandidateObservation: Deferred<Observation<T>>, controlObservation: Observation<T>, sample: Sample = sampleFactory.create()): Result<T> {
-        deferredCandidateObservation.await().also { candidateObservation ->
-            return publishResult(candidateObservation, controlObservation, sample)
-        }
+        LOGGER.debug("Awaiting candidateObservation...")
+        val candidateObservation = deferredCandidateObservation.await()
+        LOGGER.debug("candidateObservation is {}", candidateObservation)
+        return publishResult(candidateObservation, controlObservation, sample)
     }
 
     private fun publishResult(candidateObservation: Observation<T>, controlObservation: Observation<T>, sample: Sample = sampleFactory.create()): Result<T> {
         countExceptions(candidateObservation, candidateExceptionCount)
-        return Result(this@Experiment, controlObservation, candidateObservation, context, sample).apply {
-            publish(this)
-        }
+        LOGGER.info("Creating Result...")
+        val result = Result(this@Experiment, controlObservation, candidateObservation, context, sample)
+        LOGGER.info("Created Result")
+        publish(result)
+        return result
     }
 
     private fun executeCandidate(candidate: () -> T?) =
@@ -136,8 +156,10 @@ open class Experiment<T>(
         return if (candidate.exception != null) {
             ComparisonResult("Candidate threw an exception.")
         } else {
+            LOGGER.info("Comparing {} with {}", control.value, candidate.value)
             comparator.invoke(control.value, candidate.value)
         }.apply {
+            LOGGER.info("Compared...match={}", this.matches)
             totalCount.increment()
             if (!matches) {
                 mismatchCount.increment()
@@ -157,12 +179,12 @@ open class Experiment<T>(
         get() = true
 
     open fun publish(result: Result<T>) {
-        publishers.forEach { it.publish(result) }
+        publishers.forEach {
+            LOGGER.debug("Publishing to {}...", it)
+            it.publish(result)
+            LOGGER.debug("Published to {}", it)
+        }
         result.sample.published.set(true)
-    }
-
-    companion object {
-        private const val NAMESPACE_PREFIX = "scientist"
     }
 
 }
