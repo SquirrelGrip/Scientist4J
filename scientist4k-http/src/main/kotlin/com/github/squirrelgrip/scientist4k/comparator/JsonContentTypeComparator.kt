@@ -20,9 +20,9 @@ class JsonContentTypeComparator : ContentTypeComparator {
         } else {
             ComparisonResult(
                     *difference.entriesOnlyOnLeft()
-                            .map { (key, value) -> "$key in control, not in candidate" }.toTypedArray(),
+                            .map { (key, _) -> "$key in control, not in candidate" }.toTypedArray(),
                     *difference.entriesOnlyOnRight()
-                            .map { (key, value) -> "$key in candidate, not in control" }.toTypedArray(),
+                            .map { (key, _) -> "$key in candidate, not in control" }.toTypedArray(),
                     *difference.entriesDiffering()
                             .map { (key, value) -> "$key has different values (${value.leftValue()} != ${value.rightValue()})" }.toTypedArray()
             )

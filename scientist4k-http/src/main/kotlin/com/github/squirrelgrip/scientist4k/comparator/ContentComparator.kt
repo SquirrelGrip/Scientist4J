@@ -8,8 +8,8 @@ import com.google.common.net.MediaType
 import com.google.common.net.MediaType.JSON_UTF_8
 
 class ContentComparator : ExperimentComparator<ExperimentResponse> {
-    val defaultContentTypeComparator: ContentTypeComparator = DefaultContentTypeComparator()
-    val contentComparators: Map<MediaType, ContentTypeComparator> = mapOf(
+    private val defaultContentTypeComparator: ContentTypeComparator = DefaultContentTypeComparator()
+    private val contentComparators: Map<MediaType, ContentTypeComparator> = mapOf(
             JSON_UTF_8.withoutParameters() to JsonContentTypeComparator()
     )
 
@@ -29,7 +29,7 @@ class ContentComparator : ExperimentComparator<ExperimentResponse> {
 }
 
 private fun ExperimentResponse.toMediaType(): MediaType? {
-    val contentType = this.getHeader(CONTENT_TYPE)
+    val contentType = this.getContentType()
     return if (contentType != null) {
         MediaType.parse(contentType)?.withoutParameters()
     } else {
@@ -37,7 +37,7 @@ private fun ExperimentResponse.toMediaType(): MediaType? {
     }
 }
 
-private fun ExperimentResponse.getHeader(header: String): String? {
+private fun ExperimentResponse.getContentType(): String? {
     return this.headers.firstOrNull { it.name == CONTENT_TYPE }?.value
 }
 

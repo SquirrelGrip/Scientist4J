@@ -21,7 +21,7 @@
         <assertj.version>3.15.0</assertj.version>
         <cheti.version>1.1.6</cheti.version>
         <dropwizard-metrics.version>5.0.0</dropwizard-metrics.version>
-        <extensions.version>1.0.10-SNAPSHOT</extensions.version>
+        <extensions.version>1.0.12-SNAPSHOT</extensions.version>
         <httpclient.version>4.5.12</httpclient.version>
         <guava.version>29.0-jre</guava.version>
         <jackson.version>2.10.3</jackson.version>
@@ -255,6 +255,7 @@
                     <artifactId>jgitflow-maven-plugin</artifactId>
                     <version>1.0.0</version>
                     <configuration>
+                        <allowSnapshots>false</allowSnapshots>
                         <username>${env.GIT_USER}</username>
                         <password>${env.GIT_TOKEN}</password>
                         <pullMaster>true</pullMaster>
