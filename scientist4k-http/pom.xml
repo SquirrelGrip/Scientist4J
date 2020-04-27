@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.github.squirrelgrip</groupId>
         <artifactId>scientist4k</artifactId>
-        <version>0.6.1</version>
+        <version>0.6.2</version>
     </parent>
     <name>${project.groupId}:${project.artifactId}</name>
 
@@ -17,11 +17,6 @@
         <dependency>
             <groupId>com.github.squirrelgrip</groupId>
             <artifactId>extensions</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.github.squirrelgrip</groupId>
-            <artifactId>scientist4k-core</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.github.squirrelgrip</groupId>
@@ -61,10 +56,6 @@
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
         </dependency>
         <dependency>
             <groupId>org.assertj</groupId>

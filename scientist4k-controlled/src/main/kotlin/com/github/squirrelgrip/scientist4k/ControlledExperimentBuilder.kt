@@ -5,6 +5,7 @@ import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
 import com.github.squirrelgrip.scientist4k.model.DefaultExperimentComparator
 import com.github.squirrelgrip.scientist4k.model.ExperimentComparator
 import com.github.squirrelgrip.scientist4k.model.sample.SampleFactory
+import com.google.common.eventbus.EventBus
 
 class ControlledExperimentBuilder<T>(
     private var name: String = "Test",
@@ -12,7 +13,8 @@ class ControlledExperimentBuilder<T>(
     private var raiseOnMismatch: Boolean = false,
     private var sampleFactory: SampleFactory = SampleFactory(),
     private var comparator: ExperimentComparator<T?> = DefaultExperimentComparator(),
-    private var context: Map<String, String> = emptyMap()
+    private var context: Map<String, String> = emptyMap(),
+    private var eventBus: EventBus = EventBus()
 ) {
     constructor(experimentConfiguration: ExperimentConfiguration): this(
             experimentConfiguration.name,
@@ -51,8 +53,13 @@ class ControlledExperimentBuilder<T>(
         return this
     }
 
+    fun withEventBus(eventBus: EventBus): ControlledExperimentBuilder<T> {
+        this.eventBus = eventBus
+        return this
+    }
+
     fun build(): ControlledExperiment<T> {
-        return ControlledExperiment(name, raiseOnMismatch, metricsProvider, context, comparator, sampleFactory)
+        return ControlledExperiment(name, raiseOnMismatch, metricsProvider, context, comparator, sampleFactory, eventBus)
     }
 
 }

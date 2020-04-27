@@ -2,9 +2,13 @@ package com.github.squirrelgrip.scientist4k
 
 import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
 import com.github.squirrelgrip.scientist4k.metrics.Timer
-import com.github.squirrelgrip.scientist4k.model.*
+import com.github.squirrelgrip.scientist4k.model.ControlledResult
+import com.github.squirrelgrip.scientist4k.model.DefaultExperimentComparator
+import com.github.squirrelgrip.scientist4k.model.ExperimentComparator
+import com.github.squirrelgrip.scientist4k.model.Observation
 import com.github.squirrelgrip.scientist4k.model.sample.Sample
 import com.github.squirrelgrip.scientist4k.model.sample.SampleFactory
+import com.google.common.eventbus.EventBus
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
@@ -18,14 +22,16 @@ open class ControlledExperiment<T>(
         metrics: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD"),
         context: Map<String, Any> = emptyMap(),
         comparator: ExperimentComparator<T?> = DefaultExperimentComparator(),
-        sampleFactory: SampleFactory = SampleFactory()
+        sampleFactory: SampleFactory = SampleFactory(),
+        eventBus: EventBus = EventBus()
 ): AbstractExperiment<T>(
         name,
         raiseOnMismatch,
         metrics,
         context,
         comparator,
-        sampleFactory
+        sampleFactory,
+        eventBus
 ) {
     /**
      * Note that if `raiseOnMismatch` is true, [.runAsync] will block waiting for
@@ -33,7 +39,6 @@ open class ControlledExperiment<T>(
      * In situations where the candidate function may be significantly slower than the control,
      * it is *not* recommended to raise on mismatch.
      */
-    private val publishers = mutableListOf<ControlledPublisher<T>>()
     private val referenceTimer: Timer = metrics.timer(NAMESPACE_PREFIX, name, "reference")
 
     constructor(metrics: MetricsProvider<*>) : this("Experiment", metrics)
@@ -41,14 +46,6 @@ open class ControlledExperiment<T>(
 
     companion object {
         private val LOGGER: Logger = LoggerFactory.getLogger(ControlledExperiment::class.java)
-    }
-
-    fun addPublisher(publisher: ControlledPublisher<T>) {
-        publishers.add(publisher)
-    }
-
-    fun removePublisher(publisher: ControlledPublisher<T>) {
-        publishers.remove(publisher)
     }
 
     open fun run(control: () -> T?, reference: () -> T?, candidate: () -> T?, sample: Sample = sampleFactory.create()): T? {
@@ -136,14 +133,5 @@ open class ControlledExperiment<T>(
 
     private fun executeReference(reference: () -> T?) =
             execute("reference", referenceTimer, reference, false)
-
-    open fun publish(result: ControlledResult<T>) {
-        publishers.forEach {
-            LOGGER.debug("Publishing to {}...", it)
-            it.publish(result)
-            LOGGER.debug("Published to {}", it)
-        }
-        result.sample.published.set(true)
-    }
 
 }

@@ -1,9 +1,13 @@
 package com.github.squirrelgrip.scientist4k
 
 import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
-import com.github.squirrelgrip.scientist4k.model.*
+import com.github.squirrelgrip.scientist4k.model.DefaultExperimentComparator
+import com.github.squirrelgrip.scientist4k.model.ExperimentComparator
+import com.github.squirrelgrip.scientist4k.model.Observation
+import com.github.squirrelgrip.scientist4k.model.Result
 import com.github.squirrelgrip.scientist4k.model.sample.Sample
 import com.github.squirrelgrip.scientist4k.model.sample.SampleFactory
+import com.google.common.eventbus.EventBus
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
@@ -17,14 +21,16 @@ open class Experiment<T>(
         metrics: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD"),
         context: Map<String, Any> = emptyMap(),
         comparator: ExperimentComparator<T?> = DefaultExperimentComparator(),
-        sampleFactory: SampleFactory = SampleFactory()
+        sampleFactory: SampleFactory = SampleFactory(),
+        eventBus: EventBus = EventBus()
 ) : AbstractExperiment<T>(
         name,
         raiseOnMismatch,
         metrics,
         context,
         comparator,
-        sampleFactory
+        sampleFactory,
+        eventBus
 ) {
     /**
      * Note that if `raiseOnMismatch` is true, [.runAsync] will block waiting for
@@ -32,21 +38,11 @@ open class Experiment<T>(
      * In situations where the candidate function may be significantly slower than the control,
      * it is *not* recommended to raise on mismatch.
      */
-    private val publishers = mutableListOf<Publisher<T>>()
-
     constructor(metrics: MetricsProvider<*>) : this("Experiment", metrics)
     constructor(name: String, metrics: MetricsProvider<*>) : this(name, false, metrics)
 
     companion object {
         private val LOGGER: Logger = LoggerFactory.getLogger(Experiment::class.java)
-    }
-
-    fun addPublisher(publisher: Publisher<T>) {
-        publishers.add(publisher)
-    }
-
-    fun removePublisher(publisher: Publisher<T>) {
-        publishers.remove(publisher)
     }
 
     open fun run(control: () -> T?, candidate: () -> T?, sample: Sample = sampleFactory.create()): T? {
@@ -110,15 +106,6 @@ open class Experiment<T>(
         LOGGER.info("Created Result")
         publish(result)
         return result
-    }
-
-    open fun publish(result: Result<T>) {
-        publishers.forEach {
-            LOGGER.debug("Publishing to {}...", it)
-            it.publish(result)
-            LOGGER.debug("Published to {}", it)
-        }
-        result.sample.published.set(true)
     }
 
 }

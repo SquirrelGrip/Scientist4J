@@ -216,3 +216,4 @@ hs_err_pid*
 travis/all.gpg
 *.iml
 .idea/
+certs/

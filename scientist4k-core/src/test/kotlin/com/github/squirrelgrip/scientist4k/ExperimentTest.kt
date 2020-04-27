@@ -7,17 +7,18 @@ import com.github.squirrelgrip.scientist4k.metrics.dropwizard.DropwizardMetricsP
 import com.github.squirrelgrip.scientist4k.metrics.micrometer.MicrometerMetricsProvider
 import com.github.squirrelgrip.scientist4k.model.ComparisonResult
 import com.github.squirrelgrip.scientist4k.model.ExperimentComparator
-import com.github.squirrelgrip.scientist4k.model.Publisher
-import com.nhaarman.mockitokotlin2.any
+import com.google.common.eventbus.EventBus
 import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import io.dropwizard.metrics5.MetricName
 import org.assertj.core.api.Assertions.assertThat
+import org.hamcrest.CoreMatchers.isA
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
 import org.mockito.BDDMockito.given
 import java.util.*
+
 
 class ExperimentTest {
     private fun exceptionThrowingFunction(): Int {
@@ -86,7 +87,7 @@ class ExperimentTest {
 
     @Test
     fun itWorksWithAnExtendedClass() {
-        val experiment: Experiment<Int> = TestPublishExperiment("test", NoopMetricsProvider())
+        val experiment = Experiment<Int>("test", NoopMetricsProvider())
         experiment.run({ safeFunction() }, { safeFunction() })
     }
 
@@ -141,11 +142,13 @@ class ExperimentTest {
     }
 
     @Test
-    fun `publisher is called`() {
-        val publisher = mock<Publisher<Int>>()
-        val experiment = ExperimentBuilder<Int>().withRaiseOnMismatch(true).build()
-        experiment.addPublisher(publisher)
+    fun `eventBus is called`() {
+        val eventBus = mock<EventBus>()
+        val experiment = ExperimentBuilder<Int>()
+                .withRaiseOnMismatch(true)
+                .withEventBus(eventBus)
+                .build()
         experiment.run({safeFunction()}, {safeFunction()})
-        verify(publisher).publish(any())
+        verify(eventBus).post(isA(Result::class.java))
     }
 }

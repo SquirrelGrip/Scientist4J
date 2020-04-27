@@ -4,11 +4,17 @@
     <parent>
         <artifactId>scientist4k</artifactId>
         <groupId>com.github.squirrelgrip</groupId>
-        <version>0.6.1</version>
+        <version>0.6.2</version>
     </parent>
+
     <artifactId>scientist4k-controlled-http</artifactId>
+    <name>${project.groupId}:${project.artifactId}</name>
 
     <dependencies>
+        <dependency>
+            <groupId>com.github.squirrelgrip</groupId>
+            <artifactId>cheti</artifactId>
+        </dependency>
         <dependency>
             <groupId>com.github.squirrelgrip</groupId>
             <artifactId>extensions</artifactId>
@@ -20,7 +26,7 @@
         </dependency>
         <dependency>
             <groupId>com.github.squirrelgrip</groupId>
-            <artifactId>scientist4k-http</artifactId>
+            <artifactId>scientist4k-http-core</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -28,10 +34,6 @@
             <artifactId>scientist4k-http-test</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.github.squirrelgrip</groupId>
-            <artifactId>cheti</artifactId>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>

@@ -1,10 +1,10 @@
 package com.github.squirrelgrip.scientist4k.handler
 
 import com.github.squirrelgrip.extension.json.toJson
-import com.github.squirrelgrip.scientist4k.server.SecuredServer
 import com.github.squirrelgrip.scientist4k.configuration.ConnectorConfiguration
 import com.github.squirrelgrip.scientist4k.configuration.ServerConfiguration
 import com.github.squirrelgrip.scientist4k.configuration.SslConfiguration
+import com.github.squirrelgrip.scientist4k.server.SecuredServer
 import com.google.common.net.MediaType
 import org.eclipse.jetty.server.Request
 import org.eclipse.jetty.server.handler.AbstractHandler
@@ -21,10 +21,10 @@ class ControlHandler : AbstractHandler() {
                         ConnectorConfiguration(9001),
                         ConnectorConfiguration(9002,
                                 SslConfiguration(
-                                        "target/certs/keystore.jks",
+                                        "../certs/keystore.jks",
                                         "pass:password",
                                         "JKS",
-                                        "target/certs/keystore.jks",
+                                        "../certs/keystore.jks",
                                         "pass:password",
                                         "JKS",
                                         "TLSv1.2"

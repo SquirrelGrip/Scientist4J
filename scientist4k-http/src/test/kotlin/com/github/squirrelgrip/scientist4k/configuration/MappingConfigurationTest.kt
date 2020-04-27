@@ -3,8 +3,6 @@ package com.github.squirrelgrip.scientist4k.configuration
 import org.assertj.core.api.AssertionsForInterfaceTypes.assertThat
 import org.junit.jupiter.api.Test
 
-import org.junit.jupiter.api.Assertions.*
-
 internal class MappingConfigurationTest {
 
     @Test

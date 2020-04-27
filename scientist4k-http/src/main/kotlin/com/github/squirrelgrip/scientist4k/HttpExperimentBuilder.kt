@@ -1,5 +1,6 @@
 package com.github.squirrelgrip.scientist4k
 
+import com.github.squirrelgrip.scientist4k.comparator.ExperimentResponseComparator
 import com.github.squirrelgrip.scientist4k.configuration.EndPointConfiguration
 import com.github.squirrelgrip.scientist4k.configuration.HttpExperimentConfiguration
 import com.github.squirrelgrip.scientist4k.configuration.MappingConfiguration
@@ -7,8 +8,8 @@ import com.github.squirrelgrip.scientist4k.exceptions.LaboratoryException
 import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
 import com.github.squirrelgrip.scientist4k.model.ExperimentComparator
 import com.github.squirrelgrip.scientist4k.model.ExperimentResponse
-import com.github.squirrelgrip.scientist4k.comparator.ExperimentResponseComparator
 import com.github.squirrelgrip.scientist4k.model.sample.SampleFactory
+import com.google.common.eventbus.EventBus
 
 class HttpExperimentBuilder() {
     private var mappings: List<MappingConfiguration> = emptyList()
@@ -20,6 +21,7 @@ class HttpExperimentBuilder() {
     private var context: Map<String, String> = emptyMap()
     private var controlConfig: EndPointConfiguration? = null
     private var candidateConfig: EndPointConfiguration? = null
+    private var eventBus: EventBus = EventBus()
 
     constructor(httpExperimentConfiguration: HttpExperimentConfiguration) : this() {
         name = httpExperimentConfiguration.experiment.name
@@ -78,9 +80,14 @@ class HttpExperimentBuilder() {
         return this
     }
 
+    fun withEventBus(eventBus: EventBus): HttpExperimentBuilder {
+        this.eventBus = eventBus
+        return this
+    }
+
     fun build(): HttpExperiment {
         if (controlConfig != null && candidateConfig != null) {
-            return HttpExperiment(name, raiseOnMismatch, metrics, context, comparator, sampleFactory, mappings, controlConfig!!, candidateConfig!!)
+            return HttpExperiment(name, raiseOnMismatch, metrics, context, comparator, sampleFactory, eventBus, mappings, controlConfig!!, candidateConfig!!)
         }
         throw LaboratoryException("Both control and candidate configurations must be set")
     }

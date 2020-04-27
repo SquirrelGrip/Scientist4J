@@ -1,13 +1,17 @@
 package com.github.squirrelgrip.scientist4k
 
+import com.github.squirrelgrip.scientist4k.HttpExperimentUtil.processResponse
 import com.github.squirrelgrip.scientist4k.comparator.ExperimentResponseComparator
 import com.github.squirrelgrip.scientist4k.configuration.EndPointConfiguration
 import com.github.squirrelgrip.scientist4k.configuration.MappingConfiguration
 import com.github.squirrelgrip.scientist4k.factory.RequestFactory
 import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
-import com.github.squirrelgrip.scientist4k.model.*
+import com.github.squirrelgrip.scientist4k.model.ExperimentComparator
+import com.github.squirrelgrip.scientist4k.model.ExperimentRequest
+import com.github.squirrelgrip.scientist4k.model.ExperimentResponse
 import com.github.squirrelgrip.scientist4k.model.sample.Sample
 import com.github.squirrelgrip.scientist4k.model.sample.SampleFactory
+import com.google.common.eventbus.EventBus
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import javax.servlet.http.HttpServletRequest
@@ -20,8 +24,9 @@ class HttpExperiment(
         context: Map<String, Any> = emptyMap(),
         comparator: ExperimentComparator<ExperimentResponse?> = ExperimentResponseComparator(),
         sampleFactory: SampleFactory = SampleFactory(),
-        private val mappings: List<MappingConfiguration> = emptyList(),
-        private val controlConfig: EndPointConfiguration,
+        eventBus: EventBus = EventBus(),
+        mappings: List<MappingConfiguration> = emptyList(),
+        controlConfig: EndPointConfiguration,
         private val candidateConfig: EndPointConfiguration
 ) : Experiment<ExperimentResponse>(
         name,
@@ -29,53 +34,14 @@ class HttpExperiment(
         metrics,
         context,
         comparator,
-        sampleFactory
+        sampleFactory,
+        eventBus
 ) {
-    private val controlRequestFactory = RequestFactory(controlConfig, CONTROL_COOKIE_STORE)
-    private val candidateRequestFactory = RequestFactory(candidateConfig, CANDIDATE_COOKIE_STORE, mappings)
+    private val controlRequestFactory = RequestFactory(controlConfig, HttpExperimentUtil.CONTROL_COOKIE_STORE)
+    private val candidateRequestFactory = RequestFactory(candidateConfig, HttpExperimentUtil.CANDIDATE_COOKIE_STORE, mappings)
 
     companion object {
         private val LOGGER: Logger = LoggerFactory.getLogger(HttpExperiment::class.java)
-        val CONTROL_COOKIE_STORE = "CONTROL_COOKIE_STORE"
-        val CANDIDATE_COOKIE_STORE = "CANDIDATE_COOKIE_STORE"
-
-        fun processResponse(
-                inboundResponse: HttpServletResponse,
-                controlResponse: ExperimentResponse?
-        ) {
-            LOGGER.debug("processing response {}", controlResponse)
-            if (controlResponse != null) {
-                inboundResponse.status = controlResponse.status.statusCode
-                controlResponse.headers
-                        .filter {
-                            it.name != "Set-Cookie"
-                        }
-                        .forEach {
-                            inboundResponse.addHeader(it.name, it.value)
-                        }
-                inboundResponse.outputStream.write(controlResponse.content)
-            } else {
-                LOGGER.warn("Control Response is null")
-                inboundResponse.status = 500
-                inboundResponse.writer.println("Something went wrong with the experiment")
-            }
-            inboundResponse.flushBuffer()
-        }
-    }
-
-    init {
-        addPublisher(object : Publisher<ExperimentResponse> {
-            override fun publish(result: Result<ExperimentResponse>) {
-                LOGGER.info("${result.match.matches} => ${result.sample.notes["uri"]}")
-                if (!result.match.matches) {
-                    LOGGER.info("\t${result.control.value}")
-                    LOGGER.info("\t${result.candidate?.value}")
-                    result.match.failureReasons.forEach {
-                        LOGGER.info("\t\t${it}")
-                    }
-                }
-            }
-        })
     }
 
     fun run(
@@ -83,9 +49,7 @@ class HttpExperiment(
             inboundResponse: HttpServletResponse,
             sample: Sample = sampleFactory.create()
     ) {
-        val experimentRequest = ExperimentRequest.create(inboundRequest)
-        sample.addNote("request", experimentRequest.toString())
-        sample.addNote("uri", experimentRequest.url)
+        val experimentRequest = HttpExperimentUtil.createRequest(inboundRequest, sample)
         val controlResponse = if (candidateConfig.allowedMethods.contains("*") or candidateConfig.allowedMethods.contains(inboundRequest.method)) {
             run(createControlRequest(experimentRequest), createCandidateRequest(experimentRequest), sample)
         } else {
