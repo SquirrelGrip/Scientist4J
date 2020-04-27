@@ -1,7 +1,7 @@
 package com.github.squirrelgrip.scientist4k.comparator
 
-import com.github.squirrelgrip.extensions.json.toInstance
-import com.github.squirrelgrip.extensions.map.flatten
+import com.github.squirrelgrip.extension.json.toInstance
+import com.github.squirrelgrip.extension.map.flatten
 import com.github.squirrelgrip.scientist4k.model.ComparisonResult
 import com.github.squirrelgrip.scientist4k.model.ComparisonResult.Companion.SUCCESS
 import com.google.common.collect.MapDifference

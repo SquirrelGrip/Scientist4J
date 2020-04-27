@@ -1,17 +1,17 @@
 package com.github.squirrelgrip.scientist4k
 
-import com.github.squirrelgrip.scientist4k.configuration.HttpExperimentConfiguration
+import com.github.squirrelgrip.scientist4k.configuration.ControlledHttpExperimentConfiguration
 import org.eclipse.jetty.server.Request
 import org.eclipse.jetty.server.handler.AbstractHandler
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 
-class ExperimentHandler(
-        val experiment: HttpExperiment
+class ControlledExperimentHandler(
+        val controlledHttpExperiment: ControlledHttpExperiment
 ) : AbstractHandler() {
 
-    constructor(httpExperimentConfiguration: HttpExperimentConfiguration): this(HttpExperimentBuilder(httpExperimentConfiguration).build())
+    constructor(controlledHttpExperimentConfiguration: ControlledHttpExperimentConfiguration): this(ControlledHttpExperimentBuilder(controlledHttpExperimentConfiguration).build())
 
     override fun handle(
             target: String,
@@ -19,7 +19,7 @@ class ExperimentHandler(
             request: HttpServletRequest,
             response: HttpServletResponse
     ) {
-        experiment.run(request, response)
+        controlledHttpExperiment.run(request, response)
         baseRequest.isHandled = true
     }
 

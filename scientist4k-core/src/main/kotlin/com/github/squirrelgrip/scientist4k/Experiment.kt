@@ -1,8 +1,6 @@
 package com.github.squirrelgrip.scientist4k
 
-import com.github.squirrelgrip.scientist4k.metrics.Counter
 import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
-import com.github.squirrelgrip.scientist4k.metrics.Timer
 import com.github.squirrelgrip.scientist4k.model.*
 import com.github.squirrelgrip.scientist4k.model.sample.Sample
 import com.github.squirrelgrip.scientist4k.model.sample.SampleFactory
@@ -14,12 +12,19 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 open class Experiment<T>(
-        val name: String,
-        val raiseOnMismatch: Boolean = false,
-        val metrics: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD"),
-        val context: Map<String, Any> = emptyMap(),
-        val comparator: ExperimentComparator<T?> = DefaultExperimentComparator(),
-        val sampleFactory: SampleFactory = SampleFactory()
+        name: String,
+        raiseOnMismatch: Boolean = false,
+        metrics: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD"),
+        context: Map<String, Any> = emptyMap(),
+        comparator: ExperimentComparator<T?> = DefaultExperimentComparator(),
+        sampleFactory: SampleFactory = SampleFactory()
+) : AbstractExperiment<T>(
+        name,
+        raiseOnMismatch,
+        metrics,
+        context,
+        comparator,
+        sampleFactory
 ) {
     /**
      * Note that if `raiseOnMismatch` is true, [.runAsync] will block waiting for
@@ -28,25 +33,11 @@ open class Experiment<T>(
      * it is *not* recommended to raise on mismatch.
      */
     private val publishers = mutableListOf<Publisher<T>>()
-    private val controlTimer: Timer
-    private val candidateTimer: Timer
-    private val mismatchCount: Counter
-    private val candidateExceptionCount: Counter
-    private val totalCount: Counter
 
     constructor(metrics: MetricsProvider<*>) : this("Experiment", metrics)
     constructor(name: String, metrics: MetricsProvider<*>) : this(name, false, metrics)
 
-    init {
-        controlTimer = metrics.timer(NAMESPACE_PREFIX, name, "control")
-        candidateTimer = metrics.timer(NAMESPACE_PREFIX, name, "candidate")
-        mismatchCount = metrics.counter(NAMESPACE_PREFIX, name, "mismatch")
-        candidateExceptionCount = metrics.counter(NAMESPACE_PREFIX, name, "candidate.exception")
-        totalCount = metrics.counter(NAMESPACE_PREFIX, name, "total")
-    }
-
     companion object {
-        private const val NAMESPACE_PREFIX = "scientist"
         private val LOGGER: Logger = LoggerFactory.getLogger(Experiment::class.java)
     }
 
@@ -73,11 +64,9 @@ open class Experiment<T>(
         val candidateObservation = if (runIf() && enabled()) {
             executeCandidate(candidate)
         } else {
-            null
+            scrapCandidate()
         }
-        if (candidateObservation != null) {
-            publishResult(candidateObservation, controlObservation, sample).handleComparisonMismatch()
-        }
+        publishResult(controlObservation, candidateObservation, sample).handleComparisonMismatch()
         return controlObservation.value
     }
 
@@ -86,97 +75,42 @@ open class Experiment<T>(
                 val deferredControlObservation = GlobalScope.async {
                     executeControl(control)
                 }
-                val deferredCandidateObservation = if (runIf() && enabled()) {
-                    GlobalScope.async {
-                        executeCandidate(candidate)
-                    }
-                } else {
-                    null
-                }
+                val deferredCandidateObservation =
+                        GlobalScope.async {
+                            if (runIf() && enabled()) {
+                                executeCandidate(candidate)
+                            } else {
+                                scrapCandidate()
+                            }
+                        }
+
 
                 LOGGER.debug("Awaiting deferredControlObservation...")
                 val controlObservation = deferredControlObservation.await()
                 LOGGER.debug("deferredControlObservation is {}", controlObservation)
-                if (deferredCandidateObservation != null) {
-                    val deferred = GlobalScope.async {
-                        publishAsync(deferredCandidateObservation, controlObservation, sample)
-                    }
-                    if (raiseOnMismatch) {
-                        deferred.await().handleComparisonMismatch()
-                    }
+                val deferred = GlobalScope.async {
+                    publishAsync(controlObservation, deferredCandidateObservation, sample)
+                }
+                if (raiseOnMismatch) {
+                    deferred.await().handleComparisonMismatch()
                 }
                 controlObservation.value
             }
 
-    private suspend fun publishAsync(deferredCandidateObservation: Deferred<Observation<T>>, controlObservation: Observation<T>, sample: Sample = sampleFactory.create()): Result<T> {
+    private suspend fun publishAsync(controlObservation: Observation<T>, deferredCandidateObservation: Deferred<Observation<T>>, sample: Sample = sampleFactory.create()): Result<T> {
         LOGGER.debug("Awaiting candidateObservation...")
         val candidateObservation = deferredCandidateObservation.await()
         LOGGER.debug("candidateObservation is {}", candidateObservation)
-        return publishResult(candidateObservation, controlObservation, sample)
+        return publishResult(controlObservation, candidateObservation, sample)
     }
 
-    private fun publishResult(candidateObservation: Observation<T>, controlObservation: Observation<T>, sample: Sample = sampleFactory.create()): Result<T> {
-        countExceptions(candidateObservation, candidateExceptionCount)
+    private fun publishResult(controlObservation: Observation<T>, candidateObservation: Observation<T>, sample: Sample = sampleFactory.create()): Result<T> {
         LOGGER.info("Creating Result...")
-        val result = Result(this@Experiment, controlObservation, candidateObservation, context, sample)
+        val result = Result(this, controlObservation, candidateObservation, context, sample)
         LOGGER.info("Created Result")
         publish(result)
         return result
     }
-
-    private fun executeCandidate(candidate: () -> T?) =
-            execute("candidate", candidateTimer, candidate, false)
-
-    private fun executeControl(control: () -> T?) =
-            execute("control", controlTimer, control, true)
-
-    private fun countExceptions(observation: Observation<T>, exceptions: Counter) {
-        if (observation.exception != null) {
-            exceptions.increment()
-        }
-    }
-
-    private fun execute(name: String, timer: Timer, function: () -> T?, shouldThrow: Boolean): Observation<T> {
-        val observation = Observation<T>(name, timer)
-        observation.time {
-            try {
-                observation.setValue(function.invoke())
-            } catch (e: Exception) {
-                observation.setException(e)
-            }
-        }
-        val exception = observation.exception
-        if (exception != null && shouldThrow) {
-            throw exception
-        }
-        return observation
-    }
-
-    fun compare(control: Observation<T>, candidate: Observation<T>): ComparisonResult {
-        return if (candidate.exception != null) {
-            ComparisonResult("Candidate threw an exception.")
-        } else {
-            LOGGER.info("Comparing {} with {}", control.value, candidate.value)
-            comparator.invoke(control.value, candidate.value)
-        }.apply {
-            LOGGER.info("Compared...match={}", this.matches)
-            totalCount.increment()
-            if (!matches) {
-                mismatchCount.increment()
-            }
-        }
-    }
-
-    open fun runIf(): Boolean {
-        return true
-    }
-
-    open fun enabled(): Boolean {
-        return true
-    }
-
-    open val isAsync: Boolean
-        get() = true
 
     open fun publish(result: Result<T>) {
         publishers.forEach {

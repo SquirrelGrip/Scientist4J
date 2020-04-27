@@ -1,6 +1,6 @@
 package com.github.squirrelgrip.scientist4k
 
-import com.github.squirrelgrip.extensions.json.toInstance
+import com.github.squirrelgrip.extension.json.toInstance
 import com.github.squirrelgrip.scientist4k.configuration.HttpExperimentConfiguration
 import java.io.File
 
