@@ -2,11 +2,8 @@ package com.github.squirrelgrip.scientist4k.configuration
 
 import com.github.squirrelgrip.extension.json.toInstance
 import com.github.squirrelgrip.extension.json.toJson
-import com.github.squirrelgrip.scientist4k.model.DefaultExperimentComparator
 import org.assertj.core.api.AssertionsForInterfaceTypes.assertThat
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
-import java.io.File
 
 internal class ExperimentConfigurationTest {
     @Test

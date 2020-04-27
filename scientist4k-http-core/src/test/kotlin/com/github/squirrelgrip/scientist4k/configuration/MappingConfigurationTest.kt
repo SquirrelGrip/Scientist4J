@@ -1,5 +1,6 @@
 package com.github.squirrelgrip.scientist4k.configuration
 
+import com.github.squirrelgrip.scientist4k.configuration.MappingConfiguration
 import org.assertj.core.api.AssertionsForInterfaceTypes.assertThat
 import org.junit.jupiter.api.Test
 
