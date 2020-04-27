@@ -1,7 +1,7 @@
 package com.github.squirrelgrip.scientist4k.comparator
 
 import com.fasterxml.jackson.databind.JsonNode
-import com.github.fge.jsonpatch.diff.JsonDiff
+import com.flipkart.zjsonpatch.JsonDiff
 import com.github.squirrelgrip.extension.json.toJson
 import com.github.squirrelgrip.extension.json.toJsonNode
 import com.github.squirrelgrip.scientist4k.model.ComparisonResult
