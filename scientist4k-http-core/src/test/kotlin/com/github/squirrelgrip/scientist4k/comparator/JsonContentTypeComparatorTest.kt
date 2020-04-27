@@ -20,7 +20,7 @@ internal class JsonContentTypeComparatorTest {
                 Example(4, "PPP", mapOf(1 to "DDD"), listOf(Item(1, "AAA4"), Item(2, "BBB4")))
         )
         val comparisonResult = JsonContentTypeComparator().invoke(listA.toJson().toByteArray(), listB.toJson().toByteArray())
-        assertThat(comparisonResult.matches).isTrue
+        assertThat(comparisonResult.matches).isTrue()
     }
 
     @Test
@@ -38,7 +38,7 @@ internal class JsonContentTypeComparatorTest {
                 Example(4, "PPP", mapOf(1 to "DDD"), listOf(Item(1, "AAA4"), Item(2, "BBB4")))
         )
         val comparisonResult = JsonContentTypeComparator().invoke(listA.toJson().toByteArray(), listB.toJson().toByteArray())
-        assertThat(comparisonResult.matches).isFalse
+        assertThat(comparisonResult.matches).isFalse()
     }
 
     @Test
@@ -56,7 +56,7 @@ internal class JsonContentTypeComparatorTest {
                 Example(4, "PPP", mapOf(1 to "DDD"), listOf(Item(1, "AAA4"), Item(2, "BBB4")))
         )
         val comparisonResult = JsonContentTypeComparator().invoke(listA.toJson().toByteArray(), listB.toJson().toByteArray())
-        assertThat(comparisonResult.matches).isFalse
+        assertThat(comparisonResult.matches).isFalse()
     }
 
     @Test
@@ -74,7 +74,7 @@ internal class JsonContentTypeComparatorTest {
                 Example(4, "PPP", mapOf(1 to "DDD"), listOf(Item(1, "AAA4"), Item(2, "BBB4")))
         )
         val comparisonResult = JsonContentTypeComparator().invoke(listA.toJson().toByteArray(), listB.toJson().toByteArray())
-        assertThat(comparisonResult.matches).isFalse
+        assertThat(comparisonResult.matches).isFalse()
     }
 
     @Test
@@ -92,7 +92,7 @@ internal class JsonContentTypeComparatorTest {
                 Example(1, "SSS", mapOf(1 to "AAA"), listOf(Item(1, "AAA1"), Item(2, "BBB1")))
         )
         val comparisonResult = JsonContentTypeComparator().invoke(listA.toJson().toByteArray(), listB.toJson().toByteArray())
-        assertThat(comparisonResult.matches).isFalse
+        assertThat(comparisonResult.matches).isFalse()
     }
 }
 
