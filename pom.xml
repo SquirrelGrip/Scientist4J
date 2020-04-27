@@ -4,7 +4,7 @@
 
     <groupId>com.github.squirrelgrip</groupId>
     <artifactId>scientist4k</artifactId>
-    <version>0.6.4-SNAPSHOT</version>
+    <version>0.6.3</version>
     <packaging>pom</packaging>
 
     <name>${project.groupId}:${project.artifactId}</name>
