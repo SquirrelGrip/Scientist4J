@@ -379,6 +379,8 @@
         <module>scientist4k-controlled</module>
         <module>scientist4k-http</module>
         <module>scientist4k-controlled-http</module>
+        <module>scientist4k-http-test</module>
+        <module>scientist4k-http-core</module>
     </modules>
 
     <profiles>

@@ -1,6 +1,7 @@
-package com.github.squirrelgrip.scientist4k
+package com.github.squirrelgrip.scientist4k.handler
 
 import com.github.squirrelgrip.extension.json.toJson
+import com.github.squirrelgrip.scientist4k.server.SecuredServer
 import com.github.squirrelgrip.scientist4k.configuration.ConnectorConfiguration
 import com.github.squirrelgrip.scientist4k.configuration.ServerConfiguration
 import com.github.squirrelgrip.scientist4k.configuration.SslConfiguration
@@ -13,12 +14,13 @@ import javax.servlet.http.Cookie
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
-class SecondaryControlHandler : AbstractHandler() {
+
+class CandidateHandler : AbstractHandler() {
     companion object {
         val serverConfiguration = ServerConfiguration(
                 listOf(
-                        ConnectorConfiguration(9003),
-                        ConnectorConfiguration(9004,
+                        ConnectorConfiguration(9011),
+                        ConnectorConfiguration(9012,
                                 SslConfiguration(
                                         "target/certs/keystore.jks",
                                         "pass:password",
@@ -31,7 +33,7 @@ class SecondaryControlHandler : AbstractHandler() {
                         )
                 )
         )
-        private val LOGGER: Logger = LoggerFactory.getLogger(SecondaryControlHandler::class.java)
+        private val LOGGER: Logger = LoggerFactory.getLogger(CandidateHandler::class.java)
     }
 
     override fun handle(
@@ -40,13 +42,13 @@ class SecondaryControlHandler : AbstractHandler() {
             request: HttpServletRequest,
             response: HttpServletResponse
     ) {
-        LOGGER.info("ControlHandler received request: ${request.method} ${request.requestURL}")
+        LOGGER.info("CandidateHandler received request: ${request.method} ${request.requestURL}")
         val out = response.writer
         when (target) {
-            "/control" -> {
+            "/candidate" -> {
                 response.contentType = "text/plain;charset=utf-8"
                 response.status = HttpServletResponse.SC_OK
-                out.println("Control")
+                out.println("Candidate")
             }
             "/ok" -> {
                 response.contentType = "text/html;charset=utf-8"
@@ -56,46 +58,45 @@ class SecondaryControlHandler : AbstractHandler() {
             "/differentContent" -> {
                 response.contentType = "text/plain;charset=utf-8"
                 response.status = HttpServletResponse.SC_OK
-                out.println("Control Content")
+                out.println("Candidate Content")
             }
-            "/mappedControl" -> {
+            "/mappedCandidate" -> {
                 response.contentType = "text/plain;charset=utf-8"
                 response.status = HttpServletResponse.SC_OK
                 out.println("mapped")
             }
             "/status" -> {
                 response.contentType = "text/html;charset=utf-8"
-                response.status = HttpServletResponse.SC_OK
+                response.status = HttpServletResponse.SC_CREATED
                 out.println("<h1>status</h1>")
             }
             "/contentType" -> {
-                response.contentType = "text/html;charset=utf-8"
-                response.status = HttpServletResponse.SC_OK
+                response.contentType = "text/html"
+                response.status = HttpServletResponse.SC_CREATED
                 out.println("<h1>content type</h1>")
             }
             "/cookie" -> {
                 response.contentType = "text/html;charset=utf-8"
                 response.status = HttpServletResponse.SC_OK
                 response.addCookie(Cookie("name", "value"))
-                out.println("<h1>cookie</h1>")
+                out.println("<h1>Cookie</h1>")
             }
             "/addcookie" -> {
                 response.contentType = "text/html;charset=utf-8"
                 response.status = HttpServletResponse.SC_OK
                 response.addCookie(Cookie("name", "value"))
+                response.addCookie(Cookie("add", "value"))
                 out.println("<h1>Hello</h1>")
             }
             "/alteredcookie" -> {
                 response.contentType = "text/html;charset=utf-8"
                 response.status = HttpServletResponse.SC_OK
-                response.addCookie(Cookie("name", "value"))
+                response.addCookie(Cookie("name", "different_value"))
                 out.println("<h1>Hello</h1>")
             }
             "/removedcookie" -> {
                 response.contentType = "text/html;charset=utf-8"
                 response.status = HttpServletResponse.SC_OK
-                val cookie = Cookie("name", "value")
-                response.addCookie(cookie)
                 out.println("<h1>Hello</h1>")
             }
             "/redirect" -> {
@@ -106,10 +107,10 @@ class SecondaryControlHandler : AbstractHandler() {
                 response.status = HttpServletResponse.SC_OK
                 out.println(mapOf("1" to "AAA", "2" to listOf("BBB", "CCC"), "3" to mapOf("4" to listOf("DDD", "EEE"))).toJson())
             }
-            "/jsonDifferent" -> {
+             "/jsonDifferent" -> {
                 response.contentType = MediaType.JSON_UTF_8.toString()
                 response.status = HttpServletResponse.SC_OK
-                out.println(mapOf("1" to "AAA", "2" to listOf("BBB", "CCC"), "3" to mapOf("4" to listOf("DDD", "EEE"))).toJson())
+                out.println(mapOf("5" to "AAA", "2" to listOf("BBB", "CCC"), "3" to mapOf("4" to listOf("DDD", "EEE"))).toJson())
             }
             else -> {
                 response.status = HttpServletResponse.SC_NOT_FOUND
@@ -117,10 +118,11 @@ class SecondaryControlHandler : AbstractHandler() {
         }
         baseRequest.isHandled = true
     }
+
 }
 
 fun main() {
-    val server = SecuredServer(SecondaryControlHandler.serverConfiguration, CandidateHandler())
+    val server = SecuredServer(CandidateHandler.serverConfiguration, CandidateHandler())
     server.start()
     server.join()
 }

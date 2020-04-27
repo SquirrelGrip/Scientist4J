@@ -1,4 +1,4 @@
-package com.github.squirrelgrip.scientist4k
+package com.github.squirrelgrip.scientist4k.server
 
 import com.github.squirrelgrip.scientist4k.configuration.ServerConfiguration
 import org.eclipse.jetty.server.Handler

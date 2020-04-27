@@ -1,4 +1,4 @@
-package com.github.squirrelgrip.configuration.exception
+package com.github.squirrelgrip.scientist4k.exception
 
 class InvalidConfigurationException(message: String) : Exception(message) {
     constructor(): this("Invalid Configuration")

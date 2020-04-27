@@ -3,9 +3,13 @@ package com.github.squirrelgrip.scientist4k
 import com.github.squirrelgrip.cheti.Cheti
 import com.github.squirrelgrip.extension.json.toInstance
 import com.github.squirrelgrip.scientist4k.configuration.ControlledHttpExperimentConfiguration
+import com.github.squirrelgrip.scientist4k.handler.CandidateHandler
+import com.github.squirrelgrip.scientist4k.handler.ControlHandler
+import com.github.squirrelgrip.scientist4k.handler.ReferenceHandler
 import com.github.squirrelgrip.scientist4k.model.ControlledPublisher
 import com.github.squirrelgrip.scientist4k.model.ControlledResult
 import com.github.squirrelgrip.scientist4k.model.ExperimentResponse
+import com.github.squirrelgrip.scientist4k.server.SecuredServer
 import org.apache.http.client.methods.RequestBuilder
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory
 import org.apache.http.impl.client.HttpClients
@@ -41,8 +45,8 @@ class ControlledHttpExperimentServerTest {
             val cheti = Cheti(chetiConfiguration)
             cheti.execute()
 
-            val primaryControlServer = SecuredServer(PrimaryControlHandler.serverConfiguration, PrimaryControlHandler())
-            val secondaryControlServer = SecuredServer(SecondaryControlHandler.serverConfiguration, SecondaryControlHandler())
+            val primaryControlServer = SecuredServer(ControlHandler.serverConfiguration, ControlHandler())
+            val secondaryControlServer = SecuredServer(ReferenceHandler.serverConfiguration, ReferenceHandler())
             val candidateServer = SecuredServer(CandidateHandler.serverConfiguration, CandidateHandler())
 
             primaryControlServer.start()
