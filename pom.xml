@@ -4,7 +4,7 @@
 
     <groupId>com.github.squirrelgrip</groupId>
     <artifactId>scientist4k</artifactId>
-    <version>0.6.0</version>
+    <version>0.6.1</version>
     <packaging>pom</packaging>
 
     <name>${project.groupId}:${project.artifactId}</name>
@@ -379,6 +379,8 @@
         <module>scientist4k-controlled</module>
         <module>scientist4k-http</module>
         <module>scientist4k-controlled-http</module>
+        <module>scientist4k-http-test</module>
+        <module>scientist4k-http-core</module>
     </modules>
 
     <profiles>

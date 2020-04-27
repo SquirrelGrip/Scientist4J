@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <artifactId>scientist4k-http</artifactId>
     <parent>
-        <groupId>com.github.squirrelgrip</groupId>
         <artifactId>scientist4k</artifactId>
+        <groupId>com.github.squirrelgrip</groupId>
         <version>0.6.1</version>
     </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>scientist4k-http-core</artifactId>
     <name>${project.groupId}:${project.artifactId}</name>
 
     <dependencies>
@@ -19,22 +20,6 @@
             <artifactId>extensions</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.github.squirrelgrip</groupId>
-            <artifactId>scientist4k-core</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.github.squirrelgrip</groupId>
-            <artifactId>scientist4k-http-core</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.github.squirrelgrip</groupId>
-            <artifactId>scientist4k-http-test</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
         </dependency>
@@ -44,18 +29,8 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>io.dropwizard.metrics5</groupId>
-            <artifactId>metrics-core</artifactId>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>io.micrometer</groupId>
-            <artifactId>micrometer-core</artifactId>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>org.awaitility</groupId>
-            <artifactId>awaitility</artifactId>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-stdlib</artifactId>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -63,17 +38,9 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-stdlib</artifactId>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
@@ -84,6 +51,10 @@
             <groupId>org.mockito</groupId>
             <artifactId>mockito-junit-jupiter</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

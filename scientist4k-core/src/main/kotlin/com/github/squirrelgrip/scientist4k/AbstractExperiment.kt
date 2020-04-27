@@ -83,7 +83,7 @@ abstract class AbstractExperiment<T>(
         return if (candidate.exception != null) {
             ComparisonResult("Candidate threw an exception.")
         } else {
-            LOGGER.info("Comparing {} with {}", control.value, candidate.value)
+            LOGGER.info("Comparing\n{}\n{}", control.value, candidate.value)
             comparator.invoke(control.value, candidate.value)
         }.apply {
             LOGGER.info("Compared...match={}", this.matches)
