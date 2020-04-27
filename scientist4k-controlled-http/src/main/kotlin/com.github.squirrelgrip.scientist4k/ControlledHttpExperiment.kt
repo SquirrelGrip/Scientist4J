@@ -10,9 +10,12 @@ import com.github.squirrelgrip.scientist4k.configuration.EndPointConfiguration
 import com.github.squirrelgrip.scientist4k.configuration.MappingConfiguration
 import com.github.squirrelgrip.scientist4k.factory.RequestFactory
 import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
-import com.github.squirrelgrip.scientist4k.model.*
+import com.github.squirrelgrip.scientist4k.model.ExperimentComparator
+import com.github.squirrelgrip.scientist4k.model.ExperimentRequest
+import com.github.squirrelgrip.scientist4k.model.ExperimentResponse
 import com.github.squirrelgrip.scientist4k.model.sample.Sample
 import com.github.squirrelgrip.scientist4k.model.sample.SampleFactory
+import com.google.common.eventbus.EventBus
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import javax.servlet.http.HttpServletRequest
@@ -25,6 +28,7 @@ class ControlledHttpExperiment(
         context: Map<String, Any> = emptyMap(),
         comparator: ExperimentComparator<ExperimentResponse?> = ExperimentResponseComparator(),
         sampleFactory: SampleFactory = SampleFactory(),
+        eventBus: EventBus = EventBus(),
         mappings: List<MappingConfiguration> = emptyList(),
         controlConfig: EndPointConfiguration,
         referenceConfig: EndPointConfiguration,
@@ -35,7 +39,8 @@ class ControlledHttpExperiment(
         metrics,
         context,
         comparator,
-        sampleFactory
+        sampleFactory,
+        eventBus
 ) {
     private val controlRequestFactory = RequestFactory(controlConfig, CONTROL_COOKIE_STORE)
     private val referenceRequestFactory = RequestFactory(referenceConfig, REFERENCE_COOKIE_STORE)
@@ -43,22 +48,6 @@ class ControlledHttpExperiment(
 
     companion object {
         private val LOGGER: Logger = LoggerFactory.getLogger(ControlledHttpExperiment::class.java)
-    }
-
-    init {
-        addPublisher(object : ControlledPublisher<ExperimentResponse> {
-            override fun publish(result: ControlledResult<ExperimentResponse>) {
-                LOGGER.info("${result.match.matches} => ${result.sample.notes["uri"]}")
-                if (!result.match.matches) {
-                    LOGGER.info("\t${result.control.value}")
-                    LOGGER.info("\t${result.reference.value}")
-                    LOGGER.info("\t${result.candidate?.value}")
-                    result.match.failureReasons.forEach {
-                        LOGGER.info("\t\t${it}")
-                    }
-                }
-            }
-        })
     }
 
     fun run(

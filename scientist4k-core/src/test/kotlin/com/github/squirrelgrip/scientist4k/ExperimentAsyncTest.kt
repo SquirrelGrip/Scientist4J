@@ -62,7 +62,7 @@ class ExperimentAsyncTest {
 
     @Test
     fun itWorksWithAnExtendedClass() {
-        val experiment = TestPublishExperiment<Int>("test", NoopMetricsProvider())
+        val experiment = Experiment<Int>("test", NoopMetricsProvider())
         val value = experiment.run({ safeFunction() }, { safeFunction() })
         assertThat(value).isEqualTo(3)
     }

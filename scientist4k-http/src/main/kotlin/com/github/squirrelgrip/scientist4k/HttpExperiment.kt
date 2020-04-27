@@ -6,9 +6,12 @@ import com.github.squirrelgrip.scientist4k.configuration.EndPointConfiguration
 import com.github.squirrelgrip.scientist4k.configuration.MappingConfiguration
 import com.github.squirrelgrip.scientist4k.factory.RequestFactory
 import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
-import com.github.squirrelgrip.scientist4k.model.*
+import com.github.squirrelgrip.scientist4k.model.ExperimentComparator
+import com.github.squirrelgrip.scientist4k.model.ExperimentRequest
+import com.github.squirrelgrip.scientist4k.model.ExperimentResponse
 import com.github.squirrelgrip.scientist4k.model.sample.Sample
 import com.github.squirrelgrip.scientist4k.model.sample.SampleFactory
+import com.google.common.eventbus.EventBus
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import javax.servlet.http.HttpServletRequest
@@ -21,6 +24,7 @@ class HttpExperiment(
         context: Map<String, Any> = emptyMap(),
         comparator: ExperimentComparator<ExperimentResponse?> = ExperimentResponseComparator(),
         sampleFactory: SampleFactory = SampleFactory(),
+        eventBus: EventBus = EventBus(),
         mappings: List<MappingConfiguration> = emptyList(),
         controlConfig: EndPointConfiguration,
         private val candidateConfig: EndPointConfiguration
@@ -30,28 +34,14 @@ class HttpExperiment(
         metrics,
         context,
         comparator,
-        sampleFactory
+        sampleFactory,
+        eventBus
 ) {
     private val controlRequestFactory = RequestFactory(controlConfig, HttpExperimentUtil.CONTROL_COOKIE_STORE)
     private val candidateRequestFactory = RequestFactory(candidateConfig, HttpExperimentUtil.CANDIDATE_COOKIE_STORE, mappings)
 
     companion object {
         private val LOGGER: Logger = LoggerFactory.getLogger(HttpExperiment::class.java)
-    }
-
-    init {
-        addPublisher(object : Publisher<ExperimentResponse> {
-            override fun publish(result: Result<ExperimentResponse>) {
-                LOGGER.info("${result.match.matches} => ${result.sample.notes["uri"]}")
-                if (!result.match.matches) {
-                    LOGGER.info("\t${result.control.value}")
-                    LOGGER.info("\t${result.candidate?.value}")
-                    result.match.failureReasons.forEach {
-                        LOGGER.info("\t\t${it}")
-                    }
-                }
-            }
-        })
     }
 
     fun run(

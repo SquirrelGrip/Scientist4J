@@ -6,9 +6,9 @@ import com.github.squirrelgrip.scientist4k.configuration.HttpExperimentConfigura
 import com.github.squirrelgrip.scientist4k.handler.CandidateHandler
 import com.github.squirrelgrip.scientist4k.handler.ControlHandler
 import com.github.squirrelgrip.scientist4k.model.ExperimentResponse
-import com.github.squirrelgrip.scientist4k.model.Publisher
 import com.github.squirrelgrip.scientist4k.model.Result
 import com.github.squirrelgrip.scientist4k.server.SecuredServer
+import com.google.common.eventbus.Subscribe
 import org.apache.http.client.methods.RequestBuilder
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory
 import org.apache.http.impl.client.HttpClients
@@ -21,7 +21,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.io.File
 import java.util.concurrent.TimeUnit
-
 
 class HttpExperimentServerTest {
 
@@ -65,11 +64,10 @@ class HttpExperimentServerTest {
 
     var actualResult: MutableList<Result<ExperimentResponse>> = mutableListOf()
 
-    val publisher = object : Publisher<ExperimentResponse> {
-        override fun publish(result: Result<ExperimentResponse>) {
-            println(result.sample.notes["request"])
-            actualResult.add(result)
-        }
+    @Subscribe
+    fun receiveResult(result: Result<ExperimentResponse>) {
+        println(result.sample.notes["request"])
+        actualResult.add(result)
     }
 
     lateinit var testSubject: HttpExperimentServer
@@ -89,7 +87,7 @@ class HttpExperimentServerTest {
                 candidate = candidate
         )
         testSubject = HttpExperimentServer(configuration)
-        (testSubject.handler as ExperimentHandler).experiment.addPublisher(publisher)
+        (testSubject.handler as ExperimentHandler).experiment.eventBus.register(this)
         testSubject.start()
         assertIsRunning(HTTP_EXPERIMENT_URL)
     }

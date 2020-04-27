@@ -5,6 +5,7 @@ import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
 import com.github.squirrelgrip.scientist4k.metrics.Timer
 import com.github.squirrelgrip.scientist4k.model.*
 import com.github.squirrelgrip.scientist4k.model.sample.SampleFactory
+import com.google.common.eventbus.EventBus
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -14,7 +15,8 @@ abstract class AbstractExperiment<T>(
         val metrics: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD"),
         val context: Map<String, Any> = emptyMap(),
         val comparator: ExperimentComparator<T?> = DefaultExperimentComparator(),
-        val sampleFactory: SampleFactory = SampleFactory()
+        val sampleFactory: SampleFactory = SampleFactory(),
+        val eventBus: EventBus = EventBus()
 ) {
     /**
      * Note that if `raiseOnMismatch` is true, [.runAsync] will block waiting for
@@ -77,6 +79,10 @@ abstract class AbstractExperiment<T>(
 
     open val isAsync: Boolean
         get() = true
+
+    open fun publish(result: Any) {
+        eventBus.post(result)
+    }
 
     fun compare(control: Observation<T>, candidate: Observation<T>): ComparisonResult {
         countExceptions(candidate, candidateExceptionCount)

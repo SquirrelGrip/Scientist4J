@@ -6,10 +6,10 @@ import com.github.squirrelgrip.scientist4k.configuration.ControlledHttpExperimen
 import com.github.squirrelgrip.scientist4k.handler.CandidateHandler
 import com.github.squirrelgrip.scientist4k.handler.ControlHandler
 import com.github.squirrelgrip.scientist4k.handler.ReferenceHandler
-import com.github.squirrelgrip.scientist4k.model.ControlledPublisher
 import com.github.squirrelgrip.scientist4k.model.ControlledResult
 import com.github.squirrelgrip.scientist4k.model.ExperimentResponse
 import com.github.squirrelgrip.scientist4k.server.SecuredServer
+import com.google.common.eventbus.Subscribe
 import org.apache.http.client.methods.RequestBuilder
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory
 import org.apache.http.impl.client.HttpClients
@@ -22,7 +22,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.io.File
 import java.util.concurrent.TimeUnit
-
 
 class ControlledHttpExperimentServerTest {
 
@@ -70,11 +69,10 @@ class ControlledHttpExperimentServerTest {
 
     var actualResult: MutableList<ControlledResult<ExperimentResponse>> = mutableListOf()
 
-    val publisher = object : ControlledPublisher<ExperimentResponse> {
-        override fun publish(result: ControlledResult<ExperimentResponse>) {
-            println(result.sample.notes["uri"])
-            actualResult.add(result)
-        }
+    @Subscribe
+    fun receiveResult(result: ControlledResult<ExperimentResponse>) {
+        println(result.sample.notes["request"])
+        actualResult.add(result)
     }
 
     lateinit var testSubject: ControlledHttpExperimentServer
@@ -97,7 +95,7 @@ class ControlledHttpExperimentServerTest {
                 candidate = candidate
         )
         testSubject = ControlledHttpExperimentServer(configuration)
-        (testSubject.handler as ControlledExperimentHandler).controlledHttpExperiment.addPublisher(publisher)
+        (testSubject.handler as ControlledExperimentHandler).controlledHttpExperiment.eventBus.register(this)
         testSubject.start()
         assertIsRunning(HTTP_EXPERIMENT_URL)
     }

@@ -90,7 +90,7 @@ class ControlledExperimentTest {
 
     @Test
     fun itWorksWithAnExtendedClass() {
-        val experiment: ControlledExperiment<Int> = TestPublishControlledExperiment("test", NoopMetricsProvider())
+        val experiment = ControlledExperiment<Int>("test", NoopMetricsProvider())
         experiment.run({ safeFunction() }, { safeFunction() }, { safeFunction() })
     }
 
@@ -125,7 +125,6 @@ class ControlledExperimentTest {
                 .build()
         experiment.run({ 1 }, { 1 }, { 2 })
         sleepFunction()
-        verify(comparator).invoke(1, 1)
         verify(comparator).invoke(1, 2)
     }
 }
