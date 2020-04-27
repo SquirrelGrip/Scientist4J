@@ -19,7 +19,6 @@ import org.junit.jupiter.api.Test
 import org.mockito.BDDMockito.given
 import java.util.*
 
-
 class ExperimentTest {
     private fun exceptionThrowingFunction(): Int {
         throw Exception("throw an exception")
