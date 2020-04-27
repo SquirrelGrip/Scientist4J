@@ -1,10 +1,8 @@
 package com.github.squirrelgrip.scientist4k
 
-import com.github.squirrelgrip.extensions.json.toInstance
 import com.github.squirrelgrip.scientist4k.configuration.HttpExperimentConfiguration
 import org.eclipse.jetty.server.Request
 import org.eclipse.jetty.server.handler.AbstractHandler
-import java.io.File
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 

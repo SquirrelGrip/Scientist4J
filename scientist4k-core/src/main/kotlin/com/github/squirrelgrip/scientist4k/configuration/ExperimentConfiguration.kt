@@ -3,10 +3,8 @@ package com.github.squirrelgrip.scientist4k.configuration
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
-import com.github.squirrelgrip.extensions.json.toInstance
+import com.github.squirrelgrip.extension.json.toInstance
 import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
-import com.github.squirrelgrip.scientist4k.model.DefaultExperimentComparator
-import com.github.squirrelgrip.scientist4k.model.ExperimentComparator
 import com.github.squirrelgrip.scientist4k.model.sample.SampleFactory
 import java.io.File
 

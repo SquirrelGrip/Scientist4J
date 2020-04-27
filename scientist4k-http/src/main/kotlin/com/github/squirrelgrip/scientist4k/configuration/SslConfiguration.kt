@@ -1,7 +1,7 @@
 package com.github.squirrelgrip.scientist4k.configuration
 
 import com.github.squirrelgrip.configuration.exception.InvalidConfigurationException
-import com.github.squirrelgrip.extensions.file.toInputStream
+import com.github.squirrelgrip.extension.file.toInputStream
 import java.io.File
 import java.security.KeyStore
 import java.security.SecureRandom

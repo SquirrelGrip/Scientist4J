@@ -1,6 +1,6 @@
 package com.github.squirrelgrip.scientist4k
 
-import com.github.squirrelgrip.extensions.json.toJson
+import com.github.squirrelgrip.extension.json.toJson
 import com.github.squirrelgrip.scientist4k.configuration.ConnectorConfiguration
 import com.github.squirrelgrip.scientist4k.configuration.ServerConfiguration
 import com.github.squirrelgrip.scientist4k.configuration.SslConfiguration

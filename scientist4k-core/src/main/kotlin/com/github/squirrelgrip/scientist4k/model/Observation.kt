@@ -3,6 +3,7 @@ package com.github.squirrelgrip.scientist4k.model
 import com.fasterxml.jackson.annotation.JsonPropertyOrder
 import com.github.squirrelgrip.scientist4k.metrics.NoopTimer
 import com.github.squirrelgrip.scientist4k.metrics.Timer
+import com.github.squirrelgrip.util.initOnce
 
 @JsonPropertyOrder (
         "name",

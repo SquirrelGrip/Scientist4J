@@ -1,7 +1,7 @@
 package com.github.squirrelgrip.scientist4k
 
 import com.github.squirrelgrip.cheti.Cheti
-import com.github.squirrelgrip.extensions.json.toInstance
+import com.github.squirrelgrip.extension.json.toInstance
 import com.github.squirrelgrip.scientist4k.configuration.ControlledHttpExperimentConfiguration
 import com.github.squirrelgrip.scientist4k.model.ControlledPublisher
 import com.github.squirrelgrip.scientist4k.model.ControlledResult
