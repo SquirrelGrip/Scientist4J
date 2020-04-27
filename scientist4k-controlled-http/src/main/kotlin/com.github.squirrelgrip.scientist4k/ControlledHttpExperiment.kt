@@ -1,9 +1,10 @@
 package com.github.squirrelgrip.scientist4k
 
-
-import com.github.squirrelgrip.scientist4k.HttpExperiment.Companion.CANDIDATE_COOKIE_STORE
-import com.github.squirrelgrip.scientist4k.HttpExperiment.Companion.CONTROL_COOKIE_STORE
-import com.github.squirrelgrip.scientist4k.HttpExperiment.Companion.processResponse
+import com.github.squirrelgrip.scientist4k.HttpExperimentUtil.CANDIDATE_COOKIE_STORE
+import com.github.squirrelgrip.scientist4k.HttpExperimentUtil.CONTROL_COOKIE_STORE
+import com.github.squirrelgrip.scientist4k.HttpExperimentUtil.REFERENCE_COOKIE_STORE
+import com.github.squirrelgrip.scientist4k.HttpExperimentUtil.createRequest
+import com.github.squirrelgrip.scientist4k.HttpExperimentUtil.processResponse
 import com.github.squirrelgrip.scientist4k.comparator.ExperimentResponseComparator
 import com.github.squirrelgrip.scientist4k.configuration.EndPointConfiguration
 import com.github.squirrelgrip.scientist4k.configuration.MappingConfiguration
@@ -24,9 +25,9 @@ class ControlledHttpExperiment(
         context: Map<String, Any> = emptyMap(),
         comparator: ExperimentComparator<ExperimentResponse?> = ExperimentResponseComparator(),
         sampleFactory: SampleFactory = SampleFactory(),
-        private val mappings: List<MappingConfiguration> = emptyList(),
-        private val controlConfig: EndPointConfiguration,
-        private val referenceConfig: EndPointConfiguration,
+        mappings: List<MappingConfiguration> = emptyList(),
+        controlConfig: EndPointConfiguration,
+        referenceConfig: EndPointConfiguration,
         private val candidateConfig: EndPointConfiguration
 ) : ControlledExperiment<ExperimentResponse>(
         name,
@@ -37,12 +38,11 @@ class ControlledHttpExperiment(
         sampleFactory
 ) {
     private val controlRequestFactory = RequestFactory(controlConfig, CONTROL_COOKIE_STORE)
-    private val referenceRequestFactory = RequestFactory(controlConfig, REFERENCE_COOKIE_STORE)
+    private val referenceRequestFactory = RequestFactory(referenceConfig, REFERENCE_COOKIE_STORE)
     private val candidateRequestFactory = RequestFactory(candidateConfig, CANDIDATE_COOKIE_STORE, mappings)
 
     companion object {
         private val LOGGER: Logger = LoggerFactory.getLogger(ControlledHttpExperiment::class.java)
-        val REFERENCE_COOKIE_STORE = "REFERENCE_COOKIE_STORE"
     }
 
     init {
@@ -66,9 +66,7 @@ class ControlledHttpExperiment(
             inboundResponse: HttpServletResponse,
             sample: Sample = sampleFactory.create()
     ) {
-        val experimentRequest = ExperimentRequest.create(inboundRequest)
-        sample.addNote("request", experimentRequest.toString())
-        sample.addNote("uri", experimentRequest.url)
+        val experimentRequest = createRequest(inboundRequest, sample)
         val controlResponse = if (candidateConfig.allowedMethods.contains("*") or candidateConfig.allowedMethods.contains(inboundRequest.method)) {
             run(createControlRequest(experimentRequest), createReferenceRequest(experimentRequest), createCandidateRequest(experimentRequest), sample)
         } else {

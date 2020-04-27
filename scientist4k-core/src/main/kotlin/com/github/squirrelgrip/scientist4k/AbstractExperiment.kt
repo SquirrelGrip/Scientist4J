@@ -45,7 +45,7 @@ abstract class AbstractExperiment<T>(
     protected fun executeControl(control: () -> T?) =
             execute("control", controlTimer, control, true)
 
-    protected fun countExceptions(observation: Observation<T>, exceptions: Counter) {
+    private fun countExceptions(observation: Observation<T>, exceptions: Counter) {
         if (observation.exception != null) {
             exceptions.increment()
         }

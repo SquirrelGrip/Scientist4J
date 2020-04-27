@@ -1,5 +1,6 @@
 package com.github.squirrelgrip.scientist4k
 
+import com.github.squirrelgrip.scientist4k.HttpExperimentUtil.processResponse
 import com.github.squirrelgrip.scientist4k.comparator.ExperimentResponseComparator
 import com.github.squirrelgrip.scientist4k.configuration.EndPointConfiguration
 import com.github.squirrelgrip.scientist4k.configuration.MappingConfiguration
@@ -20,8 +21,8 @@ class HttpExperiment(
         context: Map<String, Any> = emptyMap(),
         comparator: ExperimentComparator<ExperimentResponse?> = ExperimentResponseComparator(),
         sampleFactory: SampleFactory = SampleFactory(),
-        private val mappings: List<MappingConfiguration> = emptyList(),
-        private val controlConfig: EndPointConfiguration,
+        mappings: List<MappingConfiguration> = emptyList(),
+        controlConfig: EndPointConfiguration,
         private val candidateConfig: EndPointConfiguration
 ) : Experiment<ExperimentResponse>(
         name,
@@ -31,36 +32,11 @@ class HttpExperiment(
         comparator,
         sampleFactory
 ) {
-    private val controlRequestFactory = RequestFactory(controlConfig, CONTROL_COOKIE_STORE)
-    private val candidateRequestFactory = RequestFactory(candidateConfig, CANDIDATE_COOKIE_STORE, mappings)
+    private val controlRequestFactory = RequestFactory(controlConfig, HttpExperimentUtil.CONTROL_COOKIE_STORE)
+    private val candidateRequestFactory = RequestFactory(candidateConfig, HttpExperimentUtil.CANDIDATE_COOKIE_STORE, mappings)
 
     companion object {
         private val LOGGER: Logger = LoggerFactory.getLogger(HttpExperiment::class.java)
-        val CONTROL_COOKIE_STORE = "CONTROL_COOKIE_STORE"
-        val CANDIDATE_COOKIE_STORE = "CANDIDATE_COOKIE_STORE"
-
-        fun processResponse(
-                inboundResponse: HttpServletResponse,
-                controlResponse: ExperimentResponse?
-        ) {
-            LOGGER.debug("processing response {}", controlResponse)
-            if (controlResponse != null) {
-                inboundResponse.status = controlResponse.status.statusCode
-                controlResponse.headers
-                        .filter {
-                            it.name != "Set-Cookie"
-                        }
-                        .forEach {
-                            inboundResponse.addHeader(it.name, it.value)
-                        }
-                inboundResponse.outputStream.write(controlResponse.content)
-            } else {
-                LOGGER.warn("Control Response is null")
-                inboundResponse.status = 500
-                inboundResponse.writer.println("Something went wrong with the experiment")
-            }
-            inboundResponse.flushBuffer()
-        }
     }
 
     init {
@@ -83,9 +59,7 @@ class HttpExperiment(
             inboundResponse: HttpServletResponse,
             sample: Sample = sampleFactory.create()
     ) {
-        val experimentRequest = ExperimentRequest.create(inboundRequest)
-        sample.addNote("request", experimentRequest.toString())
-        sample.addNote("uri", experimentRequest.url)
+        val experimentRequest = HttpExperimentUtil.createRequest(inboundRequest, sample)
         val controlResponse = if (candidateConfig.allowedMethods.contains("*") or candidateConfig.allowedMethods.contains(inboundRequest.method)) {
             run(createControlRequest(experimentRequest), createCandidateRequest(experimentRequest), sample)
         } else {

@@ -1,0 +1,103 @@
+{
+  "common": {
+    "location": "../certs",
+    "generate": "ALWAYS",
+    "validFor": "1D",
+    "issuer": "SigningCA",
+    "password": "pass:password"
+  },
+  "certificates": [
+    {
+      "name": "RootCA",
+      "type": "ROOT",
+      "issuer": "",
+      "subject": {
+        "cn": "RootCA",
+        "ou": "SquirrelGrip",
+        "o": "Github",
+        "st": "Singapore",
+        "l": "Singapore",
+        "c": "SG"
+      }
+    },
+    {
+      "name": "SigningCA",
+      "type": "SIGNING",
+      "issuer": "RootCA",
+      "subject": {
+        "cn": "SigningCA",
+        "ou": "SquirrelGrip",
+        "o": "Github",
+        "st": "Singapore",
+        "l": "Singapore",
+        "c": "SG"
+      }
+    },
+    {
+      "name": "Server",
+      "type": "SERVER",
+      "subject": {
+        "cn": "Server"
+      },
+      "extensions": {
+        "altSubject": {
+          "critical": false,
+          "value": [
+            {
+              "type": "IPAddress",
+              "value": "127.0.0.1"
+            },
+            {
+              "type": "DNSName",
+              "value": "localhost"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Client",
+      "type": "CLIENT",
+      "subject": {
+        "cn": "Client"
+      }
+    }
+  ],
+  "keystores": [
+    {
+      "name": "keystore.jks",
+      "type": "JKS",
+      "chains": [
+        "Server",
+        "Client"
+      ]
+    },
+    {
+      "name": "keystore.p12",
+      "type": "PKCS12",
+      "chains": [
+        "Server",
+        "Client"
+      ]
+    }
+  ],
+  "chains": [
+    {
+      "alias": "Server",
+      "chain": [
+        "Server",
+        "SigningCA",
+        "RootCA"
+      ]
+    },
+    {
+      "alias": "Client",
+      "chain": [
+        "Client",
+        "SigningCA",
+        "RootCA"
+      ]
+    }
+  ]
+
+}
