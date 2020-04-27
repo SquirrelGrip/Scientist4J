@@ -4,8 +4,6 @@ import com.github.squirrelgrip.scientist4k.comparator.ExperimentResponseComparat
 import com.github.squirrelgrip.scientist4k.configuration.EndPointConfiguration
 import com.github.squirrelgrip.scientist4k.configuration.MappingConfiguration
 import com.github.squirrelgrip.scientist4k.factory.RequestFactory
-import com.github.squirrelgrip.scientist4k.factory.RequestFactory.Companion.CANDIDATE_COOKIE_STORE
-import com.github.squirrelgrip.scientist4k.factory.RequestFactory.Companion.CONTROL_COOKIE_STORE
 import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
 import com.github.squirrelgrip.scientist4k.model.*
 import com.github.squirrelgrip.scientist4k.model.sample.Sample
@@ -38,7 +36,33 @@ class HttpExperiment(
 
     companion object {
         private val LOGGER: Logger = LoggerFactory.getLogger(HttpExperiment::class.java)
+        val CONTROL_COOKIE_STORE = "CONTROL_COOKIE_STORE"
+        val CANDIDATE_COOKIE_STORE = "CANDIDATE_COOKIE_STORE"
+
+        fun processResponse(
+                inboundResponse: HttpServletResponse,
+                controlResponse: ExperimentResponse?
+        ) {
+            LOGGER.debug("processing response {}", controlResponse)
+            if (controlResponse != null) {
+                inboundResponse.status = controlResponse.status.statusCode
+                controlResponse.headers
+                        .filter {
+                            it.name != "Set-Cookie"
+                        }
+                        .forEach {
+                            inboundResponse.addHeader(it.name, it.value)
+                        }
+                inboundResponse.outputStream.write(controlResponse.content)
+            } else {
+                LOGGER.warn("Control Response is null")
+                inboundResponse.status = 500
+                inboundResponse.writer.println("Something went wrong with the experiment")
+            }
+            inboundResponse.flushBuffer()
+        }
     }
+
     init {
         addPublisher(object : Publisher<ExperimentResponse> {
             override fun publish(result: Result<ExperimentResponse>) {
@@ -68,29 +92,6 @@ class HttpExperiment(
             createControlRequest(experimentRequest).invoke()
         }
         processResponse(inboundResponse, controlResponse)
-    }
-
-    private fun processResponse(
-            inboundResponse: HttpServletResponse,
-            controlResponse: ExperimentResponse?
-    ) {
-        LOGGER.debug("processing response {}", controlResponse)
-        if (controlResponse != null) {
-            inboundResponse.status = controlResponse.status.statusCode
-            controlResponse.headers
-                    .filter {
-                        it.name != "Set-Cookie"
-                    }
-                    .forEach {
-                        inboundResponse.addHeader(it.name, it.value)
-                    }
-            inboundResponse.outputStream.write(controlResponse.content)
-        } else {
-            LOGGER.warn("Control Response is null")
-            inboundResponse.status = 500
-            inboundResponse.writer.println("Something went wrong with the experiment")
-        }
-        inboundResponse.flushBuffer()
     }
 
     private fun createControlRequest(request: ExperimentRequest): () -> ExperimentResponse {

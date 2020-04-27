@@ -34,14 +34,14 @@ class ControlledExperimentAsyncTest {
     fun itThrowsAnExceptionWhenControlFails() {
         val experiment = ControlledExperiment<Int>("test", NoopMetricsProvider())
         assertThrows(RuntimeException::class.java) {
-            experiment.runAsync({ exceptionThrowingFunction() }, { exceptionThrowingFunction() })
+            experiment.runAsync({ exceptionThrowingFunction() }, { safeFunction() }, { safeFunction() })
         }
     }
 
     @Test
     fun itDoesntThrowAnExceptionWhenCandidateFails() {
         val experiment = ControlledExperiment<Int>("test", NoopMetricsProvider())
-        val value = experiment.runAsync({ safeFunction() }, { exceptionThrowingFunction() })
+        val value = experiment.runAsync({ safeFunction() }, { safeFunction() }, { exceptionThrowingFunction() })
         assertThat(value).isEqualTo(3)
     }
 
@@ -49,21 +49,21 @@ class ControlledExperimentAsyncTest {
     fun itThrowsOnMismatch() {
         val experiment = ControlledExperiment<Int>("test", true, NoopMetricsProvider())
         assertThrows(MismatchException::class.java) {
-            experiment.runAsync({ safeFunction() }, { safeFunctionWithDifferentResult() })
+            experiment.runAsync({ safeFunction() }, { safeFunction() }, { safeFunctionWithDifferentResult() })
         }
     }
 
     @Test
     fun itDoesNotThrowOnMatch() {
         val experiment = ControlledExperiment<Int>("test", true, NoopMetricsProvider())
-        val value = experiment.runAsync({ safeFunction() }, { safeFunction() })
+        val value = experiment.runAsync({ safeFunction() }, { safeFunction() }, { safeFunction() })
         assertThat(value).isEqualTo(3)
     }
 
     @Test
     fun itWorksWithAnExtendedClass() {
         val experiment = TestPublishControlledExperiment<Int>("test", NoopMetricsProvider())
-        val value = experiment.run({ safeFunction() }, { safeFunction() })
+        val value = experiment.run({ safeFunction() }, { safeFunction() }, { safeFunction() })
         assertThat(value).isEqualTo(3)
     }
 
@@ -71,7 +71,7 @@ class ControlledExperimentAsyncTest {
     fun asyncRunsFaster() {
         val experiment = ControlledExperiment<Int>("test", true, NoopMetricsProvider())
         val date1 = Date()
-        val value = experiment.runAsync({ sleepFunction() }, { sleepFunction() })
+        val value = experiment.runAsync({ sleepFunction() }, { sleepFunction() }, { sleepFunction() })
         val date2 = Date()
         val difference = date2.time - date1.time
         assertThat(difference).isLessThan(2000)
@@ -92,7 +92,7 @@ class ControlledExperimentAsyncTest {
 
     private fun timeExperiment(experiment: ControlledExperiment<Int>): Long {
         val date1 = Date()
-        experiment.runAsync({ shortSleepFunction() }, { sleepFunction() })
+        experiment.runAsync({ shortSleepFunction() }, { sleepFunction() }, { sleepFunction() })
         val date2 = Date()
         return date2.time - date1.time
     }

@@ -26,8 +26,6 @@ class RequestFactory(
 ) {
     companion object {
         private val LOGGER: Logger = LoggerFactory.getLogger(RequestFactory::class.java)
-        val CONTROL_COOKIE_STORE = "CONTROL_COOKIE_STORE"
-        val CANDIDATE_COOKIE_STORE = "CANDIDATE_COOKIE_STORE"
     }
 
     val sessions: MutableMap<String, MutableMap<String, CookieStore>> = mutableMapOf()
@@ -106,13 +104,14 @@ class RequestFactory(
     }
 
     private fun getSession(request: ExperimentRequest): MutableMap<String, CookieStore> {
-        return sessions.computeIfAbsent(request.session.id) {
-            mutableMapOf(
-                    CONTROL_COOKIE_STORE to BasicCookieStore(),
-                    CANDIDATE_COOKIE_STORE to BasicCookieStore()
-            )
+        synchronized(request.session) {
+            var map = sessions[request.session.id]
+            if (map == null) {
+                map = mutableMapOf(cookieStoreAttributeName to BasicCookieStore())
+                sessions[request.session.id] = map
+            }
+            return map
         }
-
     }
 
 }

@@ -34,7 +34,6 @@
         <mockito-kotlin.version>2.2.0</mockito-kotlin.version>
         <slf4j.version>1.7.30</slf4j.version>
         <spring-boot.version>2.2.6.RELEASE</spring-boot.version>
-
     </properties>
 
     <dependencyManagement>
@@ -379,6 +378,7 @@
         <module>scientist4k-core</module>
         <module>scientist4k-controlled</module>
         <module>scientist4k-http</module>
+        <module>scientist4k-controlled-http</module>
     </modules>
 
     <profiles>
