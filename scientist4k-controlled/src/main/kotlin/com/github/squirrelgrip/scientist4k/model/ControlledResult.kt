@@ -1,7 +1,7 @@
 package com.github.squirrelgrip.scientist4k.model
 
 import com.github.squirrelgrip.scientist4k.ControlledExperiment
-import com.github.squirrelgrip.scientist4k.exceptions.MismatchException
+import com.github.squirrelgrip.scientist4k.exception.MismatchException
 import com.github.squirrelgrip.scientist4k.model.sample.Sample
 
 class ControlledResult<T>(

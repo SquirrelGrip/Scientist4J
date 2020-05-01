@@ -4,7 +4,7 @@ import com.github.squirrelgrip.scientist4k.comparator.ExperimentResponseComparat
 import com.github.squirrelgrip.scientist4k.configuration.EndPointConfiguration
 import com.github.squirrelgrip.scientist4k.configuration.HttpExperimentConfiguration
 import com.github.squirrelgrip.scientist4k.configuration.MappingConfiguration
-import com.github.squirrelgrip.scientist4k.exceptions.LaboratoryException
+import com.github.squirrelgrip.scientist4k.exception.LaboratoryException
 import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
 import com.github.squirrelgrip.scientist4k.model.ExperimentComparator
 import com.github.squirrelgrip.scientist4k.model.ExperimentResponse

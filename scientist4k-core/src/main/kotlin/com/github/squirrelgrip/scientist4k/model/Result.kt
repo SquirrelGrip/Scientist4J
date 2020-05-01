@@ -1,7 +1,7 @@
 package com.github.squirrelgrip.scientist4k.model
 
 import com.github.squirrelgrip.scientist4k.Experiment
-import com.github.squirrelgrip.scientist4k.exceptions.MismatchException
+import com.github.squirrelgrip.scientist4k.exception.MismatchException
 import com.github.squirrelgrip.scientist4k.model.sample.Sample
 
 class Result<T>(
@@ -29,6 +29,10 @@ class Result<T>(
             }
             throw MismatchException(msg)
         }
+    }
+
+    override fun toString(): String {
+        return "${experiment.name} ($match)\n\tControl  => $control\n\tCandidate=> $candidate"
     }
 
 }
