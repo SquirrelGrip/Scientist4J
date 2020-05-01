@@ -9,7 +9,6 @@ class ControlledResult<T>(
         val control: Observation<T>,
         val reference: Observation<T>,
         val candidate: Observation<T>,
-        val context: Map<String, Any> = emptyMap(),
         val sample: Sample
 ) {
     val match =

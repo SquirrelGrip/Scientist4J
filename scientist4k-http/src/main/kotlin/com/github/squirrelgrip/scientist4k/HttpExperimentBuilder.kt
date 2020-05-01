@@ -87,7 +87,7 @@ class HttpExperimentBuilder() {
 
     fun build(): HttpExperiment {
         if (controlConfig != null && candidateConfig != null) {
-            return HttpExperiment(name, raiseOnMismatch, metrics, context, comparator, sampleFactory, eventBus, mappings, controlConfig!!, candidateConfig!!)
+            return HttpExperiment(name, raiseOnMismatch, metrics, comparator, sampleFactory, eventBus, mappings, controlConfig!!, candidateConfig!!)
         }
         throw LaboratoryException("Both control and candidate configurations must be set")
     }

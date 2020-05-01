@@ -188,8 +188,7 @@ class HttpExperimentServerTest {
         val result = awaitResult("/jsonDifferent")
         assertThat(result.match.matches).isFalse()
         assertThat(result.match.failureReasons).containsExactlyInAnyOrder(
-                "1 in control, not in candidate",
-                "5 in candidate, not in control"
+                """{"op":"move","from":"/1","path":"/5"}"""
         )
     }
 

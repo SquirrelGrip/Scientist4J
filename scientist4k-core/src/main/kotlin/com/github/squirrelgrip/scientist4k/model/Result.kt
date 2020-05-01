@@ -8,7 +8,6 @@ class Result<T>(
         private val experiment: Experiment<T>,
         val control: Observation<T>,
         val candidate: Observation<T>?,
-        val context: Map<String, Any> = emptyMap(),
         val sample: Sample
 ) {
     val match =

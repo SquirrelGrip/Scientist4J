@@ -136,7 +136,6 @@ class ExperimentTest {
         assertThat(experiment.name).isEqualTo("name")
         assertThat(experiment.raiseOnMismatch).isEqualTo(true)
         assertThat(experiment.metrics.javaClass).isEqualTo(NoopMetricsProvider::class.java)
-        assertThat(experiment.context).containsAllEntriesOf(emptyMap())
         assertThat(experiment.sampleFactory.prefix).isEqualTo("prefix")
     }
 

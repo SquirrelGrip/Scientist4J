@@ -7,7 +7,6 @@ import com.github.squirrelgrip.extension.json.toJsonNode
 import com.github.squirrelgrip.scientist4k.model.ComparisonResult
 import com.github.squirrelgrip.scientist4k.model.ComparisonResult.Companion.SUCCESS
 
-
 class JsonContentTypeComparator : ContentTypeComparator {
 
     override fun invoke(control: ByteArray, candidate: ByteArray): ComparisonResult {
@@ -23,7 +22,7 @@ class JsonContentTypeComparator : ContentTypeComparator {
         } else {
             ComparisonResult(
                     *list.map {
-                        toJson()
+                        it.toJson()
                     }.toTypedArray()
             )
         }

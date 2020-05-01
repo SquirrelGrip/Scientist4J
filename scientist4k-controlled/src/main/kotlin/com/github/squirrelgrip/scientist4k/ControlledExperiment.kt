@@ -20,7 +20,6 @@ open class ControlledExperiment<T>(
         name: String,
         raiseOnMismatch: Boolean = false,
         metrics: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD"),
-        context: Map<String, Any> = emptyMap(),
         comparator: ExperimentComparator<T?> = DefaultExperimentComparator(),
         sampleFactory: SampleFactory = SampleFactory(),
         eventBus: EventBus = EventBus()
@@ -28,7 +27,6 @@ open class ControlledExperiment<T>(
         name,
         raiseOnMismatch,
         metrics,
-        context,
         comparator,
         sampleFactory,
         eventBus
@@ -121,7 +119,7 @@ open class ControlledExperiment<T>(
 
     private fun publishResult(controlObservation: Observation<T>, referenceObservation: Observation<T>, candidateObservation: Observation<T>, sample: Sample): ControlledResult<T> {
         LOGGER.info("Creating Result...")
-        val result = ControlledResult(this, controlObservation, referenceObservation, candidateObservation, context, sample)
+        val result = ControlledResult(this, controlObservation, referenceObservation, candidateObservation, sample)
         LOGGER.info("Created Result")
         publish(result)
         return result

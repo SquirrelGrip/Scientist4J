@@ -19,7 +19,6 @@ open class Experiment<T>(
         name: String,
         raiseOnMismatch: Boolean = false,
         metrics: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD"),
-        context: Map<String, Any> = emptyMap(),
         comparator: ExperimentComparator<T?> = DefaultExperimentComparator(),
         sampleFactory: SampleFactory = SampleFactory(),
         eventBus: EventBus = EventBus()
@@ -27,7 +26,6 @@ open class Experiment<T>(
         name,
         raiseOnMismatch,
         metrics,
-        context,
         comparator,
         sampleFactory,
         eventBus
@@ -102,8 +100,8 @@ open class Experiment<T>(
 
     private fun publishResult(controlObservation: Observation<T>, candidateObservation: Observation<T>, sample: Sample = sampleFactory.create()): Result<T> {
         LOGGER.info("Creating Result...")
-        val result = Result(this, controlObservation, candidateObservation, context, sample)
-        LOGGER.info("Created Result")
+        val result = Result(this, controlObservation, candidateObservation, sample)
+        LOGGER.info("Publishing Result")
         publish(result)
         return result
     }
