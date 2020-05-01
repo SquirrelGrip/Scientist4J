@@ -6,6 +6,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
 internal class ObservationTest {
+
     @Test
     fun `Observation set value to null`() {
         val observation = Observation<Int>("observation", NoopMetricsProvider().timer())
