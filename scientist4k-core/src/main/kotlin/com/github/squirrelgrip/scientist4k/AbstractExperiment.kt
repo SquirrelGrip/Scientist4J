@@ -13,7 +13,6 @@ abstract class AbstractExperiment<T>(
         val name: String,
         val raiseOnMismatch: Boolean = false,
         val metrics: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD"),
-        val context: Map<String, Any> = emptyMap(),
         val comparator: ExperimentComparator<T?> = DefaultExperimentComparator(),
         val sampleFactory: SampleFactory = SampleFactory(),
         val eventBus: EventBus = EventBus()

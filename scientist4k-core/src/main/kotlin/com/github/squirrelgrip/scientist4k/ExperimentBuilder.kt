@@ -13,7 +13,6 @@ class ExperimentBuilder<T>(
     private var raiseOnMismatch: Boolean = false,
     private var sampleFactory: SampleFactory = SampleFactory(),
     private var comparator: ExperimentComparator<T?> = DefaultExperimentComparator(),
-    private var context: Map<String, String> = emptyMap(),
     private var eventBus: EventBus = EventBus()
 ) {
     constructor(experimentConfiguration: ExperimentConfiguration): this(
@@ -53,18 +52,13 @@ class ExperimentBuilder<T>(
         return this
     }
 
-    fun withContext(context: Map<String, String>): ExperimentBuilder<T> {
-        this.context = context
-        return this
-    }
-
     fun withEventBus(eventBus: EventBus): ExperimentBuilder<T> {
         this.eventBus = eventBus
         return this
     }
 
     fun build(): Experiment<T> {
-        return Experiment(name, raiseOnMismatch, metricsProvider, context, comparator, sampleFactory, eventBus)
+        return Experiment(name, raiseOnMismatch, metricsProvider, comparator, sampleFactory, eventBus)
     }
 
 }

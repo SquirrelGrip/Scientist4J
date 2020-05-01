@@ -1,7 +1,7 @@
 package com.github.squirrelgrip.scientist4k.model
 
 import com.github.squirrelgrip.scientist4k.ControlledExperiment
-import com.github.squirrelgrip.scientist4k.exceptions.MismatchException
+import com.github.squirrelgrip.scientist4k.exception.MismatchException
 import com.github.squirrelgrip.scientist4k.model.sample.Sample
 
 class ControlledResult<T>(
@@ -9,7 +9,6 @@ class ControlledResult<T>(
         val control: Observation<T>,
         val reference: Observation<T>,
         val candidate: Observation<T>,
-        val context: Map<String, Any> = emptyMap(),
         val sample: Sample
 ) {
     val match =

@@ -52,7 +52,14 @@ class Observation<T>(
         } catch (e: Exception) {
             setException(e)
         }
+    }
 
+    override fun toString(): String {
+        return if (exception != null) {
+            exception!!.message ?: exception!!.javaClass.toString()
+        } else {
+            value.toString()
+        }
     }
 
 }

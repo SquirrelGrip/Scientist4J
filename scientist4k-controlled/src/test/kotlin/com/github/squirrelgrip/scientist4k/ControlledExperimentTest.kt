@@ -1,6 +1,6 @@
 package com.github.squirrelgrip.scientist4k
 
-import com.github.squirrelgrip.scientist4k.exceptions.MismatchException
+import com.github.squirrelgrip.scientist4k.exception.MismatchException
 import com.github.squirrelgrip.scientist4k.metrics.NoopMetricsProvider
 import com.github.squirrelgrip.scientist4k.metrics.dropwizard.DropwizardMetricsProvider
 import com.github.squirrelgrip.scientist4k.metrics.micrometer.MicrometerMetricsProvider

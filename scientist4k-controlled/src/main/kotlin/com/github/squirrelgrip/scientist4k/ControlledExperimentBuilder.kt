@@ -13,7 +13,6 @@ class ControlledExperimentBuilder<T>(
     private var raiseOnMismatch: Boolean = false,
     private var sampleFactory: SampleFactory = SampleFactory(),
     private var comparator: ExperimentComparator<T?> = DefaultExperimentComparator(),
-    private var context: Map<String, String> = emptyMap(),
     private var eventBus: EventBus = EventBus()
 ) {
     constructor(experimentConfiguration: ExperimentConfiguration): this(
@@ -43,11 +42,6 @@ class ControlledExperimentBuilder<T>(
         return this
     }
 
-    fun withContext(context: Map<String, String>): ControlledExperimentBuilder<T> {
-        this.context = context
-        return this
-    }
-
     fun withSampleFactory(sampleFactory: SampleFactory): ControlledExperimentBuilder<T> {
         this.sampleFactory = sampleFactory
         return this
@@ -59,7 +53,7 @@ class ControlledExperimentBuilder<T>(
     }
 
     fun build(): ControlledExperiment<T> {
-        return ControlledExperiment(name, raiseOnMismatch, metricsProvider, context, comparator, sampleFactory, eventBus)
+        return ControlledExperiment(name, raiseOnMismatch, metricsProvider, comparator, sampleFactory, eventBus)
     }
 
 }

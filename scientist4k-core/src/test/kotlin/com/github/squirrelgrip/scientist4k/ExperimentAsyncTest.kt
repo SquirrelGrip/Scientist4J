@@ -1,6 +1,6 @@
 package com.github.squirrelgrip.scientist4k
 
-import com.github.squirrelgrip.scientist4k.exceptions.MismatchException
+import com.github.squirrelgrip.scientist4k.exception.MismatchException
 import com.github.squirrelgrip.scientist4k.metrics.NoopMetricsProvider
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertThrows

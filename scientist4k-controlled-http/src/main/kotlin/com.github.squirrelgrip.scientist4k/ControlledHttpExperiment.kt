@@ -25,7 +25,6 @@ class ControlledHttpExperiment(
         name: String,
         raiseOnMismatch: Boolean,
         metrics: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD"),
-        context: Map<String, Any> = emptyMap(),
         comparator: ExperimentComparator<ExperimentResponse?> = ExperimentResponseComparator(),
         sampleFactory: SampleFactory = SampleFactory(),
         eventBus: EventBus = EventBus(),
@@ -37,7 +36,6 @@ class ControlledHttpExperiment(
         name,
         raiseOnMismatch,
         metrics,
-        context,
         comparator,
         sampleFactory,
         eventBus
