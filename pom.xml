@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <parent>
+        <groupId>com.github.squirrelgrip</groupId>
+        <artifactId>root</artifactId>
+        <version>1.0.7</version>
+    </parent>
     <groupId>com.github.squirrelgrip</groupId>
     <artifactId>scientist4k</artifactId>
     <version>0.6.6-SNAPSHOT</version>
@@ -382,29 +388,5 @@
         <module>scientist4k-http-test</module>
         <module>scientist4k-http-core</module>
     </modules>
-
-    <profiles>
-        <profile>
-            <id>release</id>
-            <properties>
-                <deployment.url>${project.distributionManagement.repository.url}</deployment.url>
-            </properties>
-        </profile>
-        <profile>
-            <id>gitflowStart</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>com.manamind.jgitflow</groupId>
-                        <artifactId>jgitflow-maven-plugin</artifactId>
-                        <version>1.0.0</version>
-                        <configuration combine.self="append">
-                            <allowSnapshots>true</allowSnapshots>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 
 </project>
