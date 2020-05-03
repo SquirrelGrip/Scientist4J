@@ -216,5 +216,5 @@ hs_err_pid*
 travis/all.gpg
 *.iml
 .idea/
-certs/
 !/certs/cheti.json
+certs/
