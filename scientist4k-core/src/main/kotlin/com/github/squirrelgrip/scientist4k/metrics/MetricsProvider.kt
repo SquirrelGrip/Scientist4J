@@ -11,7 +11,7 @@ interface MetricsProvider<T> {
             val javaClass = when (type) {
                 "DROPWIZARD" -> "com.github.squirrelgrip.scientist4k.metrics.dropwizard.DropwizardMetricsProvider"
                 "MICROMETER" -> "com.github.squirrelgrip.scientist4k.metrics.micrometer.MicrometerMetricsProvider"
-                else -> "com.github.squirrelgrip.scientist4k.metrics.NoopMetricsProvider"
+                else -> "com.github.squirrelgrip.scientist4k.metrics.noop.NoopMetricsProvider"
             }
             return Class.forName(javaClass).newInstance() as MetricsProvider<*>
         }
