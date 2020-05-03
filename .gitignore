@@ -217,4 +217,8 @@ travis/all.gpg
 *.iml
 .idea/
 !/certs/cheti.json
-certs/
+/certs/*.pwd
+/certs/*.p12
+/certs/*.jks
+/certs/**/*.crt
+/certs/**/*.key
