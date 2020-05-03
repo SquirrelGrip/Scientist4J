@@ -37,7 +37,7 @@ internal class FilterExperimentTest {
         @JvmStatic
         @BeforeAll
         fun beforeAll() {
-            val chetiConfiguration = Thread.currentThread().contextClassLoader.getResourceAsStream("cheti.json")
+            val chetiConfiguration = File("../certs/cheti.json")
             val cheti = Cheti(chetiConfiguration)
             cheti.execute()
 

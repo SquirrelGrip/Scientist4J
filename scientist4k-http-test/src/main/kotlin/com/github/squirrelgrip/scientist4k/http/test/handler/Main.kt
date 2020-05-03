@@ -3,6 +3,7 @@ package com.github.squirrelgrip.scientist4k.http.test.handler
 import com.github.squirrelgrip.cheti.Cheti
 import com.github.squirrelgrip.scientist4k.http.core.configuration.SslConfiguration
 import com.github.squirrelgrip.scientist4k.http.core.server.SecuredServer
+import java.io.File
 
 class Main {
     val controlServer: SecuredServer
@@ -22,7 +23,7 @@ class Main {
     }
 
     init {
-        val chetiConfiguration = Thread.currentThread().contextClassLoader.getResourceAsStream("cheti.json")
+        val chetiConfiguration = File("../certs/cheti.json")
         val cheti = Cheti(chetiConfiguration)
         cheti.execute()
 
