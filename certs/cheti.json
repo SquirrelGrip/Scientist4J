@@ -1,6 +1,6 @@
 {
   "common": {
-    "location": "target/certs",
+    "location": "../target/certs",
     "generate": "ALWAYS",
     "validFor": "1D",
     "issuer": "SigningCA",

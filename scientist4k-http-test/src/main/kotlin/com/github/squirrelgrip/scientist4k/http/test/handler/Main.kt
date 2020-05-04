@@ -12,10 +12,10 @@ class Main {
 
     companion object {
         val sslConfiguration = SslConfiguration(
-        "../certs/keystore.jks",
+        "../target/certs/keystore.jks",
         "pass:password",
         "JKS",
-        "../certs/keystore.jks",
+        "../target/certs/keystore.jks",
         "pass:password",
         "JKS",
         "TLSv1.2"
