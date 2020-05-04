@@ -8,7 +8,7 @@
         <version>1.0.8</version>
     </parent>
     <artifactId>scientist4k</artifactId>
-    <version>0.6.6</version>
+    <version>0.7.0</version>
     <packaging>pom</packaging>
 
     <name>${project.groupId}:${project.artifactId}</name>
@@ -32,11 +32,12 @@
 
     <modules>
         <module>scientist4k-core</module>
-        <module>scientist4k-controlled</module>
-        <module>scientist4k-http</module>
-        <module>scientist4k-controlled-http</module>
-        <module>scientist4k-http-test</module>
         <module>scientist4k-http-core</module>
+        <module>scientist4k-http-test</module>
+        <module>scientist4k-http-server</module>
+        <module>scientist4k-http-filter</module>
+        <module>scientist4k-controlled-core</module>
+        <module>scientist4k-controlled-http-server</module>
     </modules>
 
     <properties>

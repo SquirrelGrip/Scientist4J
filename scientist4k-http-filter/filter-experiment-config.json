@@ -1,0 +1,43 @@
+{
+  "experiment": {
+    "name": "filter",
+    "raiseOnMismatch": false,
+    "metricsProvider": "DROPWIZARD",
+    "sampleFactory": {
+      "prefix": ""
+    }
+  },
+  "mappings": {
+    "/mappedControl": "/mappedCandidate"
+  },
+  "control": {
+    "url": "https://localhost:9004",
+    "sslConfiguration": {
+      "keyStorePath": "../certs/keystore.jks",
+      "keyStorePassword": "pass:password",
+      "keyStoreType": "JKS",
+      "trustStorePath": "../certs/keystore.jks",
+      "trustStorePassword": "pass:password",
+      "trustStoreType": "JKS",
+      "algorithm": "TLSv1.2"
+    },
+    "allowedMethods": [
+      "*"
+    ]
+  },
+  "candidate": {
+    "url": "https://localhost:9012",
+    "sslConfiguration": {
+      "keyStorePath": "../certs/keystore.jks",
+      "keyStorePassword": "pass:password",
+      "keyStoreType": "JKS",
+      "trustStorePath": "../certs/keystore.jks",
+      "trustStorePassword": "pass:password",
+      "trustStoreType": "JKS",
+      "algorithm": "TLSv1.2"
+    },
+    "allowedMethods": [
+      "GET"
+    ]
+  }
+}
