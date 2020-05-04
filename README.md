@@ -11,7 +11,7 @@ A port of Github's refactoring tool [Scientist](https://github.com/github/scient
 <dependency>
     <groupId>com.github.squirrelgrip</groupId>
     <artifactId>ccientist4k-core</artifactId>
-    <version>0.1</version>
+    <version>0.7.1</version>
 </dependency>
 ```
 # Usage

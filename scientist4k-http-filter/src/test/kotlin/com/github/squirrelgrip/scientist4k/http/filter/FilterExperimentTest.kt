@@ -13,7 +13,6 @@ import org.apache.http.client.methods.RequestBuilder
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory
 import org.apache.http.impl.client.HttpClients
 import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.AssertionsForInterfaceTypes
 import org.awaitility.Awaitility
 import org.eclipse.jetty.servlet.FilterHolder
 import org.eclipse.jetty.servlet.ServletContextHandler
@@ -60,7 +59,7 @@ internal class FilterExperimentTest {
         }
 
         fun isRunning(url: String): Boolean {
-            val sslConfiguration = filterExperimentConfiguration.candidate.sslConfiguration
+            val sslConfiguration = filterExperimentConfiguration.alternateRoute.sslConfiguration
             val httpClient = HttpClients.custom().setSSLSocketFactory(
                     SSLConnectionSocketFactory(
                             sslConfiguration!!.sslContext(),
@@ -107,12 +106,72 @@ internal class FilterExperimentTest {
     }
 
     @Test
-    fun filter() {
+    fun resultsAreSame() {
         assertThat(isRunning("$HTTPS_CONTROL_URL/ok")).isTrue()
 
         val result = awaitResult("/ok")
-        AssertionsForInterfaceTypes.assertThat(result.match.matches).isTrue()
-        AssertionsForInterfaceTypes.assertThat(result.match.failureReasons).isEmpty()
+        assertThat(result.match.matches).isTrue()
+        assertThat(result.match.failureReasons).isEmpty()
+    }
+
+    @Test
+    fun resultsAreDifferent() {
+        assertThat(isRunning("$HTTPS_CONTROL_URL/status")).isTrue()
+
+        val result = awaitResult("/status")
+        assertThat(result.match.matches).isFalse()
+        assertThat(result.match.failureReasons).isNotEmpty()
+    }
+
+    @Test
+    fun `requests should be different when candidate doesn't exist`() {
+        assertThat(isRunning("$HTTPS_CONTROL_URL/control")).isTrue()
+
+        val result = awaitResult("/control")
+        assertThat(result.match.matches).isFalse()
+        assertThat(result.match.failureReasons).containsExactlyInAnyOrder(
+                "Control returned status 200 and Candidate returned status 404.",
+                "Content-Type is different: text/plain != null."
+        )
+    }
+
+    @Test
+    fun `request is mapped to another uri`() {
+        assertThat(isRunning("$HTTPS_CONTROL_URL/mappedControl")).isTrue()
+
+        val result = awaitResult("/mappedControl")
+        assertThat(result.match.failureReasons).isEmpty()
+    }
+
+    @Test
+    fun `requests should be different when control doesn't exist`() {
+        assertThat(isRunning("$HTTPS_CONTROL_URL/candidate")).isFalse()
+
+        val result = awaitResult("/candidate")
+        assertThat(result.match.matches).isFalse()
+        assertThat(result.match.failureReasons).containsExactlyInAnyOrder(
+                "Control returned status 404 and Candidate returned status 200.",
+                "Content-Type is different: null != text/plain."
+        )
+    }
+
+    @Test
+    fun `requests with json response is different`() {
+        assertThat(isRunning("$HTTPS_CONTROL_URL/jsonDifferent")).isTrue()
+
+        val result = awaitResult("/jsonDifferent")
+        assertThat(result.match.matches).isFalse()
+        assertThat(result.match.failureReasons).containsExactlyInAnyOrder(
+                """{"op":"move","from":"/1","path":"/5"}"""
+        )
+    }
+
+    @Test
+    fun `requests with json response is same`() {
+        assertThat(isRunning("$HTTPS_CONTROL_URL/json")).isTrue()
+
+        val result = awaitResult("/json")
+        assertThat(result.match.matches).isTrue()
     }
 
 }

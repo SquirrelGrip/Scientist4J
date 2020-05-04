@@ -4,19 +4,20 @@ import com.github.squirrelgrip.scientist4k.core.configuration.ExperimentConfigur
 import com.github.squirrelgrip.scientist4k.core.exception.MismatchException
 import com.github.squirrelgrip.scientist4k.core.model.ComparisonResult
 import com.github.squirrelgrip.scientist4k.core.model.ExperimentComparator
+import com.github.squirrelgrip.scientist4k.core.model.ExperimentResult
 import com.github.squirrelgrip.scientist4k.metrics.dropwizard.DropwizardMetricsProvider
 import com.github.squirrelgrip.scientist4k.metrics.micrometer.MicrometerMetricsProvider
 import com.github.squirrelgrip.scientist4k.metrics.noop.NoopMetricsProvider
 import com.google.common.eventbus.EventBus
 import com.nhaarman.mockitokotlin2.eq
+import com.nhaarman.mockitokotlin2.isA
 import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verify
 import io.dropwizard.metrics5.MetricName
 import org.assertj.core.api.Assertions.assertThat
-import org.hamcrest.CoreMatchers.isA
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
 import org.mockito.BDDMockito.given
+import org.mockito.Mockito.verify
 import java.util.*
 
 class ExperimentTest {
@@ -147,6 +148,6 @@ class ExperimentTest {
                 .withEventBus(eventBus)
                 .build()
         experiment.run({safeFunction()}, {safeFunction()})
-        verify(eventBus).post(isA(Result::class.java))
+        verify(eventBus).post(isA<ExperimentResult<Int>>())
     }
 }
