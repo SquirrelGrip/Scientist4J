@@ -7,10 +7,10 @@
       {
         "port": 9000,
         "sslConfiguration": {
-          "keyStorePath": "../certs/keystore.jks",
+          "keyStorePath": "../target/certs/keystore.jks",
           "keyStorePassword": "pass:password",
           "keyStoreType": "JKS",
-          "trustStorePath": "../certs/keystore.jks",
+          "trustStorePath": "../target/certs/keystore.jks",
           "trustStorePassword": "pass:password",
           "trustStoreType": "JKS",
           "algorithm": "TLSv1.2"
@@ -33,10 +33,10 @@
   "control": {
     "url": "https://localhost:9002",
     "sslConfiguration": {
-      "keyStorePath": "../certs/keystore.jks",
+      "keyStorePath": "../target/certs/keystore.jks",
       "keyStorePassword": "pass:password",
       "keyStoreType": "JKS",
-      "trustStorePath": "../certs/keystore.jks",
+      "trustStorePath": "../target/certs/keystore.jks",
       "trustStorePassword": "pass:password",
       "trustStoreType": "JKS",
       "algorithm": "TLSv1.2"
@@ -48,10 +48,10 @@
   "reference": {
     "url": "https://localhost:9004",
     "sslConfiguration": {
-      "keyStorePath": "../certs/keystore.jks",
+      "keyStorePath": "../target/certs/keystore.jks",
       "keyStorePassword": "pass:password",
       "keyStoreType": "JKS",
-      "trustStorePath": "../certs/keystore.jks",
+      "trustStorePath": "../target/certs/keystore.jks",
       "trustStorePassword": "pass:password",
       "trustStoreType": "JKS",
       "algorithm": "TLSv1.2"
@@ -63,10 +63,10 @@
   "candidate": {
     "url": "https://localhost:9012",
     "sslConfiguration": {
-      "keyStorePath": "../certs/keystore.jks",
+      "keyStorePath": "../target/certs/keystore.jks",
       "keyStorePassword": "pass:password",
       "keyStoreType": "JKS",
-      "trustStorePath": "../certs/keystore.jks",
+      "trustStorePath": "../target/certs/keystore.jks",
       "trustStorePassword": "pass:password",
       "trustStoreType": "JKS",
       "algorithm": "TLSv1.2"
