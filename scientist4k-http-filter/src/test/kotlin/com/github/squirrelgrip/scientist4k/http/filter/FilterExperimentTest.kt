@@ -80,10 +80,8 @@ internal class FilterExperimentTest {
 
     @Subscribe
     fun receiveResult(experimentResult: ExperimentResult<ExperimentResponse>) {
-        println(experimentResult.sample.notes["request"])
         actualExperimentResult.add(experimentResult)
     }
-
 
     @BeforeEach
     fun beforeEach() {

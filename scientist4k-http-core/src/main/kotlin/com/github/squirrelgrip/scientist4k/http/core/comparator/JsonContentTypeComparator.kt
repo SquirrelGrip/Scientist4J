@@ -14,8 +14,6 @@ class JsonContentTypeComparator : ContentTypeComparator {
         val candidateJsonNode = candidate.toJsonNode()
 
         val diff: JsonNode = JsonDiff.asJson(controlJsonNode, candidateJsonNode)
-        println(diff.toJson())
-
         val list = diff.asIterable().toList()
         return if (list.isEmpty()) {
             SUCCESS

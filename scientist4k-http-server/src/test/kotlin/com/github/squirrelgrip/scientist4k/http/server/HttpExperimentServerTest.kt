@@ -66,7 +66,6 @@ class HttpExperimentServerTest {
 
     @Subscribe
     fun receiveResult(experimentResult: ExperimentResult<ExperimentResponse>) {
-        println(experimentResult.sample.notes["request"])
         actualResult.add(experimentResult)
     }
 
@@ -152,7 +151,7 @@ class HttpExperimentServerTest {
         assertThat(result.match.matches).isFalse()
         assertThat(result.match.failureReasons).containsExactlyInAnyOrder(
                 "Control returned status 200 and Candidate returned status 404.",
-                "Content-Type is different: text/plain != null."
+                "Content-Type is different: text/plain; charset=iso-8859-1 != null."
         )
     }
 
@@ -177,7 +176,7 @@ class HttpExperimentServerTest {
         assertThat(result.match.matches).isFalse()
         assertThat(result.match.failureReasons).containsExactlyInAnyOrder(
                 "Control returned status 404 and Candidate returned status 200.",
-                "Content-Type is different: null != text/plain."
+                "Content-Type is different: null != text/plain; charset=iso-8859-1."
         )
     }
 

@@ -32,8 +32,8 @@ class FilterExperimentResponseWrapper(
     val experimentResponse: ExperimentResponse
         get() {
             val headers = headerNames.map {
-                BasicHeader(it, getHeader(it))
-            }.toTypedArray<Header>()
+                it to getHeader(it)
+            }.toMap()
             val content: ByteArray = when {
                 this::copyServletOutputStream.isInitialized -> copyServletOutputStream.getCopy()
                 this::copyPrintWriter.isInitialized -> copyPrintWriter.getCopy()
