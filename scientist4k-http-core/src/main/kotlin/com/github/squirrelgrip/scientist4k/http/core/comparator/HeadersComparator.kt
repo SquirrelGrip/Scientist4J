@@ -7,7 +7,6 @@ import com.github.squirrelgrip.scientist4k.http.core.model.ExperimentResponse
 import com.google.common.collect.MapDifference
 import com.google.common.collect.Maps
 import com.google.common.net.HttpHeaders.*
-import org.apache.http.Header
 
 class HeadersComparator : ExperimentComparator<ExperimentResponse> {
     override fun invoke(control: ExperimentResponse, candidate: ExperimentResponse): ComparisonResult {
@@ -40,11 +39,9 @@ class HeadersComparator : ExperimentComparator<ExperimentResponse> {
             SERVER
     )
 
-    private fun map(control: Array<Header>): Map<String, String> {
-        return (control).filter {
-            it.name !in IGNORED_HEADERS
-        }.map {
-            it.name to it.value
-        }.toMap<String, String>()
+    private fun map(control: Map<String, String>): Map<String, String> {
+        return control.filter {
+            it.key !in IGNORED_HEADERS
+        }
     }
 }

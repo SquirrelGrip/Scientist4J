@@ -30,12 +30,12 @@ object HttpExperimentUtil {
             inboundResponse.status = controlResponse.status
             controlResponse.headers
                     .filter {
-                        it.name != "Set-Cookie"
+                        it.key != "Set-Cookie"
                     }
                     .forEach {
-                        inboundResponse.addHeader(it.name, it.value)
+                        inboundResponse.addHeader(it.key, it.value)
                     }
-            inboundResponse.outputStream.write(controlResponse.content)
+            inboundResponse.outputStream.write(controlResponse.body)
         } else {
             LOGGER.warn("Control Response is null")
             inboundResponse.status = 500

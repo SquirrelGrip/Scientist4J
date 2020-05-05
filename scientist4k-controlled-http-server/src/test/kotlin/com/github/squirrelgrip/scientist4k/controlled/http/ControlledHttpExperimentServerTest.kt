@@ -71,7 +71,6 @@ class ControlledHttpExperimentServerTest {
 
     @Subscribe
     fun receiveResult(result: ControlledExperimentResult<ExperimentResponse>) {
-        println(result.sample.notes["request"])
         actualResult.add(result)
     }
 
