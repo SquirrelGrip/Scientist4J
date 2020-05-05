@@ -15,7 +15,9 @@ abstract class AbstractExperiment<T>(
         val metrics: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD"),
         val comparator: ExperimentComparator<T?> = DefaultExperimentComparator(),
         val sampleFactory: SampleFactory = SampleFactory(),
-        val eventBus: EventBus = DEFAULT_EVENT_BUS
+        val eventBus: EventBus = DEFAULT_EVENT_BUS,
+        val enabled: Boolean = true,
+        val async: Boolean = true
 ) {
     /**
      * Note that if `raiseOnMismatch` is true, [.runAsync] will block waiting for
@@ -38,13 +40,14 @@ abstract class AbstractExperiment<T>(
         val DEFAULT_EVENT_BUS: EventBus = EventBus()
     }
 
-    protected fun scrapCandidate(): Observation<T> =
-            scrap("candidate")
+    protected fun executeCandidate(candidate: () -> T?): Observation<T> =
+            if (isEnabled()) {
+                execute("candidate", candidateTimer, candidate, false)
+            } else {
+                scrap("candidate")
+            }
 
-    protected fun executeCandidate(candidate: () -> T?) =
-            execute("candidate", candidateTimer, candidate, false)
-
-    protected fun executeControl(control: () -> T?) =
+    protected fun executeControl(control: () -> T?): Observation<T> =
             execute("control", controlTimer, control, true)
 
     private fun countExceptions(observation: Observation<T>, exceptions: Counter) {
@@ -69,16 +72,12 @@ abstract class AbstractExperiment<T>(
         return observation
     }
 
-    open fun runIf(): Boolean {
-        return true
-    }
-
-    open fun enabled(): Boolean {
-        return true
+    open fun isEnabled(): Boolean {
+        return enabled
     }
 
     open val isAsync: Boolean
-        get() = true
+        get() = async
 
     open fun publish(result: Any) {
         eventBus.post(result)

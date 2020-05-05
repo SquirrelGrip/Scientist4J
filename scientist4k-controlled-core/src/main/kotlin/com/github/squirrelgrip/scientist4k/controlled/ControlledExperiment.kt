@@ -59,16 +59,8 @@ open class ControlledExperiment<T>(
 
     open fun runSync(control: () -> T?, reference: () -> T?, candidate: () -> T?, sample: Sample = sampleFactory.create()): T? {
         val controlObservation: Observation<T> = executeControl(control)
-        val candidateObservation = if (runIf() && enabled()) {
-            executeCandidate(candidate)
-        } else {
-            scrapCandidate()
-        }
-        val referenceObservation = if (runIf() && enabled()) {
-            executeReference(reference)
-        } else {
-            scrapReference()
-        }
+        val candidateObservation = executeCandidate(candidate)
+        val referenceObservation = executeReference(reference)
         publishResult(controlObservation, referenceObservation, candidateObservation, sample).handleComparisonMismatch()
         return controlObservation.value
     }
@@ -80,19 +72,11 @@ open class ControlledExperiment<T>(
                 }
                 val deferredCandidateObservation =
                         GlobalScope.async {
-                            if (runIf() && enabled()) {
-                                executeCandidate(candidate)
-                            } else {
-                                scrapCandidate()
-                            }
+                            executeCandidate(candidate)
                         }
                 val deferredReferenceObservation =
                         GlobalScope.async {
-                            if (runIf() && enabled()) {
-                                executeReference(reference)
-                            } else {
-                                scrapReference()
-                            }
+                            executeReference(reference)
                         }
 
 
@@ -106,6 +90,13 @@ open class ControlledExperiment<T>(
                     deferred.await().handleComparisonMismatch()
                 }
                 controlObservation.value
+            }
+
+    protected fun executeReference(reference: () -> T?): Observation<T> =
+            if (isEnabled()) {
+                execute("reference", referenceTimer, reference, false)
+            } else {
+                scrap("reference")
             }
 
     private suspend fun publishAsync(controlObservation: Observation<T>, deferredReferenceObservation: Deferred<Observation<T>>, deferredCandidateObservation: Deferred<Observation<T>>, sample: Sample): ControlledExperimentResult<T> {
@@ -129,8 +120,5 @@ open class ControlledExperiment<T>(
     private fun scrapReference(): Observation<T> {
         return scrap("reference")
     }
-
-    private fun executeReference(reference: () -> T?) =
-            execute("reference", referenceTimer, reference, false)
 
 }

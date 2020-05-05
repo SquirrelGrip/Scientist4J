@@ -1,7 +1,7 @@
 # Scientist4K
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.squirrelgrip/Scientist4K/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.squirrelgrip/Scientist4K)
-[![Build Status](https://travis-ci.com/SquirrelGrip/Scientist4K.svg?branch=develop)](https://travis-ci.com/SquirrelGrip/Scientist4K)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.squirrelgrip/scientist4k/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.squirrelgrip/scientist4k)
+[![Build Status](https://travis-ci.com/SquirrelGrip/scientist4k.svg?branch=develop)](https://travis-ci.com/SquirrelGrip/scientist4k)
 
 A port of Github's refactoring tool [Scientist](https://github.com/github/scientist) in Kotlin
 
@@ -11,7 +11,7 @@ A port of Github's refactoring tool [Scientist](https://github.com/github/scient
 <dependency>
     <groupId>com.github.squirrelgrip</groupId>
     <artifactId>ccientist4k-core</artifactId>
-    <version>0.1</version>
+    <version>0.7.1</version>
 </dependency>
 ```
 # Usage

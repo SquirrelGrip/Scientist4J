@@ -10,22 +10,7 @@
   "mappings": {
     "/mappedControl": "/mappedCandidate"
   },
-  "control": {
-    "url": "https://localhost:9004",
-    "sslConfiguration": {
-      "keyStorePath": "../target/certs/keystore.jks",
-      "keyStorePassword": "pass:password",
-      "keyStoreType": "JKS",
-      "trustStorePath": "../target/certs/keystore.jks",
-      "trustStorePassword": "pass:password",
-      "trustStoreType": "JKS",
-      "algorithm": "TLSv1.2"
-    },
-    "allowedMethods": [
-      "*"
-    ]
-  },
-  "candidate": {
+  "alternateRoute": {
     "url": "https://localhost:9012",
     "sslConfiguration": {
       "keyStorePath": "../target/certs/keystore.jks",

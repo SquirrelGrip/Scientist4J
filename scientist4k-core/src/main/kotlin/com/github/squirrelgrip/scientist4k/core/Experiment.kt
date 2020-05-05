@@ -2,8 +2,8 @@ package com.github.squirrelgrip.scientist4k.core
 
 import com.github.squirrelgrip.scientist4k.core.model.DefaultExperimentComparator
 import com.github.squirrelgrip.scientist4k.core.model.ExperimentComparator
-import com.github.squirrelgrip.scientist4k.core.model.Observation
 import com.github.squirrelgrip.scientist4k.core.model.ExperimentResult
+import com.github.squirrelgrip.scientist4k.core.model.Observation
 import com.github.squirrelgrip.scientist4k.core.model.sample.Sample
 import com.github.squirrelgrip.scientist4k.core.model.sample.SampleFactory
 import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
@@ -21,14 +21,18 @@ open class Experiment<T>(
         metrics: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD"),
         comparator: ExperimentComparator<T?> = DefaultExperimentComparator(),
         sampleFactory: SampleFactory = SampleFactory(),
-        eventBus: EventBus = DEFAULT_EVENT_BUS
+        eventBus: EventBus = DEFAULT_EVENT_BUS,
+        enabled: Boolean = true,
+        async: Boolean = true
 ) : AbstractExperiment<T>(
         name,
         raiseOnMismatch,
         metrics,
         comparator,
         sampleFactory,
-        eventBus
+        eventBus,
+        enabled,
+        async
 ) {
     /**
      * Note that if `raiseOnMismatch` is true, [.runAsync] will block waiting for
@@ -55,11 +59,7 @@ open class Experiment<T>(
 
     open fun runSync(control: () -> T?, candidate: () -> T?, sample: Sample = sampleFactory.create()): T? {
         val controlObservation: Observation<T> = executeControl(control)
-        val candidateObservation = if (runIf() && enabled()) {
-            executeCandidate(candidate)
-        } else {
-            scrapCandidate()
-        }
+        val candidateObservation: Observation<T> = executeCandidate(candidate)
         publishResult(controlObservation, candidateObservation, sample).handleComparisonMismatch()
         return controlObservation.value
     }
@@ -71,13 +71,8 @@ open class Experiment<T>(
                 }
                 val deferredCandidateObservation =
                         GlobalScope.async {
-                            if (runIf() && enabled()) {
-                                executeCandidate(candidate)
-                            } else {
-                                scrapCandidate()
-                            }
+                            executeCandidate(candidate)
                         }
-
 
                 LOGGER.debug("Awaiting deferredControlObservation...")
                 val controlObservation = deferredControlObservation.await()
