@@ -23,14 +23,18 @@ open class ControlledExperiment<T>(
         metrics: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD"),
         comparator: ExperimentComparator<T?> = DefaultExperimentComparator(),
         sampleFactory: SampleFactory = SampleFactory(),
-        eventBus: EventBus = EventBus()
+        eventBus: EventBus = EventBus(),
+        enabled: Boolean = true,
+        async: Boolean = true
 ): AbstractExperiment<T>(
         name,
         raiseOnMismatch,
         metrics,
         comparator,
         sampleFactory,
-        eventBus
+        eventBus,
+        enabled,
+        async
 ) {
     /**
      * Note that if `raiseOnMismatch` is true, [.runAsync] will block waiting for
@@ -115,10 +119,6 @@ open class ControlledExperiment<T>(
         LOGGER.info("Created Result")
         publish(result)
         return result
-    }
-
-    private fun scrapReference(): Observation<T> {
-        return scrap("reference")
     }
 
 }

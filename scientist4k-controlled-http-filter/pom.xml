@@ -1,21 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
     <parent>
-        <artifactId>scientist4k</artifactId>
         <groupId>com.github.squirrelgrip</groupId>
+        <artifactId>scientist4k</artifactId>
         <version>0.7.7-SNAPSHOT</version>
     </parent>
-    <modelVersion>4.0.0</modelVersion>
+    <artifactId>scientist4k-controlled-http-filter</artifactId>
 
-    <artifactId>scientist4k-http-core</artifactId>
     <name>${project.artifactId}</name>
 
     <dependencies>
-        <dependency>
-            <groupId>com.flipkart.zjsonpatch</groupId>
-            <artifactId>zjsonpatch</artifactId>
-            <version>0.4.10</version>
-        </dependency>
         <dependency>
             <groupId>com.github.squirrelgrip</groupId>
             <artifactId>cheti</artifactId>
@@ -26,8 +21,19 @@
         </dependency>
         <dependency>
             <groupId>com.github.squirrelgrip</groupId>
-            <artifactId>scientist4k-core</artifactId>
+            <artifactId>scientist4k-controlled-core</artifactId>
             <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.squirrelgrip</groupId>
+            <artifactId>scientist4k-http-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.squirrelgrip</groupId>
+            <artifactId>scientist4k-http-test</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
@@ -39,8 +45,23 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
+            <groupId>io.dropwizard.metrics5</groupId>
+            <artifactId>metrics-core</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-core</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.awaitility</groupId>
+            <artifactId>awaitility</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.assertj</groupId>
@@ -52,11 +73,6 @@
             <artifactId>kotlin-stdlib</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-engine</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
             <scope>test</scope>
@@ -65,10 +81,6 @@
             <groupId>org.mockito</groupId>
             <artifactId>mockito-junit-jupiter</artifactId>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

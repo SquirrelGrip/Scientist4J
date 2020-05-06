@@ -46,6 +46,11 @@
                 <artifactId>scientist4k-controlled-http-server</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.github.squirrelgrip</groupId>
+                <artifactId>scientist4k-controlled-http-filter</artifactId>
+                <version>${project.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 

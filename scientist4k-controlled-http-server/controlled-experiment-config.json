@@ -46,7 +46,7 @@
     ]
   },
   "reference": {
-    "url": "https://localhost:9004",
+    "url": "https://localhost:9022",
     "sslConfiguration": {
       "keyStorePath": "../target/certs/keystore.jks",
       "keyStorePassword": "pass:password",

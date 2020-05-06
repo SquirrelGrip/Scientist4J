@@ -1,4 +1,4 @@
-package com.github.squirrelgrip.scientist4k.http.filter
+package com.github.squirrelgrip.scientist4k.http.core.wrapper
 
 import java.io.ByteArrayOutputStream
 import javax.servlet.ServletOutputStream

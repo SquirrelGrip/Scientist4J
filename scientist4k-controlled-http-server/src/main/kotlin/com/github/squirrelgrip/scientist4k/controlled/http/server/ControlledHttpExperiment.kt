@@ -1,4 +1,4 @@
-package com.github.squirrelgrip.scientist4k.controlled.http
+package com.github.squirrelgrip.scientist4k.controlled.http.server
 
 import com.github.squirrelgrip.scientist4k.controlled.ControlledExperiment
 import com.github.squirrelgrip.scientist4k.core.model.ExperimentComparator
@@ -9,7 +9,7 @@ import com.github.squirrelgrip.scientist4k.http.core.HttpExperimentUtil.CONTROL_
 import com.github.squirrelgrip.scientist4k.http.core.HttpExperimentUtil.REFERENCE_COOKIE_STORE
 import com.github.squirrelgrip.scientist4k.http.core.HttpExperimentUtil.createRequest
 import com.github.squirrelgrip.scientist4k.http.core.HttpExperimentUtil.processResponse
-import com.github.squirrelgrip.scientist4k.http.core.comparator.ExperimentResponseComparator
+import com.github.squirrelgrip.scientist4k.http.core.comparator.DefaultExperimentResponseComparator
 import com.github.squirrelgrip.scientist4k.http.core.configuration.EndPointConfiguration
 import com.github.squirrelgrip.scientist4k.http.core.configuration.MappingConfiguration
 import com.github.squirrelgrip.scientist4k.http.core.factory.RequestFactory
@@ -26,9 +26,11 @@ class ControlledHttpExperiment(
         name: String,
         raiseOnMismatch: Boolean,
         metrics: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD"),
-        comparator: ExperimentComparator<ExperimentResponse?> = ExperimentResponseComparator(),
+        comparator: ExperimentComparator<ExperimentResponse?> = DefaultExperimentResponseComparator(),
         sampleFactory: SampleFactory = SampleFactory(),
         eventBus: EventBus = EventBus(),
+        enabled: Boolean = true,
+        async: Boolean = true,
         mappings: List<MappingConfiguration> = emptyList(),
         controlConfig: EndPointConfiguration,
         referenceConfig: EndPointConfiguration,
@@ -39,7 +41,9 @@ class ControlledHttpExperiment(
         metrics,
         comparator,
         sampleFactory,
-        eventBus
+        eventBus,
+        enabled,
+        async
 ) {
     private val controlRequestFactory = RequestFactory(controlConfig, CONTROL_COOKIE_STORE)
     private val referenceRequestFactory = RequestFactory(referenceConfig, REFERENCE_COOKIE_STORE)

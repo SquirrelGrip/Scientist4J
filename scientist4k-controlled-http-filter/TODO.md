@@ -1,0 +1,1 @@
+* Allow ignored headers configurable

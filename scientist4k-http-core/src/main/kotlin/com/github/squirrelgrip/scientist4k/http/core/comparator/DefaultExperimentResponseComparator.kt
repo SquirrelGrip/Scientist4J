@@ -10,7 +10,8 @@ class DefaultExperimentResponseComparator() : ExperimentResponseComparator(
                 HttpHeaders.DATE,
                 HttpHeaders.CONTENT_LENGTH,
                 HttpHeaders.CONTENT_TYPE,
-                HttpHeaders.EXPIRES
+                HttpHeaders.EXPIRES,
+                HttpHeaders.SERVER
         ),
         ContentComparator()
 )
