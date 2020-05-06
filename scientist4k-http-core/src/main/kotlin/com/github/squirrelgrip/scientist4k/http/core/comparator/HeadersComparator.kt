@@ -3,13 +3,22 @@ package com.github.squirrelgrip.scientist4k.http.core.comparator
 import com.github.squirrelgrip.scientist4k.core.model.ComparisonResult
 import com.github.squirrelgrip.scientist4k.core.model.ComparisonResult.Companion.SUCCESS
 import com.github.squirrelgrip.scientist4k.core.model.ExperimentComparator
+import com.github.squirrelgrip.scientist4k.core.model.toComparisonResult
 import com.github.squirrelgrip.scientist4k.http.core.model.ExperimentResponse
 import com.google.common.collect.MapDifference
 import com.google.common.collect.Maps
-import com.google.common.net.HttpHeaders.*
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
-class HeadersComparator : ExperimentComparator<ExperimentResponse> {
+open class HeadersComparator(
+        vararg val ignoredHeaders: String
+) : ExperimentComparator<ExperimentResponse> {
+    companion object {
+        private val LOGGER: Logger = LoggerFactory.getLogger(HeadersComparator::class.java)
+    }
+
     override fun invoke(control: ExperimentResponse, candidate: ExperimentResponse): ComparisonResult {
+        LOGGER.trace("Comparing Headers...")
         val controlMap = map(control.headers)
         val candidateMap = map(candidate.headers)
 
@@ -29,19 +38,9 @@ class HeadersComparator : ExperimentComparator<ExperimentResponse> {
         return ComparisonResult(entriesDiffering, entriesOnlyInControl, entriesOnlyInCandidate)
     }
 
-    val IGNORED_HEADERS = arrayOf(
-            SET_COOKIE,
-            LAST_MODIFIED,
-            DATE,
-            CONTENT_LENGTH,
-            CONTENT_TYPE,
-            EXPIRES,
-            SERVER
-    )
-
     private fun map(control: Map<String, String>): Map<String, String> {
         return control.filter {
-            it.key !in IGNORED_HEADERS
+            !ignoredHeaders.contains(it.key)
         }
     }
 }

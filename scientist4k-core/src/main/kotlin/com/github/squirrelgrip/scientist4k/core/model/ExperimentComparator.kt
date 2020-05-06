@@ -17,6 +17,7 @@ data class ComparisonResult(
     val matches: Boolean by lazy {
         failureReasons.isEmpty()
     }
+
 }
 
 class DefaultExperimentComparator<T> : ExperimentComparator<T?> {
@@ -36,3 +37,4 @@ class DefaultExperimentComparator<T> : ExperimentComparator<T?> {
     }
 }
 
+fun List<String>.toComparisonResult(): ComparisonResult = ComparisonResult(this)

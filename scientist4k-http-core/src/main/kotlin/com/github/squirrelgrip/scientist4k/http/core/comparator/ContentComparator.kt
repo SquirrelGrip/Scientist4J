@@ -6,14 +6,20 @@ import com.github.squirrelgrip.scientist4k.http.core.model.ExperimentResponse
 import com.google.common.net.HttpHeaders.CONTENT_TYPE
 import com.google.common.net.MediaType
 import com.google.common.net.MediaType.JSON_UTF_8
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 class ContentComparator : ExperimentComparator<ExperimentResponse> {
-    private val defaultContentTypeComparator: ContentTypeComparator = DefaultContentTypeComparator()
-    private val contentComparators: Map<MediaType, ContentTypeComparator> = mapOf(
-            JSON_UTF_8 to JsonContentTypeComparator()
-    )
+    companion object {
+        private val LOGGER: Logger = LoggerFactory.getLogger(StatusComparator::class.java)
+        private val defaultContentTypeComparator: ContentTypeComparator = DefaultContentTypeComparator()
+        private val contentComparators: Map<MediaType, ContentTypeComparator> = mapOf(
+                JSON_UTF_8 to JsonContentTypeComparator()
+        )
+    }
 
     override fun invoke(control: ExperimentResponse, candidate: ExperimentResponse): ComparisonResult {
+        LOGGER.trace("Comparing Contents...")
         val controlContentType = control.mediaType
         val candidateContentType = candidate.mediaType
         if (controlContentType != null && controlContentType.withoutParameters() == candidateContentType?.withoutParameters()) {
@@ -31,7 +37,6 @@ class ContentComparator : ExperimentComparator<ExperimentResponse> {
                     }
                     .values
                     .firstOrNull() ?: defaultContentTypeComparator
-
 
 }
 
