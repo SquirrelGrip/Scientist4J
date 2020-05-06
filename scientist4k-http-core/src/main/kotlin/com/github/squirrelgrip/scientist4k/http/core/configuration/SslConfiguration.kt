@@ -16,8 +16,11 @@ open class SslConfiguration(
         val trustStorePath: String = "",
         val trustStorePassword: String = "",
         val trustStoreType: String = KeyStore.getDefaultType(),
-        val algorithm: String = "TLS"
+        val algorithm: String = "TLS",
+        val needClientAuth: Boolean = false,
+        val wantClientAuth: Boolean = false
 ) {
+
 
     fun sslContext(): SSLContext = SSLContext.getInstance(algorithm).apply {
         init(keyManagerFactory().keyManagers, trustManagerFactory().trustManagers, SecureRandom())

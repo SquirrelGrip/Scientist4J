@@ -18,11 +18,11 @@ class ExperimentResponseComparator() : ExperimentComparator<ExperimentResponse?>
 
     override fun invoke(control: ExperimentResponse?, candidate: ExperimentResponse?): ComparisonResult {
         if (control != null && candidate != null) {
-            LOGGER.info("Comparing StatusLine...")
+            LOGGER.trace("Comparing StatusLine...")
             val statusMatch = statusComparator.invoke(control.status, candidate.status)
-            LOGGER.info("Comparing Headers...")
+            LOGGER.trace("Comparing Headers...")
             val headerMatch = headersComparator.invoke(control, candidate)
-            LOGGER.info("Comparing Contents...")
+            LOGGER.trace("Comparing Contents...")
             val contentMatch = contentComparator.invoke(control, candidate)
             return ComparisonResult(statusMatch, headerMatch, contentMatch)
         }

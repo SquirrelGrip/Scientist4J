@@ -76,7 +76,7 @@ internal class FilterExperimentTest {
         AbstractExperiment.DEFAULT_EVENT_BUS.register(this)
     }
 
-    var actualExperimentResult: MutableList<ExperimentResult<ExperimentResponse>> = mutableListOf()
+    val actualExperimentResult: MutableList<ExperimentResult<ExperimentResponse>> = mutableListOf()
 
     @Subscribe
     fun receiveResult(experimentResult: ExperimentResult<ExperimentResponse>) {

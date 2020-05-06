@@ -49,10 +49,10 @@ open class Experiment<T>(
 
     open fun run(control: () -> T?, candidate: () -> T?, sample: Sample = sampleFactory.create()): T? {
         return if (isAsync) {
-            LOGGER.trace("Running async")
+            LOGGER.debug("Running async")
             runAsync(control, candidate, sample)
         } else {
-            LOGGER.trace("Running sync")
+            LOGGER.debug("Running sync")
             runSync(control, candidate, sample)
         }
     }
@@ -74,9 +74,9 @@ open class Experiment<T>(
                             executeCandidate(candidate)
                         }
 
-                LOGGER.debug("Awaiting deferredControlObservation...")
+                LOGGER.trace("Awaiting deferredControlObservation...")
                 val controlObservation = deferredControlObservation.await()
-                LOGGER.debug("deferredControlObservation is {}", controlObservation)
+                LOGGER.trace("deferredControlObservation is {}", controlObservation)
                 val deferred = GlobalScope.async {
                     publishAsync(controlObservation, deferredCandidateObservation, sample)
                 }
@@ -87,16 +87,16 @@ open class Experiment<T>(
             }
 
     private suspend fun publishAsync(controlObservation: Observation<T>, deferredCandidateObservation: Deferred<Observation<T>>, sample: Sample = sampleFactory.create()): ExperimentResult<T> {
-        LOGGER.debug("Awaiting candidateObservation...")
+        LOGGER.trace("Awaiting candidateObservation...")
         val candidateObservation = deferredCandidateObservation.await()
-        LOGGER.debug("candidateObservation is {}", candidateObservation)
+        LOGGER.trace("candidateObservation is {}", candidateObservation)
         return publishResult(controlObservation, candidateObservation, sample)
     }
 
     private fun publishResult(controlObservation: Observation<T>, candidateObservation: Observation<T>, sample: Sample = sampleFactory.create()): ExperimentResult<T> {
-        LOGGER.info("Creating Result...")
+        LOGGER.trace("Creating Result...")
         val result = ExperimentResult(this, controlObservation, candidateObservation, sample)
-        LOGGER.info("Publishing Result")
+        LOGGER.trace("Publishing Result")
         publish(result)
         return result
     }

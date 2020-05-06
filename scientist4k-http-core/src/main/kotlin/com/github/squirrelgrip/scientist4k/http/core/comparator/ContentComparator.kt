@@ -10,7 +10,7 @@ import com.google.common.net.MediaType.JSON_UTF_8
 class ContentComparator : ExperimentComparator<ExperimentResponse> {
     private val defaultContentTypeComparator: ContentTypeComparator = DefaultContentTypeComparator()
     private val contentComparators: Map<MediaType, ContentTypeComparator> = mapOf(
-            MediaType.JSON_UTF_8 to JsonContentTypeComparator()
+            JSON_UTF_8 to JsonContentTypeComparator()
     )
 
     override fun invoke(control: ExperimentResponse, candidate: ExperimentResponse): ComparisonResult {
