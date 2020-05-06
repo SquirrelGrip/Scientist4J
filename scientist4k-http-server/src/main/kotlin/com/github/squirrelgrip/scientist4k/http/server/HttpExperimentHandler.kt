@@ -6,8 +6,8 @@ import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 
-class ExperimentHandler(
-        val experiment: HttpExperiment
+class HttpExperimentHandler(
+        val httpExperiment: HttpExperiment
 ) : AbstractHandler() {
 
     constructor(httpExperimentConfiguration: HttpExperimentConfiguration): this(HttpExperimentBuilder(httpExperimentConfiguration).build())
@@ -18,7 +18,7 @@ class ExperimentHandler(
             request: HttpServletRequest,
             response: HttpServletResponse
     ) {
-        experiment.run(request, response)
+        httpExperiment.run(request, response)
         baseRequest.isHandled = true
     }
 
