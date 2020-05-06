@@ -34,6 +34,8 @@ data class ServerConfiguration(
             keyStore = sslConfiguration.keyStore()
             trustStore = sslConfiguration.trustStore()
             setKeyManagerPassword(String(sslConfiguration.keyStorePassword.password()))
+            wantClientAuth = sslConfiguration.wantClientAuth
+            needClientAuth = sslConfiguration.needClientAuth
         }
         return ServerConnector(server,
                 SslConnectionFactory(sslContextFactory, "http/1.1"),
