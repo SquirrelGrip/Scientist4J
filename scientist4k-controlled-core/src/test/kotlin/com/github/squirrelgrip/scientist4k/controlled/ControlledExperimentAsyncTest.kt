@@ -74,7 +74,7 @@ class ControlledExperimentAsyncTest {
         val value = experiment.runAsync({ sleepFunction() }, { sleepFunction() }, { sleepFunction() })
         val date2 = Date()
         val difference = date2.time - date1.time
-        assertThat(difference).isLessThan(2000)
+        assertThat(difference).isLessThan(3000)
         assertThat(difference).isGreaterThanOrEqualTo(1000)
         assertThat(value).isEqualTo(3)
     }
