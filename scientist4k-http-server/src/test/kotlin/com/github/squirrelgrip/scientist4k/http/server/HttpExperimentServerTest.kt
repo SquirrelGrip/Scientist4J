@@ -4,7 +4,6 @@ import com.github.squirrelgrip.cheti.Cheti
 import com.github.squirrelgrip.extension.json.toInstance
 import com.github.squirrelgrip.scientist4k.core.AbstractExperiment
 import com.github.squirrelgrip.scientist4k.core.model.ExperimentResult
-import com.github.squirrelgrip.scientist4k.http.core.consumer.ElasticSearchConsumer
 import com.github.squirrelgrip.scientist4k.http.core.model.ExperimentResponse
 import com.github.squirrelgrip.scientist4k.http.core.server.SecuredServer
 import com.github.squirrelgrip.scientist4k.http.test.handler.CandidateHandler
@@ -15,8 +14,11 @@ import org.apache.http.conn.ssl.SSLConnectionSocketFactory
 import org.apache.http.impl.client.HttpClients
 import org.assertj.core.api.AssertionsForInterfaceTypes.assertThat
 import org.awaitility.Awaitility
-import org.junit.jupiter.api.*
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import java.io.File
 import java.util.concurrent.TimeUnit
 
@@ -31,12 +33,10 @@ class HttpExperimentServerTest {
         private val HTTPS_EXPERIMENT_URL = "https://localhost:9000"
 
         val httpExperimentConfiguration = File("experiment-config.json").toInstance<HttpExperimentConfiguration>()
-        val elasticSearchConsumer = ElasticSearchConsumer<Any>("http://10.0.1.40:9200/test/_doc")
 
         @JvmStatic
         @BeforeAll
         fun beforeAll() {
-            AbstractExperiment.DEFAULT_EVENT_BUS.register(elasticSearchConsumer)
             Cheti(File("../certs/cheti.json")).execute()
 
             val candidateServer = SecuredServer(CandidateHandler.serverConfiguration, CandidateHandler())
@@ -44,12 +44,6 @@ class HttpExperimentServerTest {
 
             controlServer.start()
             candidateServer.start()
-        }
-
-        @JvmStatic
-        @AfterAll
-        fun afterAll() {
-            AbstractExperiment.DEFAULT_EVENT_BUS.unregister(elasticSearchConsumer)
         }
 
         fun isRunning(url: String): Boolean {
