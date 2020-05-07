@@ -4,10 +4,10 @@
     <parent>
         <groupId>com.github.squirrelgrip</groupId>
         <artifactId>scientist4k</artifactId>
-        <version>0.7.6</version>
+        <version>0.7.7</version>
     </parent>
     <artifactId>scientist4k-http-server</artifactId>
-    <name>${project.groupId}:${project.artifactId}</name>
+    <name>${project.artifactId}</name>
 
     <dependencies>
         <dependency>
@@ -54,7 +54,7 @@
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
+            <artifactId>junit-jupiter-engine</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

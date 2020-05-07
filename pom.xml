@@ -5,13 +5,13 @@
     <parent>
         <groupId>com.github.squirrelgrip</groupId>
         <artifactId>root</artifactId>
-        <version>1.0.9</version>
+        <version>1.0.12</version>
     </parent>
     <artifactId>scientist4k</artifactId>
-    <version>0.7.6</version>
+    <version>0.7.7</version>
     <packaging>pom</packaging>
 
-    <name>${project.groupId}:${project.artifactId}</name>
+    <name>${project.artifactId}</name>
     <description>A Kotlin port of Github's Scientist library for refactoring critical code paths</description>
     <url>https://www.github.com/squirrelgrip/Scientist4K</url>
 
@@ -38,12 +38,13 @@
         <module>scientist4k-http-filter</module>
         <module>scientist4k-controlled-core</module>
         <module>scientist4k-controlled-http-server</module>
+        <module>scientist4k-controlled-http-filter</module>
         <module>scientist4k-bom</module>
     </modules>
 
     <properties>
-        <cheti.version>1.1.10</cheti.version>
-        <extensions.version>1.0.18</extensions.version>
+        <cheti.version>1.1.11</cheti.version>
+        <extensions.version>1.0.19</extensions.version>
     </properties>
 
     <dependencyManagement>

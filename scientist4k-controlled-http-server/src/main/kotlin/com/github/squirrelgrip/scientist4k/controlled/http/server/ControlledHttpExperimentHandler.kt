@@ -1,4 +1,4 @@
-package com.github.squirrelgrip.scientist4k.controlled.http
+package com.github.squirrelgrip.scientist4k.controlled.http.server
 
 import com.github.squirrelgrip.scientist4k.http.core.configuration.ControlledHttpExperimentConfiguration
 import org.eclipse.jetty.server.Request
@@ -6,7 +6,7 @@ import org.eclipse.jetty.server.handler.AbstractHandler
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
-class ControlledExperimentHandler(
+class ControlledHttpExperimentHandler(
         val controlledHttpExperiment: ControlledHttpExperiment
 ) : AbstractHandler() {
 

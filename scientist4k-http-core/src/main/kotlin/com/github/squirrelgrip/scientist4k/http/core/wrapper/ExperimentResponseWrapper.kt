@@ -1,15 +1,13 @@
-package com.github.squirrelgrip.scientist4k.http.filter
+package com.github.squirrelgrip.scientist4k.http.core.wrapper
 
 import com.github.squirrelgrip.scientist4k.http.core.model.ExperimentResponse
-import org.apache.http.Header
-import org.apache.http.message.BasicHeader
 import java.io.PrintWriter
 import javax.servlet.ServletOutputStream
 import javax.servlet.ServletResponse
 import javax.servlet.http.HttpServletResponse
 import javax.servlet.http.HttpServletResponseWrapper
 
-class FilterExperimentResponseWrapper(
+class ExperimentResponseWrapper(
         response: ServletResponse
 ) : HttpServletResponseWrapper(response as HttpServletResponse) {
     private lateinit var copyServletOutputStream: CopyServletOutputStream

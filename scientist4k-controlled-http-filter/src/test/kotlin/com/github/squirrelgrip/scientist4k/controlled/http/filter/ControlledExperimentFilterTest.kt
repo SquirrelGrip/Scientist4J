@@ -1,12 +1,13 @@
-package com.github.squirrelgrip.scientist4k.http.filter
+package com.github.squirrelgrip.scientist4k.controlled.http.filter
 
 import com.github.squirrelgrip.cheti.Cheti
 import com.github.squirrelgrip.extension.json.toInstance
+import com.github.squirrelgrip.scientist4k.controlled.model.ControlledExperimentResult
 import com.github.squirrelgrip.scientist4k.core.AbstractExperiment
-import com.github.squirrelgrip.scientist4k.core.model.ExperimentResult
 import com.github.squirrelgrip.scientist4k.http.core.model.ExperimentResponse
 import com.github.squirrelgrip.scientist4k.http.core.server.SecuredServer
 import com.github.squirrelgrip.scientist4k.http.test.handler.CandidateHandler
+import com.github.squirrelgrip.scientist4k.http.test.handler.ReferenceHandler
 import com.github.squirrelgrip.scientist4k.http.test.servlet.ControlServlet
 import com.google.common.eventbus.Subscribe
 import org.apache.http.client.methods.RequestBuilder
@@ -25,25 +26,23 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 import javax.servlet.DispatcherType
 
-internal class FilterExperimentTest {
+internal class ControlledExperimentFilterTest {
 
     companion object {
         private val HTTP_CONTROL_URL = "http://localhost:9003"
         private val HTTPS_CONTROL_URL = "https://localhost:9004"
 
-        val filterExperimentConfiguration = File("filter-experiment-config.json").toInstance<FilterExperimentConfiguration>()
+        val controlledFilterExperimentConfiguration = File("controlled-filter-experiment-config.json").toInstance<ControlledFilterExperimentConfiguration>()
 
         @JvmStatic
         @BeforeAll
         fun beforeAll() {
-            val chetiConfiguration = File("../certs/cheti.json")
-            val cheti = Cheti(chetiConfiguration)
-            cheti.execute()
+            Cheti(File("../certs/cheti.json")).execute()
 
-            val holder: FilterHolder = FilterHolder(FilterExperiment::class.java)
-            holder.name = "Experiment Filter"
+            val holder: FilterHolder = FilterHolder(ConfigurableControlledExperimentFilter::class.java)
+            holder.name = "Controlled Experiment Filter"
             holder.initParameters = mapOf(
-                    "config" to "filter-experiment-config.json"
+                    "config" to "controlled-filter-experiment-config.json"
             )
 
             val context = ServletContextHandler(ServletContextHandler.SESSIONS).apply {
@@ -56,10 +55,12 @@ internal class FilterExperimentTest {
 
             val candidateServer = SecuredServer(CandidateHandler.serverConfiguration, CandidateHandler())
             candidateServer.start()
+            val referenceServer = SecuredServer(ReferenceHandler.serverConfiguration, ReferenceHandler())
+            referenceServer.start()
         }
 
         fun isRunning(url: String): Boolean {
-            val sslConfiguration = filterExperimentConfiguration.alternateRoute.sslConfiguration
+            val sslConfiguration = controlledFilterExperimentConfiguration.detour.sslConfiguration
             val httpClient = HttpClients.custom().setSSLSocketFactory(
                     SSLConnectionSocketFactory(
                             sslConfiguration!!.sslContext(),
@@ -76,10 +77,10 @@ internal class FilterExperimentTest {
         AbstractExperiment.DEFAULT_EVENT_BUS.register(this)
     }
 
-    val actualExperimentResult: MutableList<ExperimentResult<ExperimentResponse>> = mutableListOf()
+    private val actualExperimentResult: MutableList<ControlledExperimentResult<ExperimentResponse>> = mutableListOf()
 
     @Subscribe
-    fun receiveResult(experimentResult: ExperimentResult<ExperimentResponse>) {
+    fun receiveResult(experimentResult: ControlledExperimentResult<ExperimentResponse>) {
         actualExperimentResult.add(experimentResult)
     }
 
@@ -88,13 +89,13 @@ internal class FilterExperimentTest {
         actualExperimentResult.clear()
     }
 
-    private fun getResult(uri: String): ExperimentResult<ExperimentResponse>? {
+    private fun getResult(uri: String): ControlledExperimentResult<ExperimentResponse>? {
         return actualExperimentResult.firstOrNull {
             it.sample.notes["uri"] == uri
         }
     }
 
-    private fun awaitResult(url: String): ExperimentResult<ExperimentResponse> {
+    private fun awaitResult(url: String): ControlledExperimentResult<ExperimentResponse> {
         Awaitility.await().atMost(5, TimeUnit.SECONDS).until {
             getResult(url) != null
         }
@@ -129,7 +130,7 @@ internal class FilterExperimentTest {
         assertThat(result.match.matches).isFalse()
         assertThat(result.match.failureReasons).containsExactlyInAnyOrder(
                 "Control returned status 200 and Candidate returned status 404.",
-                "Content-Type is different: text/plain != null."
+                "Content-Type is different: text/plain; charset=iso-8859-1 != null."
         )
     }
 
@@ -149,7 +150,7 @@ internal class FilterExperimentTest {
         assertThat(result.match.matches).isFalse()
         assertThat(result.match.failureReasons).containsExactlyInAnyOrder(
                 "Control returned status 404 and Candidate returned status 200.",
-                "Content-Type is different: null != text/plain."
+                "Content-Type is different: null != text/plain; charset=iso-8859-1."
         )
     }
 

@@ -13,6 +13,7 @@ object HttpExperimentUtil {
     val CONTROL_COOKIE_STORE = "CONTROL_COOKIE_STORE"
     val REFERENCE_COOKIE_STORE = "REFERENCE_COOKIE_STORE"
     val CANDIDATE_COOKIE_STORE = "CANDIDATE_COOKIE_STORE"
+    val DETOUR_COOKIE_STORE = "DETOUR_COOKIE_STORE"
 
     fun createRequest(inboundRequest: HttpServletRequest, sample: Sample): ExperimentRequest {
         val experimentRequest = ExperimentRequest.create(inboundRequest)

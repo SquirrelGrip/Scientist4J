@@ -1,4 +1,4 @@
-package com.github.squirrelgrip.scientist4k.controlled.http
+package com.github.squirrelgrip.scientist4k.controlled.http.server
 
 import com.github.squirrelgrip.cheti.Cheti
 import com.github.squirrelgrip.extension.json.toInstance
@@ -28,10 +28,10 @@ class ControlledHttpExperimentServerTest {
     companion object {
         private const val HTTP_CONTROL_URL = "http://localhost:9001"
         private const val HTTPS_CONTROL_URL = "https://localhost:9002"
-        private const val HTTP_REFERENCE_URL = "http://localhost:9003"
-        private const val HTTPS_REFERENCE_URL = "https://localhost:9004"
         private const val HTTP_CANDIDATE_URL = "http://localhost:9011"
         private const val HTTPS_CANDIDATE_URL = "https://localhost:9012"
+        private const val HTTP_REFERENCE_URL = "http://localhost:9021"
+        private const val HTTPS_REFERENCE_URL = "https://localhost:9022"
         private const val HTTP_EXPERIMENT_URL = "http://localhost:8999"
         private const val HTTPS_EXPERIMENT_URL = "https://localhost:9000"
 
@@ -44,12 +44,12 @@ class ControlledHttpExperimentServerTest {
             val cheti = Cheti(chetiConfiguration)
             cheti.execute()
 
-            val primaryControlServer = SecuredServer(ControlHandler.serverConfiguration, ControlHandler())
-            val secondaryControlServer = SecuredServer(ReferenceHandler.serverConfiguration, ReferenceHandler())
+            val controlServer = SecuredServer(ControlHandler.serverConfiguration, ControlHandler())
+            val referenceServer = SecuredServer(ReferenceHandler.serverConfiguration, ReferenceHandler())
             val candidateServer = SecuredServer(CandidateHandler.serverConfiguration, CandidateHandler())
 
-            primaryControlServer.start()
-            secondaryControlServer.start()
+            controlServer.start()
+            referenceServer.start()
             candidateServer.start()
         }
 
@@ -94,7 +94,7 @@ class ControlledHttpExperimentServerTest {
                 candidate = candidate
         )
         testSubject = ControlledHttpExperimentServer(configuration)
-        (testSubject.handler as ControlledExperimentHandler).controlledHttpExperiment.eventBus.register(this)
+        (testSubject.handler as ControlledHttpExperimentHandler).controlledHttpExperiment.eventBus.register(this)
         testSubject.start()
         assertIsRunning(HTTP_EXPERIMENT_URL)
     }
@@ -157,7 +157,7 @@ class ControlledHttpExperimentServerTest {
         assertThat(result.match.matches).isFalse()
         assertThat(result.match.failureReasons).containsExactlyInAnyOrder(
                 "Control returned status 200 and Candidate returned status 404.",
-                "Content-Type is different: text/plain != null."
+                "Content-Type is different: text/plain; charset=iso-8859-1 != null."
         )
     }
 
@@ -182,7 +182,7 @@ class ControlledHttpExperimentServerTest {
         assertThat(result.match.matches).isFalse()
         assertThat(result.match.failureReasons).containsExactlyInAnyOrder(
                 "Control returned status 404 and Candidate returned status 200.",
-                "Content-Type is different: null != text/plain."
+                "Content-Type is different: null != text/plain; charset=iso-8859-1."
         )
     }
 
@@ -195,8 +195,7 @@ class ControlledHttpExperimentServerTest {
         val result = awaitResult("/jsonDifferent")
         assertThat(result.match.matches).isFalse()
         assertThat(result.match.failureReasons).containsExactlyInAnyOrder(
-                "1 in control, not in candidate",
-                "5 in candidate, not in control"
+                """{"op":"move","from":"/1","path":"/5"}"""
         )
     }
 
