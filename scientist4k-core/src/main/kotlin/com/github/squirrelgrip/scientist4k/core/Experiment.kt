@@ -48,6 +48,7 @@ open class Experiment<T>(
     }
 
     open fun run(control: () -> T?, candidate: () -> T?, sample: Sample = sampleFactory.create()): T? {
+        sample.addNote("experiment", name)
         return if (isAsync) {
             LOGGER.debug("Running async")
             runAsync(control, candidate, sample)

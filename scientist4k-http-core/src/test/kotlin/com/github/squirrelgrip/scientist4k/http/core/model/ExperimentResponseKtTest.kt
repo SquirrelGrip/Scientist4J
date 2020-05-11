@@ -1,5 +1,6 @@
 package com.github.squirrelgrip.scientist4k.http.core.model
 
+import com.github.squirrelgrip.scientist4k.http.core.extension.isTextLike
 import com.google.common.net.MediaType
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test

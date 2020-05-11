@@ -25,7 +25,7 @@ class HttpExperiment(
         metrics: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD"),
         comparator: ExperimentComparator<ExperimentResponse?> = DefaultExperimentResponseComparator(),
         sampleFactory: SampleFactory = SampleFactory(),
-        eventBus: EventBus = EventBus(),
+        eventBus: EventBus = DEFAULT_EVENT_BUS,
         mappings: List<MappingConfiguration> = emptyList(),
         enabled: Boolean = true,
         async: Boolean = true,

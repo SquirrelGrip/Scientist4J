@@ -12,6 +12,15 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.github.squirrelgrip</groupId>
+            <artifactId>scientist4k-http-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.squirrelgrip</groupId>
+            <artifactId>extensions</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
         </dependency>

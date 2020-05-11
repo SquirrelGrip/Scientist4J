@@ -16,7 +16,9 @@ data class ExperimentRequest(
         val cookies: Array<Cookie> = emptyArray(),
         val contentType: String?,
         val body: ByteArray = ByteArray(0),
-        val session: HttpSession
+        val session: HttpSession,
+        val parameters: Map<String, Array<String>> = emptyMap(),
+        val uri: String
 ) {
     companion object {
         fun create(inboundRequest: HttpServletRequest): ExperimentRequest {
@@ -31,7 +33,9 @@ data class ExperimentRequest(
                     inboundRequest.cookies ?: emptyArray(),
                     inboundRequest.contentType,
                     inboundRequest.inputStream.readBytes(),
-                    inboundRequest.getSession(true)
+                    inboundRequest.getSession(true),
+                    inboundRequest.parameterMap,
+                    inboundRequest.requestURI
             )
         }
 
@@ -42,8 +46,8 @@ data class ExperimentRequest(
             }
             return url.toString()
         }
-
     }
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -51,9 +55,10 @@ data class ExperimentRequest(
         other as ExperimentRequest
 
         if (method != other.method) return false
-        if (url != other.url) return false
+        if (uri != other.uri) return false
         if (protocol != other.protocol) return false
         if (headers != other.headers) return false
+        if (parameters != other.parameters) return false
         if (!cookies.contentEquals(other.cookies)) return false
         if (!body.contentEquals(other.body)) return false
 

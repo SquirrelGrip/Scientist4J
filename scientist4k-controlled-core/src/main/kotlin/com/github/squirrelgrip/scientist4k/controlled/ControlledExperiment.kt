@@ -23,7 +23,7 @@ open class ControlledExperiment<T>(
         metrics: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD"),
         comparator: ExperimentComparator<T?> = DefaultExperimentComparator(),
         sampleFactory: SampleFactory = SampleFactory(),
-        eventBus: EventBus = EventBus(),
+        eventBus: EventBus = DEFAULT_EVENT_BUS,
         enabled: Boolean = true,
         async: Boolean = true
 ): AbstractExperiment<T>(

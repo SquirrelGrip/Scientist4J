@@ -4,7 +4,7 @@ import com.github.squirrelgrip.scientist4k.metrics.Timer
 
 class NoopTimer : Timer {
     override fun record(runnable: () -> Unit) {
-        // Do Nothing
+        runnable.invoke()
     }
 
     override val duration: Long = 0
