@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.github.squirrelgrip</groupId>
         <artifactId>root</artifactId>
-        <version>1.0.12</version>
+        <version>1.0.13</version>
     </parent>
     <artifactId>scientist4k</artifactId>
     <version>0.7.8-SNAPSHOT</version>
@@ -40,6 +40,8 @@
         <module>scientist4k-controlled-http-server</module>
         <module>scientist4k-controlled-http-filter</module>
         <module>scientist4k-bom</module>
+        <module>scientist4k-report-ui</module>
+        <module>scientist4k-report-api</module>
     </modules>
 
     <properties>
@@ -59,6 +61,12 @@
                 <artifactId>cheti</artifactId>
                 <version>${cheti.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-web</artifactId>
+                <version>${spring-boot.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
+
 </project>
