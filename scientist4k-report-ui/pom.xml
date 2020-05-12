@@ -56,7 +56,7 @@
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
                     <descriptors>assembly/zip.xml</descriptors>
-                    <finalName>${project.artifactId}-${pom.version}</finalName>
+                    <finalName>${project.artifactId}-${project.version}</finalName>
                 </configuration>
                 <executions>
                     <execution>
