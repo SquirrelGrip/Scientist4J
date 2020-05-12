@@ -81,13 +81,37 @@ You may also implement your own `MetricsProvider`, to meet your specific needs.
 
 ## Optional Configuration
 
-Users can optionally override the following functions:
+Users can define the following functions:
 
-* `publish` (to publish results of an experiment, if you want to supplement the `MetricsProvider`’s publishing mechanism)
-* `compareResults` (by default this library just uses `equals` between objects for equality, but in case you want to special case equality between objects)
-* `enabled` (to limit what % of users get exposed to the new code path - by default it's 100%)
-* `runIf` (to enforce conditional behavior on who should be exposed to the new code path)
-* `isAsync` (force using the async for legacy code or move to `runAsync` method)
+* `publish` - to publish results of an experiment, if you want to supplement the `MetricsProvider`’s publishing mechanism
+* `compareResults` - by default this library just uses `equals` between objects for equality, but in case you want to special case equality between objects)
+* `sample` - add extra meta-data to each experiment execution
+* `enabled` - ability to turn the experiment functionality off, true by default
+* `async` - ability to run the experiment in synchronous or asynchronous manner, true by default
 
 License: MIT
 
+# Releasing
+Run the following to kick of a release...
+```
+mvn --batch-mode -U clean jgitflow:release-start -PgitflowStart
+```
+This will create a new release branch from the develop branch and push to origin. Travis will then kick in complete the release.
+If everything goes fine, you should see a new version in maven central after a few minutes and all you need to do is checkout develop again and keep developing, deleting the local release branch. 
+
+When ossTypes times out, which is occasionally does, please follow these steps...
+
+**Determine if the artifact was deployed successfully to maven central**
+
+**If it has**, then run the following... 
+```
+mvn --batch-mode -U clean jgitflow:release-finish -DnoDeploy=true
+```
+This will update the versions accordingly, commit and push the changes, without redeploying to maven central.
+
+**If it has not**, then...
+Checkout the release branch and fix the problem and commit the change to the release branch. This will restart the build on travis and will reattempt to build the release.
+
+# Ideas
+1. If you don't need to raiseExceptionOmMismatch you don't need a comparator.
+    1. The idea of checking if the control and candidate match may not be a concern for the execution of the experiment. The observations could be recorded only when the results are being processed do they need to be compared.

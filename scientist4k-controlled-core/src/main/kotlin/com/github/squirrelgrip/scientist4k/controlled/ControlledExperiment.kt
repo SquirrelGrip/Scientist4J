@@ -2,8 +2,8 @@ package com.github.squirrelgrip.scientist4k.controlled
 
 import com.github.squirrelgrip.scientist4k.controlled.model.ControlledExperimentResult
 import com.github.squirrelgrip.scientist4k.core.AbstractExperiment
-import com.github.squirrelgrip.scientist4k.core.model.DefaultExperimentComparator
-import com.github.squirrelgrip.scientist4k.core.model.ExperimentComparator
+import com.github.squirrelgrip.scientist4k.core.comparator.DefaultExperimentComparator
+import com.github.squirrelgrip.scientist4k.core.comparator.ExperimentComparator
 import com.github.squirrelgrip.scientist4k.core.model.Observation
 import com.github.squirrelgrip.scientist4k.core.model.sample.Sample
 import com.github.squirrelgrip.scientist4k.core.model.sample.SampleFactory
@@ -23,7 +23,7 @@ open class ControlledExperiment<T>(
         metrics: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD"),
         comparator: ExperimentComparator<T?> = DefaultExperimentComparator(),
         sampleFactory: SampleFactory = SampleFactory(),
-        eventBus: EventBus = EventBus(),
+        eventBus: EventBus = DEFAULT_EVENT_BUS,
         enabled: Boolean = true,
         async: Boolean = true
 ): AbstractExperiment<T>(

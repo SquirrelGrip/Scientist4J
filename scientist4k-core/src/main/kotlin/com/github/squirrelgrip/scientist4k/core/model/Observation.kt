@@ -1,8 +1,8 @@
 package com.github.squirrelgrip.scientist4k.core.model
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder
-import com.github.squirrelgrip.scientist4k.metrics.noop.NoopTimer
 import com.github.squirrelgrip.scientist4k.metrics.Timer
+import com.github.squirrelgrip.scientist4k.metrics.noop.NoopTimer
 import com.github.squirrelgrip.util.initOnce
 
 @JsonPropertyOrder (
@@ -47,10 +47,12 @@ class Observation<T>(
         get() = timer.duration
 
     fun time(function: () -> T?) {
-        try {
-            setValue(function.invoke())
-        } catch (e: Exception) {
-            setException(e)
+        timer.record {
+            try {
+                setValue(function.invoke())
+            } catch (e: Exception) {
+                setException(e)
+            }
         }
     }
 

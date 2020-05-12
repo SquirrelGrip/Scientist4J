@@ -2,11 +2,13 @@ package com.github.squirrelgrip.scientist4k.http.core.model
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.github.squirrelgrip.scientist4k.http.core.extension.isTextLike
 import com.google.common.net.HttpHeaders
 import com.google.common.net.MediaType
 import org.apache.http.Header
 import org.apache.http.HttpEntity
 import org.apache.http.StatusLine
+import java.util.Base64.getEncoder
 
 data class ExperimentResponse(
         @JsonProperty("status")
@@ -27,6 +29,7 @@ data class ExperimentResponse(
     )
 
     val mediaType: MediaType?
+        @JsonIgnore
         get() {
             return if (contentType != null) {
                 MediaType.parse(contentType)
@@ -39,11 +42,11 @@ data class ExperimentResponse(
     val contentType: String? = this.headers[HttpHeaders.CONTENT_TYPE]
 
     @JsonProperty("contents")
-    val contents: Any =
+    val contents: String =
         if (mediaType?.isTextLike() == true) {
             String(body)
         } else {
-            body
+            getEncoder().encodeToString(body)
         }
 
     override fun equals(other: Any?): Boolean {
@@ -66,12 +69,4 @@ data class ExperimentResponse(
         return result
     }
 
-}
-
-val textSubType = listOf("json", "geo+json", "hal+json", "xhtml", "xml", "html", "xhtml+xml", "x-www-form-urlencoded")
-
-fun MediaType.isTextLike(): Boolean {
-    return this.`is`(MediaType.ANY_TEXT_TYPE)
-            || this.parameters().containsKey("charset")
-            || (this.`is`(MediaType.ANY_APPLICATION_TYPE) && textSubType.contains(this.subtype()))
 }

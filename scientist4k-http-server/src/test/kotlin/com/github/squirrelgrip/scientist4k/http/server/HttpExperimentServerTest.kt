@@ -4,6 +4,7 @@ import com.github.squirrelgrip.cheti.Cheti
 import com.github.squirrelgrip.extension.json.toInstance
 import com.github.squirrelgrip.scientist4k.core.AbstractExperiment
 import com.github.squirrelgrip.scientist4k.core.model.ExperimentResult
+import com.github.squirrelgrip.scientist4k.http.core.consumer.FileConsumer
 import com.github.squirrelgrip.scientist4k.http.core.model.ExperimentResponse
 import com.github.squirrelgrip.scientist4k.http.core.server.SecuredServer
 import com.github.squirrelgrip.scientist4k.http.test.handler.CandidateHandler
@@ -93,6 +94,9 @@ class HttpExperimentServerTest {
         )
         testSubject = HttpExperimentServer(configuration)
         testSubject.start()
+        val file = File(File(System.getenv("user.dir"), ".."), "scientist4k-report-api/report")
+        (testSubject.handler as HttpExperimentHandler).httpExperiment.eventBus.register(FileConsumer(file))
+
         assertIsRunning(HTTP_EXPERIMENT_URL)
     }
 

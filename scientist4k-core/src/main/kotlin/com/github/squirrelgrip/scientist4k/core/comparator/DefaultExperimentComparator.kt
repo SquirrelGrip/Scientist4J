@@ -1,24 +1,8 @@
-package com.github.squirrelgrip.scientist4k.core.model
+package com.github.squirrelgrip.scientist4k.core.comparator
 
+import com.github.squirrelgrip.scientist4k.core.model.ComparisonResult
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-
-interface ExperimentComparator<T> : (T, T) -> ComparisonResult
-
-data class ComparisonResult(
-        val failureReasons: List<String>
-) {
-    constructor(vararg failureReasons: String): this(failureReasons.toList())
-    constructor(vararg comparisonResult: ComparisonResult): this(comparisonResult.flatMap { it.failureReasons })
-
-    companion object {
-        val SUCCESS = ComparisonResult(emptyList())
-    }
-    val matches: Boolean by lazy {
-        failureReasons.isEmpty()
-    }
-
-}
 
 class DefaultExperimentComparator<T> : ExperimentComparator<T?> {
     companion object {
@@ -36,5 +20,3 @@ class DefaultExperimentComparator<T> : ExperimentComparator<T?> {
         }
     }
 }
-
-fun List<String>.toComparisonResult(): ComparisonResult = ComparisonResult(this)

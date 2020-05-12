@@ -1,6 +1,10 @@
 package com.github.squirrelgrip.scientist4k.core
 
-import com.github.squirrelgrip.scientist4k.core.model.*
+import com.github.squirrelgrip.scientist4k.core.comparator.DefaultExperimentComparator
+import com.github.squirrelgrip.scientist4k.core.comparator.ExperimentComparator
+import com.github.squirrelgrip.scientist4k.core.model.ComparisonResult
+import com.github.squirrelgrip.scientist4k.core.model.Observation
+import com.github.squirrelgrip.scientist4k.core.model.ObservationStatus
 import com.github.squirrelgrip.scientist4k.core.model.sample.SampleFactory
 import com.github.squirrelgrip.scientist4k.metrics.Counter
 import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
