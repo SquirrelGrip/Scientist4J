@@ -9,9 +9,9 @@ import com.github.squirrelgrip.scientist4k.core.model.ComparisonResult.Companion
 
 class JsonContentTypeComparator : ContentTypeComparator {
 
-    override fun invoke(control: ByteArray, candidate: ByteArray): ComparisonResult {
-        val controlJsonNode = control.toJsonNode()
-        val candidateJsonNode = candidate.toJsonNode()
+    override fun invoke(control: String?, candidate: String?): ComparisonResult {
+        val controlJsonNode = control?.toJsonNode()
+        val candidateJsonNode = candidate?.toJsonNode()
 
         val diff: JsonNode = JsonDiff.asJson(controlJsonNode, candidateJsonNode)
         val list = diff.asIterable().toList()

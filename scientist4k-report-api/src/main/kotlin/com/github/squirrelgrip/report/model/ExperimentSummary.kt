@@ -1,6 +1,7 @@
 package com.github.squirrelgrip.report.model
 
 import com.github.squirrelgrip.extension.json.toInstance
+import com.github.squirrelgrip.scientist4k.http.core.extension.matches
 import com.github.squirrelgrip.scientist4k.http.core.model.HttpExperimentResult
 import java.io.File
 

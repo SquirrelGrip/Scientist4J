@@ -1,13 +1,15 @@
-package com.github.squirrelgrip.scientist4k.core.model
+package com.github.squirrelgrip.scientist4k.simple.model
 
-import com.github.squirrelgrip.scientist4k.core.Experiment
 import com.github.squirrelgrip.scientist4k.core.exception.MismatchException
+import com.github.squirrelgrip.scientist4k.core.model.ComparisonResult
+import com.github.squirrelgrip.scientist4k.core.model.ExperimentObservation
 import com.github.squirrelgrip.scientist4k.core.model.sample.Sample
+import com.github.squirrelgrip.scientist4k.simple.Experiment
 
 class ExperimentResult<T>(
         private val experiment: Experiment<T>,
-        val control: Observation<T>,
-        val candidate: Observation<T>?,
+        val control: ExperimentObservation<T>,
+        val candidate: ExperimentObservation<T>?,
         val sample: Sample
 ) {
     val match =

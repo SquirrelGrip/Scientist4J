@@ -2,9 +2,10 @@ package com.github.squirrelgrip.scientist4k.controlled.http.server
 
 import com.github.squirrelgrip.cheti.Cheti
 import com.github.squirrelgrip.extension.json.toInstance
-import com.github.squirrelgrip.scientist4k.controlled.model.ControlledExperimentResult
 import com.github.squirrelgrip.scientist4k.http.core.configuration.ControlledHttpExperimentConfiguration
-import com.github.squirrelgrip.scientist4k.http.core.model.ExperimentResponse
+import com.github.squirrelgrip.scientist4k.http.core.extension.failureReasons
+import com.github.squirrelgrip.scientist4k.http.core.extension.matches
+import com.github.squirrelgrip.scientist4k.http.core.model.HttpExperimentResult
 import com.github.squirrelgrip.scientist4k.http.core.server.SecuredServer
 import com.github.squirrelgrip.scientist4k.http.test.handler.CandidateHandler
 import com.github.squirrelgrip.scientist4k.http.test.handler.ControlHandler
@@ -40,9 +41,7 @@ class ControlledHttpExperimentServerTest {
         @JvmStatic
         @BeforeAll
         fun beforeAll() {
-            val chetiConfiguration = File("../certs/cheti.json")
-            val cheti = Cheti(chetiConfiguration)
-            cheti.execute()
+            Cheti(File("../certs/cheti.json")).execute()
 
             val controlServer = SecuredServer(ControlHandler.serverConfiguration, ControlHandler())
             val referenceServer = SecuredServer(ReferenceHandler.serverConfiguration, ReferenceHandler())
@@ -67,10 +66,10 @@ class ControlledHttpExperimentServerTest {
         }
     }
 
-    var actualResult: MutableList<ControlledExperimentResult<ExperimentResponse>> = mutableListOf()
+    var actualResult: MutableList<HttpExperimentResult> = mutableListOf()
 
     @Subscribe
-    fun receiveResult(result: ControlledExperimentResult<ExperimentResponse>) {
+    fun receiveResult(result: HttpExperimentResult) {
         actualResult.add(result)
     }
 
@@ -104,13 +103,13 @@ class ControlledHttpExperimentServerTest {
         testSubject.stop()
     }
 
-    private fun getResult(uri: String): ControlledExperimentResult<ExperimentResponse>? {
+    private fun getResult(uri: String): HttpExperimentResult? {
         return actualResult.firstOrNull {
-            it.sample.notes["uri"] == uri
+            it.request.url == uri
         }
     }
 
-    private fun awaitResult(url: String): ControlledExperimentResult<ExperimentResponse> {
+    private fun awaitResult(url: String): HttpExperimentResult {
         Awaitility.await().atMost(5, TimeUnit.SECONDS).until {
             getResult(url) != null
         }
@@ -130,8 +129,8 @@ class ControlledHttpExperimentServerTest {
         assertThat(isRunning("$HTTPS_EXPERIMENT_URL/ok")).isTrue()
 
         val result = awaitResult("/ok")
-        assertThat(result.match.matches).isTrue()
-        assertThat(result.match.failureReasons).isEmpty()
+        assertThat(result.matches()).isTrue()
+        assertThat(result.failureReasons()).isEmpty()
     }
 
     @Test
@@ -141,8 +140,8 @@ class ControlledHttpExperimentServerTest {
         assertThat(isRunning("$HTTPS_EXPERIMENT_URL/status")).isTrue()
 
         val result = awaitResult("/status")
-        assertThat(result.match.matches).isFalse()
-        assertThat(result.match.failureReasons).containsExactlyInAnyOrder(
+        assertThat(result.matches()).isFalse()
+        assertThat(result.failureReasons()).containsExactlyInAnyOrder(
                 "Control returned status 200 and Candidate returned status 201."
         )
     }
@@ -154,8 +153,8 @@ class ControlledHttpExperimentServerTest {
         assertThat(isRunning("$HTTPS_EXPERIMENT_URL/control")).isTrue()
 
         val result = awaitResult("/control")
-        assertThat(result.match.matches).isFalse()
-        assertThat(result.match.failureReasons).containsExactlyInAnyOrder(
+        assertThat(result.matches()).isFalse()
+        assertThat(result.failureReasons()).containsExactlyInAnyOrder(
                 "Control returned status 200 and Candidate returned status 404.",
                 "Content-Type is different: text/plain; charset=iso-8859-1 != null."
         )
@@ -168,8 +167,8 @@ class ControlledHttpExperimentServerTest {
         assertThat(isRunning("$HTTPS_EXPERIMENT_URL/mappedControl")).isTrue()
 
         val result = awaitResult("/mappedControl")
-        assertThat(result.match.matches).isTrue()
-        assertThat(result.match.failureReasons).isEmpty()
+        assertThat(result.matches()).isTrue()
+        assertThat(result.failureReasons()).isEmpty()
     }
 
     @Test
@@ -179,8 +178,8 @@ class ControlledHttpExperimentServerTest {
         assertThat(isRunning("$HTTPS_EXPERIMENT_URL/candidate")).isFalse()
 
         val result = awaitResult("/candidate")
-        assertThat(result.match.matches).isFalse()
-        assertThat(result.match.failureReasons).containsExactlyInAnyOrder(
+        assertThat(result.matches()).isFalse()
+        assertThat(result.failureReasons()).containsExactlyInAnyOrder(
                 "Control returned status 404 and Candidate returned status 200.",
                 "Content-Type is different: null != text/plain; charset=iso-8859-1."
         )
@@ -193,8 +192,8 @@ class ControlledHttpExperimentServerTest {
         assertThat(isRunning("$HTTPS_EXPERIMENT_URL/jsonDifferent")).isTrue()
 
         val result = awaitResult("/jsonDifferent")
-        assertThat(result.match.matches).isFalse()
-        assertThat(result.match.failureReasons).containsExactlyInAnyOrder(
+        assertThat(result.matches()).isFalse()
+        assertThat(result.failureReasons()).containsExactlyInAnyOrder(
                 """{"op":"move","from":"/1","path":"/5"}"""
         )
     }
@@ -206,7 +205,7 @@ class ControlledHttpExperimentServerTest {
         assertThat(isRunning("$HTTPS_EXPERIMENT_URL/json")).isTrue()
 
         val result = awaitResult("/json")
-        assertThat(result.match.matches).isTrue()
+        assertThat(result.matches()).isTrue()
     }
 
 }

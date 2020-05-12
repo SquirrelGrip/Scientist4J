@@ -2,7 +2,7 @@ package com.github.squirrelgrip.scientist4k.http.core.comparator
 
 import com.google.common.net.HttpHeaders
 
-class DefaultExperimentResponseComparator() : ExperimentResponseComparator(
+class DefaultHttpExperimentResponseComparator : HttpExperimentResponseComparator(
         StatusComparator(),
         HeadersComparator(
                 HttpHeaders.SET_COOKIE,

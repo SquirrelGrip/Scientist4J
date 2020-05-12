@@ -1,13 +1,10 @@
 package com.github.squirrelgrip.scientist4k.controlled.http.filter
 
 import com.github.squirrelgrip.scientist4k.core.AbstractExperiment.Companion.DEFAULT_EVENT_BUS
-import com.github.squirrelgrip.scientist4k.core.comparator.ExperimentComparator
 import com.github.squirrelgrip.scientist4k.core.exception.LaboratoryException
 import com.github.squirrelgrip.scientist4k.core.model.sample.SampleFactory
-import com.github.squirrelgrip.scientist4k.http.core.comparator.DefaultExperimentResponseComparator
 import com.github.squirrelgrip.scientist4k.http.core.configuration.EndPointConfiguration
 import com.github.squirrelgrip.scientist4k.http.core.configuration.MappingConfiguration
-import com.github.squirrelgrip.scientist4k.http.core.model.ExperimentResponse
 import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
 import com.google.common.eventbus.EventBus
 
@@ -15,9 +12,7 @@ class ControlledFilterExperimentBuilder() {
     private var mappings: List<MappingConfiguration> = emptyList()
     private var name: String = "Test"
     private var metrics: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD")
-    private var raiseOnMismatch: Boolean = false
     private var sampleFactory: SampleFactory = SampleFactory()
-    private var comparator: ExperimentComparator<ExperimentResponse?> = DefaultExperimentResponseComparator()
     private var eventBus: EventBus = DEFAULT_EVENT_BUS
     private var enabled: Boolean = true
     private var async: Boolean = true
@@ -27,7 +22,6 @@ class ControlledFilterExperimentBuilder() {
     constructor(httpExperimentConfiguration: ControlledFilterExperimentConfiguration) : this() {
         name = httpExperimentConfiguration.experiment.name
         metrics = httpExperimentConfiguration.experiment.metrics
-        raiseOnMismatch = httpExperimentConfiguration.experiment.raiseOnMismatch
         sampleFactory = httpExperimentConfiguration.experiment.sampleFactory
         detourConfig = httpExperimentConfiguration.detour
         referenceConfig = httpExperimentConfiguration.reference
@@ -48,16 +42,6 @@ class ControlledFilterExperimentBuilder() {
 
     fun withMetricsProvider(metricsProvider: MetricsProvider<*>): ControlledFilterExperimentBuilder {
         this.metrics = metricsProvider
-        return this
-    }
-
-    fun withComparator(comparator: ExperimentComparator<ExperimentResponse?>): ControlledFilterExperimentBuilder {
-        this.comparator = comparator
-        return this
-    }
-
-    fun withRaiseOnMismatch(raiseOnMismatch: Boolean): ControlledFilterExperimentBuilder {
-        this.raiseOnMismatch = raiseOnMismatch
         return this
     }
 
@@ -98,7 +82,7 @@ class ControlledFilterExperimentBuilder() {
 
     fun build(): ControlledFilterExperiment {
         if (detourConfig != null) {
-            return ControlledFilterExperiment(name, raiseOnMismatch, metrics, comparator, sampleFactory, eventBus, enabled, async, mappings, detourConfig!!, referenceConfig!!)
+            return ControlledFilterExperiment(name, metrics, sampleFactory, eventBus, enabled, async, mappings, detourConfig!!, referenceConfig!!)
         }
         throw LaboratoryException("Detour configurations must be set")
     }

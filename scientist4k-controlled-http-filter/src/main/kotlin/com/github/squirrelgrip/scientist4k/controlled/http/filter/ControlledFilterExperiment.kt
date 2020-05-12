@@ -1,11 +1,9 @@
 package com.github.squirrelgrip.scientist4k.controlled.http.filter
 
-import com.github.squirrelgrip.scientist4k.controlled.ControlledExperiment
-import com.github.squirrelgrip.scientist4k.core.comparator.ExperimentComparator
 import com.github.squirrelgrip.scientist4k.core.model.sample.Sample
 import com.github.squirrelgrip.scientist4k.core.model.sample.SampleFactory
+import com.github.squirrelgrip.scientist4k.http.controlled.AbstractControlledHttpExperiment
 import com.github.squirrelgrip.scientist4k.http.core.HttpExperimentUtil
-import com.github.squirrelgrip.scientist4k.http.core.comparator.DefaultExperimentResponseComparator
 import com.github.squirrelgrip.scientist4k.http.core.configuration.EndPointConfiguration
 import com.github.squirrelgrip.scientist4k.http.core.configuration.MappingConfiguration
 import com.github.squirrelgrip.scientist4k.http.core.factory.RequestFactory
@@ -14,8 +12,6 @@ import com.github.squirrelgrip.scientist4k.http.core.model.ExperimentResponse
 import com.github.squirrelgrip.scientist4k.http.core.wrapper.ExperimentResponseWrapper
 import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
 import com.google.common.eventbus.EventBus
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import javax.servlet.FilterChain
 import javax.servlet.ServletRequest
 import javax.servlet.ServletResponse
@@ -24,9 +20,7 @@ import javax.servlet.http.HttpServletRequestWrapper
 
 class ControlledFilterExperiment(
         name: String,
-        raiseOnMismatch: Boolean,
         metrics: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD"),
-        comparator: ExperimentComparator<ExperimentResponse?> = DefaultExperimentResponseComparator(),
         sampleFactory: SampleFactory = SampleFactory(),
         eventBus: EventBus = DEFAULT_EVENT_BUS,
         enabled: Boolean = true,
@@ -34,11 +28,9 @@ class ControlledFilterExperiment(
         mappings: List<MappingConfiguration> = emptyList(),
         detourConfig: EndPointConfiguration,
         referenceConfig: EndPointConfiguration
-) : ControlledExperiment<ExperimentResponse>(
+) : AbstractControlledHttpExperiment(
         name,
-        raiseOnMismatch,
         metrics,
-        comparator,
         sampleFactory,
         eventBus,
         enabled,
@@ -48,10 +40,6 @@ class ControlledFilterExperiment(
     private val referenceRequestFactory = RequestFactory(referenceConfig, HttpExperimentUtil.REFERENCE_COOKIE_STORE)
 
     private val allowedMethods = detourConfig.allowedMethods
-
-    companion object {
-        private val LOGGER: Logger = LoggerFactory.getLogger(ControlledFilterExperiment::class.java)
-    }
 
     fun run(
             inboundRequest: ServletRequest,

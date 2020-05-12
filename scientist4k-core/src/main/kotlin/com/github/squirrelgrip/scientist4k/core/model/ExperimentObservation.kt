@@ -12,7 +12,7 @@ import com.github.squirrelgrip.util.initOnce
         "duration",
         "status"
 )
-class Observation<T>(
+class ExperimentObservation<T>(
         val name: String,
         private val timer: Timer
 ) {
@@ -20,7 +20,7 @@ class Observation<T>(
 
     private var _exception: Exception? = null
     private var _value: T? = null
-    var status: ObservationStatus by initOnce()
+    var status: ExperimentObservationStatus by initOnce()
 
     companion object {
         val SCRAP_TIMER: Timer = NoopTimer()
@@ -35,12 +35,12 @@ class Observation<T>(
 
     fun setException(exception: Exception) {
         _exception = exception
-        status = ObservationStatus.COMPLETED
+        status = ExperimentObservationStatus.COMPLETED
     }
 
     fun setValue(value: T?) {
         _value = value
-        status = ObservationStatus.COMPLETED
+        status = ExperimentObservationStatus.COMPLETED
     }
 
     val duration: Long
