@@ -4,6 +4,7 @@ import com.github.squirrelgrip.cheti.Cheti
 import com.github.squirrelgrip.extension.json.toInstance
 import com.github.squirrelgrip.scientist4k.core.AbstractExperiment
 import com.github.squirrelgrip.scientist4k.core.model.ExperimentResult
+import com.github.squirrelgrip.scientist4k.http.core.consumer.FileConsumer
 import com.github.squirrelgrip.scientist4k.http.core.model.ExperimentResponse
 import com.github.squirrelgrip.scientist4k.http.core.server.SecuredServer
 import com.github.squirrelgrip.scientist4k.http.test.handler.CandidateHandler
@@ -25,7 +26,7 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 import javax.servlet.DispatcherType
 
-internal class ExperimentFilterTest {
+internal class HttpFilterExperimentTest {
 
     companion object {
         private val HTTP_CONTROL_URL = "http://localhost:9003"
@@ -74,6 +75,8 @@ internal class ExperimentFilterTest {
 
     init {
         AbstractExperiment.DEFAULT_EVENT_BUS.register(this)
+        val file = File(File(System.getenv("user.dir"), ".."), "scientist4k-report-api/report")
+        AbstractExperiment.DEFAULT_EVENT_BUS.register(FileConsumer(file))
     }
 
     val actualExperimentResult: MutableList<ExperimentResult<ExperimentResponse>> = mutableListOf()
