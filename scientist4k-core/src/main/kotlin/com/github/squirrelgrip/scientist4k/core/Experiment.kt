@@ -1,7 +1,7 @@
 package com.github.squirrelgrip.scientist4k.core
 
-import com.github.squirrelgrip.scientist4k.core.model.DefaultExperimentComparator
-import com.github.squirrelgrip.scientist4k.core.model.ExperimentComparator
+import com.github.squirrelgrip.scientist4k.core.comparator.DefaultExperimentComparator
+import com.github.squirrelgrip.scientist4k.core.comparator.ExperimentComparator
 import com.github.squirrelgrip.scientist4k.core.model.ExperimentResult
 import com.github.squirrelgrip.scientist4k.core.model.Observation
 import com.github.squirrelgrip.scientist4k.core.model.sample.Sample
@@ -34,12 +34,6 @@ open class Experiment<T>(
         enabled,
         async
 ) {
-    /**
-     * Note that if `raiseOnMismatch` is true, [.runAsync] will block waiting for
-     * the candidate function to complete before it can raise any resulting errors.
-     * In situations where the candidate function may be significantly slower than the control,
-     * it is *not* recommended to raise on mismatch.
-     */
     constructor(metrics: MetricsProvider<*>) : this("Experiment", metrics)
     constructor(name: String, metrics: MetricsProvider<*>) : this(name, false, metrics)
 
@@ -50,10 +44,10 @@ open class Experiment<T>(
     open fun run(control: () -> T?, candidate: () -> T?, sample: Sample = sampleFactory.create()): T? {
         sample.addNote("experiment", name)
         return if (isAsync) {
-            LOGGER.debug("Running async")
+            LOGGER.trace("Running async")
             runAsync(control, candidate, sample)
         } else {
-            LOGGER.debug("Running sync")
+            LOGGER.trace("Running sync")
             runSync(control, candidate, sample)
         }
     }
@@ -87,14 +81,14 @@ open class Experiment<T>(
                 controlObservation.value
             }
 
-    private suspend fun publishAsync(controlObservation: Observation<T>, deferredCandidateObservation: Deferred<Observation<T>>, sample: Sample = sampleFactory.create()): ExperimentResult<T> {
+    private suspend fun publishAsync(controlObservation: Observation<T>, deferredCandidateObservation: Deferred<Observation<T>>, sample: Sample): ExperimentResult<T> {
         LOGGER.trace("Awaiting candidateObservation...")
         val candidateObservation = deferredCandidateObservation.await()
         LOGGER.trace("candidateObservation is {}", candidateObservation)
         return publishResult(controlObservation, candidateObservation, sample)
     }
 
-    private fun publishResult(controlObservation: Observation<T>, candidateObservation: Observation<T>, sample: Sample = sampleFactory.create()): ExperimentResult<T> {
+    private fun publishResult(controlObservation: Observation<T>, candidateObservation: Observation<T>, sample: Sample): ExperimentResult<T> {
         LOGGER.trace("Creating Result...")
         val result = ExperimentResult(this, controlObservation, candidateObservation, sample)
         LOGGER.trace("Publishing Result")

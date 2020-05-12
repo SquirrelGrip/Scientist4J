@@ -11,17 +11,15 @@ import java.io.File
 class FileExperimentRepository(
         val baseDirectory: File
 ) : ExperimentRepository {
-   @Suppress("RECEIVER_NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
    override fun findAllExperiments(): List<String> {
         return baseDirectory.list { file, _ ->
             file.isDirectory()
         }.toList()
     }
 
-    @Suppress("RECEIVER_NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
     override fun findExperimentByName(name: String): ExperimentReport {
         val experimentDirectory = File(baseDirectory, name)
-        if (experimentDirectory.exists()) {
+        if (experimentDirectory.exists() && experimentDirectory.isDirectory()) {
             val list = experimentDirectory.listFiles().map {
                 it.toInstance<HttpExperimentResult>()
             }
