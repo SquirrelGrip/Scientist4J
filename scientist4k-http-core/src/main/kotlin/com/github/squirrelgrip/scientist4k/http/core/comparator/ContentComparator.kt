@@ -1,5 +1,6 @@
 package com.github.squirrelgrip.scientist4k.http.core.comparator
 
+import com.github.squirrelgrip.scientist4k.core.comparator.ExperimentComparator
 import com.github.squirrelgrip.scientist4k.core.model.ComparisonResult
 import com.github.squirrelgrip.scientist4k.http.core.model.ExperimentResponse
 import com.google.common.net.HttpHeaders.CONTENT_TYPE

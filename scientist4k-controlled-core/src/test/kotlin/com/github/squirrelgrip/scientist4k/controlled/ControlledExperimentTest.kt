@@ -2,9 +2,9 @@ package com.github.squirrelgrip.scientist4k.controlled
 
 import com.github.squirrelgrip.scientist4k.controlled.ControlledExperiment
 import com.github.squirrelgrip.scientist4k.controlled.ControlledExperimentBuilder
+import com.github.squirrelgrip.scientist4k.core.comparator.ExperimentComparator
 import com.github.squirrelgrip.scientist4k.core.exception.MismatchException
 import com.github.squirrelgrip.scientist4k.core.model.ComparisonResult
-import com.github.squirrelgrip.scientist4k.core.model.ExperimentComparator
 import com.github.squirrelgrip.scientist4k.metrics.noop.NoopMetricsProvider
 import com.github.squirrelgrip.scientist4k.metrics.dropwizard.DropwizardMetricsProvider
 import com.github.squirrelgrip.scientist4k.metrics.micrometer.MicrometerMetricsProvider

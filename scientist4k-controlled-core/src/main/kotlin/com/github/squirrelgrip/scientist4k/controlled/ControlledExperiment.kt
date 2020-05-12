@@ -2,8 +2,8 @@ package com.github.squirrelgrip.scientist4k.controlled
 
 import com.github.squirrelgrip.scientist4k.controlled.model.ControlledExperimentResult
 import com.github.squirrelgrip.scientist4k.core.AbstractExperiment
-import com.github.squirrelgrip.scientist4k.core.model.DefaultExperimentComparator
-import com.github.squirrelgrip.scientist4k.core.model.ExperimentComparator
+import com.github.squirrelgrip.scientist4k.core.comparator.DefaultExperimentComparator
+import com.github.squirrelgrip.scientist4k.core.comparator.ExperimentComparator
 import com.github.squirrelgrip.scientist4k.core.model.Observation
 import com.github.squirrelgrip.scientist4k.core.model.sample.Sample
 import com.github.squirrelgrip.scientist4k.core.model.sample.SampleFactory

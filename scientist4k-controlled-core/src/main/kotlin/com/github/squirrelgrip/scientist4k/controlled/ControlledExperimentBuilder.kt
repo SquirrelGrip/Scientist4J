@@ -1,10 +1,9 @@
 package com.github.squirrelgrip.scientist4k.controlled
 
-import com.github.squirrelgrip.scientist4k.core.AbstractExperiment
 import com.github.squirrelgrip.scientist4k.core.AbstractExperiment.Companion.DEFAULT_EVENT_BUS
+import com.github.squirrelgrip.scientist4k.core.comparator.DefaultExperimentComparator
+import com.github.squirrelgrip.scientist4k.core.comparator.ExperimentComparator
 import com.github.squirrelgrip.scientist4k.core.configuration.ExperimentConfiguration
-import com.github.squirrelgrip.scientist4k.core.model.DefaultExperimentComparator
-import com.github.squirrelgrip.scientist4k.core.model.ExperimentComparator
 import com.github.squirrelgrip.scientist4k.core.model.sample.SampleFactory
 import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
 import com.google.common.eventbus.EventBus
