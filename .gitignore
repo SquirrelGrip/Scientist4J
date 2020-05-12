@@ -223,3 +223,4 @@ travis/all.gpg
 /certs/**/*.crt
 /certs/**/*.key
 /scientist4k-report-api/report/
+/scientist4k-report-api/src/main/resources/static/
