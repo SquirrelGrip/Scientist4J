@@ -111,3 +111,7 @@ This will update the versions accordingly, commit and push the changes, without 
 
 **If it has not**, then...
 Checkout the release branch and fix the problem and commit the change to the release branch. This will restart the build on travis and will reattempt to build the release.
+
+# Ideas
+1. If you don't need to raiseExceptionOmMismatch you don't need a comparator.
+    1. The idea of checking if the control and candidate match may not be a concern for the execution of the experiment. The observations could be recorded only when the results are being processed do they need to be compared.

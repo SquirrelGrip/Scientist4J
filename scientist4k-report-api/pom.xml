@@ -18,6 +18,12 @@
         </dependency>
         <dependency>
             <groupId>com.github.squirrelgrip</groupId>
+            <artifactId>scientist4k-report-ui</artifactId>
+            <version>${project.version}</version>
+            <type>zip</type>
+        </dependency>
+        <dependency>
+            <groupId>com.github.squirrelgrip</groupId>
             <artifactId>extensions</artifactId>
         </dependency>
         <dependency>
