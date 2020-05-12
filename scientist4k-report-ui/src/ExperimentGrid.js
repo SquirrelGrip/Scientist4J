@@ -1,33 +1,36 @@
-import React from 'react';
-import {makeStyles} from '@material-ui/core/styles';
-import Grid from '@material-ui/core/Grid';
+import React, {useEffect, useState} from "react";
+import axios from "axios";
 import Experiment from "./Experiment";
-
-const useStyles = makeStyles((theme) => ({
-  root: {
-    flexGrow: 1,
-  },
-}));
+import Grid from "@material-ui/core/Grid";
 
 export default function ExperimentGrid() {
-  const classes = useStyles();
+    const [experiments, setExperiments] = useState();
 
-  return (
-    <div className={classes.root}>
-        <Grid container spacing={2} alignItems={'stretch'} direction={'column'}>
-          <Experiment percent={'99%'} url={'http://localhost:8081/'} name={'Experiment01'} />
-          <Experiment percent={'98%'} url={'http://localhost:8082/'} name={'Experiment02'} />
-          <Experiment percent={'98%'} url={'http://localhost:8082/'} name={'Experiment03'} />
-          <Experiment percent={'98%'} url={'http://localhost:8082/'} name={'Experiment04'} />
-          <Experiment percent={'98%'} url={'http://localhost:8082/'} name={'Experiment05'} />
-          <Experiment percent={'98%'} url={'http://localhost:8082/'} name={'Experiment06'} />
-          <Experiment percent={'98%'} url={'http://localhost:8082/'} name={'Experiment07'} />
-          <Experiment percent={'98%'} url={'http://localhost:8082/'} name={'Experiment08'} />
-          <Experiment percent={'98%'} url={'http://localhost:8082/'} name={'Experiment09'} />
-          <Experiment percent={'98%'} url={'http://localhost:8082/'} name={'Experiment10'} />
-          <Experiment percent={'98%'} url={'http://localhost:8082/'} name={'Experiment11'} />
-          <Experiment percent={'98%'} url={'http://localhost:8082/'} name={'Experiment12'} />
-        </Grid>
-    </div>
-  );
-}
+    useEffect(() => {
+        axios
+            .get(
+                "http://localhost:9080/api/v1/experiments",
+                {
+                    headers: {
+                        'Access-Control-Allow-Origin': '*',
+                        'Access-Control-Allow-Credentials': true
+                    }
+                }
+            )
+            .then(({data}) => {
+                setExperiments(data);
+            });
+    }, []);
+
+    return experiments ? (
+        <div className="experiment-list">
+            <Grid container spacing={2} alignItems={'stretch'} direction={'column'}>
+            {experiments.map(experiment => (
+                <Experiment percent={'99%'} url={'http://localhost:8081/'} name={experiment} />
+            ))}
+            </Grid>
+        </div>
+    ) : (
+        <div>Loading...</div>
+    );
+};
