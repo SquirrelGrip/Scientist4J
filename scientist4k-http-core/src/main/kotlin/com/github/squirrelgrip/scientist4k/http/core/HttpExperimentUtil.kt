@@ -1,8 +1,6 @@
 package com.github.squirrelgrip.scientist4k.http.core
 
-import com.github.squirrelgrip.extension.json.toJson
 import com.github.squirrelgrip.scientist4k.core.model.sample.Sample
-import com.github.squirrelgrip.scientist4k.http.core.extension.toHttpExperimentRequest
 import com.github.squirrelgrip.scientist4k.http.core.model.ExperimentRequest
 import com.github.squirrelgrip.scientist4k.http.core.model.ExperimentResponse
 import org.slf4j.Logger
@@ -19,8 +17,7 @@ object HttpExperimentUtil {
 
     fun createRequest(inboundRequest: HttpServletRequest, sample: Sample): ExperimentRequest {
         val experimentRequest = ExperimentRequest.create(inboundRequest)
-        sample.addNote("request", experimentRequest.toHttpExperimentRequest().toJson())
-        sample.addNote("uri", experimentRequest.uri)
+        sample.addNote("request", experimentRequest)
         return experimentRequest
     }
 

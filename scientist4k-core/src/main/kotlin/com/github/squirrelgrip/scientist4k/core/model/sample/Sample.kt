@@ -10,13 +10,13 @@ class Sample(
     @JsonProperty("startTime")
     val startTime: Instant = Instant.now()
 
-    private val _notes: MutableMap<String, String> = mutableMapOf()
+    private val _notes: MutableMap<String, Any> = mutableMapOf()
 
-    val notes: Map<String, String>
+    val notes: Map<String, Any>
         @JsonProperty("notes")
         get() = _notes.toMap()
 
-    fun addNote(noteKey: String, note: String) {
+    fun addNote(noteKey: String, note: Any) {
         _notes[noteKey] = note
     }
 

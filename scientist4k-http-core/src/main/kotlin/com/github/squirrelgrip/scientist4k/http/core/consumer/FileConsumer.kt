@@ -12,11 +12,12 @@ class FileConsumer(
 ) {
     @Subscribe
     fun receiveResult(experimentResult: ExperimentResult<ExperimentResponse>) {
-        val experimentName = experimentResult.sample.notes["experiment"]
+        val experimentName = experimentResult.sample.notes["experiment"] as String
         val sampleId = experimentResult.sample.id
-        val file = File(File(baseDirectory, experimentName).apply {
+        val experimentDirectory = File(baseDirectory, experimentName).apply {
             mkdirs()
-        }, "$sampleId.json")
+        }
+        val file = File(experimentDirectory, "$sampleId.json")
         experimentResult.toHttpExperimentResult().toJson(file)
     }
 }

@@ -2,6 +2,7 @@ package com.github.squirrelgrip.scientist4k.http.server
 
 import com.github.squirrelgrip.scientist4k.core.Experiment
 import com.github.squirrelgrip.scientist4k.core.comparator.ExperimentComparator
+import com.github.squirrelgrip.scientist4k.core.model.ExperimentResult
 import com.github.squirrelgrip.scientist4k.core.model.sample.Sample
 import com.github.squirrelgrip.scientist4k.core.model.sample.SampleFactory
 import com.github.squirrelgrip.scientist4k.http.core.HttpExperimentUtil
@@ -9,6 +10,7 @@ import com.github.squirrelgrip.scientist4k.http.core.HttpExperimentUtil.processR
 import com.github.squirrelgrip.scientist4k.http.core.comparator.DefaultExperimentResponseComparator
 import com.github.squirrelgrip.scientist4k.http.core.configuration.EndPointConfiguration
 import com.github.squirrelgrip.scientist4k.http.core.configuration.MappingConfiguration
+import com.github.squirrelgrip.scientist4k.http.core.extension.toHttpExperimentResult
 import com.github.squirrelgrip.scientist4k.http.core.factory.RequestFactory
 import com.github.squirrelgrip.scientist4k.http.core.model.ExperimentRequest
 import com.github.squirrelgrip.scientist4k.http.core.model.ExperimentResponse
@@ -77,6 +79,11 @@ class HttpExperiment(
         return candidateRequestFactory.create(request)
     }
 
+    override fun publish(result: ExperimentResult<ExperimentResponse>) {
+        if (result is ExperimentResult<ExperimentResponse>) {
+            eventBus.post(result.toHttpExperimentResult())
+        }
+    }
 }
 
 

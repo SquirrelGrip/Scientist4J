@@ -3,6 +3,7 @@ package com.github.squirrelgrip.scientist4k.core
 import com.github.squirrelgrip.scientist4k.core.comparator.DefaultExperimentComparator
 import com.github.squirrelgrip.scientist4k.core.comparator.ExperimentComparator
 import com.github.squirrelgrip.scientist4k.core.model.ComparisonResult
+import com.github.squirrelgrip.scientist4k.core.model.ExperimentResult
 import com.github.squirrelgrip.scientist4k.core.model.Observation
 import com.github.squirrelgrip.scientist4k.core.model.ObservationStatus
 import com.github.squirrelgrip.scientist4k.core.model.sample.SampleFactory
@@ -83,7 +84,7 @@ abstract class AbstractExperiment<T>(
     open val isAsync: Boolean
         get() = async
 
-    open fun publish(result: Any) {
+    open fun publish(result: ExperimentResult<T>) {
         eventBus.post(result)
     }
 
