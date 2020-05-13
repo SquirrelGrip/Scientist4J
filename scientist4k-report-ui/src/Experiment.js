@@ -18,17 +18,18 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Experiment(prop) {
   const classes = useStyles();
+  const passPercentage = (prop.experiment.pass / prop.experiment.count * 100).toFixed(0)
 
   function onExperimentClick() {
-    console.log(prop.name)
+    console.log(prop.experiment)
   }
 
   return (
     <Paper className={classes.paper} variant={'elevation'} onClick={onExperimentClick}>
       <Grid item xs={12} sm container>
-        <Grid item xs container direction="column" spacing={2} key={prop.name}>
+        <Grid item xs container direction="column" spacing={2} key={prop.experiment.name}>
           <Grid item xs>
-            <Typography gutterBottom variant="subtitle1">{prop.name}</Typography>
+            <Typography gutterBottom variant="subtitle1">{prop.experiment.name}</Typography>
             <Typography variant="body2" gutterBottom>{prop.url}</Typography>
           </Grid>
           <Grid item>
@@ -36,7 +37,7 @@ export default function Experiment(prop) {
           </Grid>
         </Grid>
         <Grid item>
-          <Box fontWeight="fontWeightBold">{prop.percent}</Box>
+          <Box fontWeight="fontWeightBold">{passPercentage}%</Box>
         </Grid>
       </Grid>
     </Paper>

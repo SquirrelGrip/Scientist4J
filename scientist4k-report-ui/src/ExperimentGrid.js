@@ -26,7 +26,7 @@ export default function ExperimentGrid() {
         <div className="experiment-list">
             <Grid container spacing={2} alignItems={'stretch'} direction={'column'}>
             {experiments.map(experiment => (
-                <Experiment percent={'99%'} url={'http://localhost:8081/'} name={experiment} key={experiment}/>
+                <Experiment url={'http://localhost:8081/'} experiment={experiment} key={experiment.name}/>
             ))}
             </Grid>
         </div>

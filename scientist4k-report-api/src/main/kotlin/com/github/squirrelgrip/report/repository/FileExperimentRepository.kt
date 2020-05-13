@@ -14,7 +14,7 @@ class FileExperimentRepository(
 ) : ExperimentRepository {
     override fun findAllExperiments(): List<ExperimentSummary> {
         return baseDirectory
-                .listFiles { file, _ -> file.isDirectory }
+                .listFiles { file -> file.isDirectory() }
                 .map { ExperimentSummary(it) }
     }
 
