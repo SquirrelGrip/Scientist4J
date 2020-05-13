@@ -4,7 +4,7 @@ import com.github.squirrelgrip.scientist4k.core.comparator.ExperimentComparator
 import com.github.squirrelgrip.scientist4k.core.model.ComparisonResult
 import com.github.squirrelgrip.scientist4k.core.model.ComparisonResult.Companion.SUCCESS
 import com.github.squirrelgrip.scientist4k.core.model.toComparisonResult
-import com.github.squirrelgrip.scientist4k.http.core.model.ExperimentResponse
+import com.github.squirrelgrip.scientist4k.http.core.model.HttpExperimentResponse
 import com.google.common.collect.MapDifference
 import com.google.common.collect.Maps
 import org.slf4j.Logger
@@ -12,12 +12,12 @@ import org.slf4j.LoggerFactory
 
 open class HeadersComparator(
         vararg val ignoredHeaders: String
-) : ExperimentComparator<ExperimentResponse> {
+) : ExperimentComparator<HttpExperimentResponse> {
     companion object {
         private val LOGGER: Logger = LoggerFactory.getLogger(HeadersComparator::class.java)
     }
 
-    override fun invoke(control: ExperimentResponse, candidate: ExperimentResponse): ComparisonResult {
+    override fun invoke(control: HttpExperimentResponse, candidate: HttpExperimentResponse): ComparisonResult {
         LOGGER.trace("Comparing Headers...")
         val controlMap = map(control.headers)
         val candidateMap = map(candidate.headers)

@@ -1,4 +1,4 @@
-package com.github.squirrelgrip.scientist4k.core
+package com.github.squirrelgrip.scientist4k.simple
 
 import com.github.squirrelgrip.scientist4k.core.exception.MismatchException
 import com.github.squirrelgrip.scientist4k.metrics.noop.NoopMetricsProvider

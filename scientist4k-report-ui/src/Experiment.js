@@ -26,7 +26,7 @@ export default function Experiment(prop) {
   return (
     <Paper className={classes.paper} variant={'elevation'} onClick={onExperimentClick}>
       <Grid item xs={12} sm container>
-        <Grid item xs container direction="column" spacing={2}>
+        <Grid item xs container direction="column" spacing={2} key={prop.name}>
           <Grid item xs>
             <Typography gutterBottom variant="subtitle1">{prop.name}</Typography>
             <Typography variant="body2" gutterBottom>{prop.url}</Typography>

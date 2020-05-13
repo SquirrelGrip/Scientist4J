@@ -1,6 +1,7 @@
 package com.github.squirrelgrip.report.controller
 
 import com.github.squirrelgrip.report.model.ExperimentReport
+import com.github.squirrelgrip.report.model.ExperimentSummary
 import com.github.squirrelgrip.report.repository.ExperimentRepository
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -18,7 +19,7 @@ class ExperimentController(
         val LOGGER: Logger = LoggerFactory.getLogger(ExperimentController::class.java)
     }
     @GetMapping("/api/v1/experiments", produces = ["application/json"])
-    fun getExperiments(): List<String> {
+    fun getExperiments(): List<ExperimentSummary> {
         return experimentRepository.findAllExperiments()
     }
 

@@ -1,9 +1,10 @@
-package com.github.squirrelgrip.scientist4k.core
+package com.github.squirrelgrip.scientist4k.simple
 
+import com.github.squirrelgrip.scientist4k.core.AbstractExperiment
 import com.github.squirrelgrip.scientist4k.core.comparator.DefaultExperimentComparator
 import com.github.squirrelgrip.scientist4k.core.comparator.ExperimentComparator
-import com.github.squirrelgrip.scientist4k.core.model.ExperimentResult
-import com.github.squirrelgrip.scientist4k.core.model.Observation
+import com.github.squirrelgrip.scientist4k.core.model.ExperimentObservation
+import com.github.squirrelgrip.scientist4k.simple.model.ExperimentResult
 import com.github.squirrelgrip.scientist4k.core.model.sample.Sample
 import com.github.squirrelgrip.scientist4k.core.model.sample.SampleFactory
 import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
@@ -53,10 +54,10 @@ open class Experiment<T>(
     }
 
     open fun runSync(control: () -> T?, candidate: () -> T?, sample: Sample = sampleFactory.create()): T? {
-        val controlObservation: Observation<T> = executeControl(control)
-        val candidateObservation: Observation<T> = executeCandidate(candidate)
-        publishResult(controlObservation, candidateObservation, sample).handleComparisonMismatch()
-        return controlObservation.value
+        val controlExperimentObservation: ExperimentObservation<T> = executeControl(control)
+        val candidateExperimentObservation: ExperimentObservation<T> = executeCandidate(candidate)
+        publishResult(controlExperimentObservation, candidateExperimentObservation, sample).handleComparisonMismatch()
+        return controlExperimentObservation.value
     }
 
     open fun runAsync(control: () -> T?, candidate: () -> T?, sample: Sample = sampleFactory.create()) =
@@ -81,16 +82,16 @@ open class Experiment<T>(
                 controlObservation.value
             }
 
-    private suspend fun publishAsync(controlObservation: Observation<T>, deferredCandidateObservation: Deferred<Observation<T>>, sample: Sample): ExperimentResult<T> {
+    private suspend fun publishAsync(controlExperimentObservation: ExperimentObservation<T>, deferredCandidateExperimentObservation: Deferred<ExperimentObservation<T>>, sample: Sample): ExperimentResult<T> {
         LOGGER.trace("Awaiting candidateObservation...")
-        val candidateObservation = deferredCandidateObservation.await()
+        val candidateObservation = deferredCandidateExperimentObservation.await()
         LOGGER.trace("candidateObservation is {}", candidateObservation)
-        return publishResult(controlObservation, candidateObservation, sample)
+        return publishResult(controlExperimentObservation, candidateObservation, sample)
     }
 
-    private fun publishResult(controlObservation: Observation<T>, candidateObservation: Observation<T>, sample: Sample): ExperimentResult<T> {
+    private fun publishResult(controlExperimentObservation: ExperimentObservation<T>, candidateExperimentObservation: ExperimentObservation<T>, sample: Sample): ExperimentResult<T> {
         LOGGER.trace("Creating Result...")
-        val result = ExperimentResult(this, controlObservation, candidateObservation, sample)
+        val result = ExperimentResult(this, controlExperimentObservation, candidateExperimentObservation, sample)
         LOGGER.trace("Publishing Result")
         publish(result)
         return result

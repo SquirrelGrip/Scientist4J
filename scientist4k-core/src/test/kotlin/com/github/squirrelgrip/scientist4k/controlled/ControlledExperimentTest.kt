@@ -1,7 +1,5 @@
 package com.github.squirrelgrip.scientist4k.controlled
 
-import com.github.squirrelgrip.scientist4k.controlled.ControlledExperiment
-import com.github.squirrelgrip.scientist4k.controlled.ControlledExperimentBuilder
 import com.github.squirrelgrip.scientist4k.core.comparator.ExperimentComparator
 import com.github.squirrelgrip.scientist4k.core.exception.MismatchException
 import com.github.squirrelgrip.scientist4k.core.model.ComparisonResult

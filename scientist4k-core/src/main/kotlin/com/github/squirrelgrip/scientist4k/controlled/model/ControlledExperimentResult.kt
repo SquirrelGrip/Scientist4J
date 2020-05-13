@@ -2,14 +2,14 @@ package com.github.squirrelgrip.scientist4k.controlled.model
 
 import com.github.squirrelgrip.scientist4k.controlled.ControlledExperiment
 import com.github.squirrelgrip.scientist4k.core.exception.MismatchException
-import com.github.squirrelgrip.scientist4k.core.model.Observation
+import com.github.squirrelgrip.scientist4k.core.model.ExperimentObservation
 import com.github.squirrelgrip.scientist4k.core.model.sample.Sample
 
 class ControlledExperimentResult<T>(
         private val experiment: ControlledExperiment<T>,
-        val control: Observation<T>,
-        val reference: Observation<T>,
-        val candidate: Observation<T>,
+        val control: ExperimentObservation<T>,
+        val reference: ExperimentObservation<T>,
+        val candidate: ExperimentObservation<T>,
         val sample: Sample
 ) {
     val match = experiment.compare(control, candidate)

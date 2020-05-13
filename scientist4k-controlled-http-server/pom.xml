@@ -4,7 +4,7 @@
     <parent>
         <artifactId>scientist4k</artifactId>
         <groupId>com.github.squirrelgrip</groupId>
-        <version>0.7.8</version>
+        <version>0.8.0</version>
     </parent>
     <artifactId>scientist4k-controlled-http-server</artifactId>
 
@@ -18,11 +18,6 @@
         <dependency>
             <groupId>com.github.squirrelgrip</groupId>
             <artifactId>extensions</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.github.squirrelgrip</groupId>
-            <artifactId>scientist4k-controlled-core</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.github.squirrelgrip</groupId>

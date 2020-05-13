@@ -3,8 +3,8 @@ package com.github.squirrelgrip.scientist4k.core
 import com.github.squirrelgrip.scientist4k.core.comparator.DefaultExperimentComparator
 import com.github.squirrelgrip.scientist4k.core.comparator.ExperimentComparator
 import com.github.squirrelgrip.scientist4k.core.model.ComparisonResult
-import com.github.squirrelgrip.scientist4k.core.model.Observation
-import com.github.squirrelgrip.scientist4k.core.model.ObservationStatus
+import com.github.squirrelgrip.scientist4k.core.model.ExperimentObservation
+import com.github.squirrelgrip.scientist4k.core.model.ExperimentObservationStatus
 import com.github.squirrelgrip.scientist4k.core.model.sample.SampleFactory
 import com.github.squirrelgrip.scientist4k.metrics.Counter
 import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
@@ -44,24 +44,24 @@ abstract class AbstractExperiment<T>(
         val DEFAULT_EVENT_BUS: EventBus = EventBus()
     }
 
-    protected fun executeCandidate(candidate: () -> T?): Observation<T> =
+    protected fun executeCandidate(candidate: () -> T?): ExperimentObservation<T> =
             if (isEnabled()) {
                 execute("candidate", candidateTimer, candidate, false)
             } else {
                 scrap("candidate")
             }
 
-    protected fun executeControl(control: () -> T?): Observation<T> =
+    protected fun executeControl(control: () -> T?): ExperimentObservation<T> =
             execute("control", controlTimer, control, true)
 
-    private fun countExceptions(observation: Observation<T>, exceptions: Counter) {
-        if (observation.exception != null) {
+    private fun countExceptions(experimentObservation: ExperimentObservation<T>, exceptions: Counter) {
+        if (experimentObservation.exception != null) {
             exceptions.increment()
         }
     }
 
-    protected fun execute(name: String, timer: Timer, function: () -> T?, shouldThrow: Boolean): Observation<T> {
-        val observation = Observation<T>(name, timer)
+    protected fun execute(name: String, timer: Timer, function: () -> T?, shouldThrow: Boolean): ExperimentObservation<T> {
+        val observation = ExperimentObservation<T>(name, timer)
         observation.time(function)
         val exception = observation.exception
         if (exception != null && shouldThrow) {
@@ -70,10 +70,10 @@ abstract class AbstractExperiment<T>(
         return observation
     }
 
-    protected fun scrap(name: String): Observation<T> {
-        val observation: Observation<T> = Observation(name)
-        observation.status = ObservationStatus.SCRAPPED
-        return observation
+    protected fun scrap(name: String): ExperimentObservation<T> {
+        val experimentObservation: ExperimentObservation<T> = ExperimentObservation(name)
+        experimentObservation.status = ExperimentObservationStatus.SCRAPPED
+        return experimentObservation
     }
 
     open fun isEnabled(): Boolean {
@@ -87,15 +87,15 @@ abstract class AbstractExperiment<T>(
         eventBus.post(result)
     }
 
-    fun compare(control: Observation<T>, candidate: Observation<T>): ComparisonResult {
+    fun compare(control: ExperimentObservation<T>, candidate: ExperimentObservation<T>): ComparisonResult {
         countExceptions(candidate, candidateExceptionCount)
         return if (candidate.exception != null) {
             ComparisonResult("Candidate threw an exception.")
         } else {
-            LOGGER.debug("Comparing\n{}\n{}", control.value, candidate.value)
+            LOGGER.trace("Comparing\n{}\n{}", control.value, candidate.value)
             comparator.invoke(control.value, candidate.value)
         }.apply {
-            LOGGER.info("Compared...match={}", this.matches)
+            LOGGER.debug("Compared...match={}", this.matches)
             totalCount.increment()
             if (!matches) {
                 mismatchCount.increment()

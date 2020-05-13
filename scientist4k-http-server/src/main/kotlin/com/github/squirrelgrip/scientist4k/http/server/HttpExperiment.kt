@@ -1,17 +1,17 @@
 package com.github.squirrelgrip.scientist4k.http.server
 
-import com.github.squirrelgrip.scientist4k.core.Experiment
-import com.github.squirrelgrip.scientist4k.core.comparator.ExperimentComparator
+import com.github.squirrelgrip.scientist4k.simple.model.ExperimentResult
 import com.github.squirrelgrip.scientist4k.core.model.sample.Sample
 import com.github.squirrelgrip.scientist4k.core.model.sample.SampleFactory
 import com.github.squirrelgrip.scientist4k.http.core.HttpExperimentUtil
 import com.github.squirrelgrip.scientist4k.http.core.HttpExperimentUtil.processResponse
-import com.github.squirrelgrip.scientist4k.http.core.comparator.DefaultExperimentResponseComparator
 import com.github.squirrelgrip.scientist4k.http.core.configuration.EndPointConfiguration
 import com.github.squirrelgrip.scientist4k.http.core.configuration.MappingConfiguration
+import com.github.squirrelgrip.scientist4k.http.core.extension.toHttpExperimentResult
 import com.github.squirrelgrip.scientist4k.http.core.factory.RequestFactory
 import com.github.squirrelgrip.scientist4k.http.core.model.ExperimentRequest
 import com.github.squirrelgrip.scientist4k.http.core.model.ExperimentResponse
+import com.github.squirrelgrip.scientist4k.http.simple.AbstractHttpExperiment
 import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
 import com.google.common.eventbus.EventBus
 import org.slf4j.Logger
@@ -21,9 +21,7 @@ import javax.servlet.http.HttpServletResponse
 
 class HttpExperiment(
         name: String,
-        raiseOnMismatch: Boolean,
         metrics: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD"),
-        comparator: ExperimentComparator<ExperimentResponse?> = DefaultExperimentResponseComparator(),
         sampleFactory: SampleFactory = SampleFactory(),
         eventBus: EventBus = DEFAULT_EVENT_BUS,
         mappings: List<MappingConfiguration> = emptyList(),
@@ -31,11 +29,9 @@ class HttpExperiment(
         async: Boolean = true,
         controlConfig: EndPointConfiguration,
         private val candidateConfig: EndPointConfiguration
-) : Experiment<ExperimentResponse>(
+) : AbstractHttpExperiment(
         name,
-        raiseOnMismatch,
         metrics,
-        comparator,
         sampleFactory,
         eventBus,
         enabled,
@@ -77,6 +73,13 @@ class HttpExperiment(
         return candidateRequestFactory.create(request)
     }
 
+    override fun publish(result: Any) {
+        if (result is ExperimentResult<*> && result.control.value is ExperimentResponse) {
+            eventBus.post((result as ExperimentResult<ExperimentResponse>).toHttpExperimentResult())
+        } else {
+            super.publish(result)
+        }
+    }
 }
 
 

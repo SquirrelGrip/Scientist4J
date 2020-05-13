@@ -4,7 +4,7 @@ import com.github.squirrelgrip.scientist4k.controlled.model.ControlledExperiment
 import com.github.squirrelgrip.scientist4k.core.AbstractExperiment
 import com.github.squirrelgrip.scientist4k.core.comparator.DefaultExperimentComparator
 import com.github.squirrelgrip.scientist4k.core.comparator.ExperimentComparator
-import com.github.squirrelgrip.scientist4k.core.model.Observation
+import com.github.squirrelgrip.scientist4k.core.model.ExperimentObservation
 import com.github.squirrelgrip.scientist4k.core.model.sample.Sample
 import com.github.squirrelgrip.scientist4k.core.model.sample.SampleFactory
 import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
@@ -62,11 +62,11 @@ open class ControlledExperiment<T>(
     }
 
     open fun runSync(control: () -> T?, reference: () -> T?, candidate: () -> T?, sample: Sample = sampleFactory.create()): T? {
-        val controlObservation: Observation<T> = executeControl(control)
+        val controlExperimentObservation = executeControl(control)
         val candidateObservation = executeCandidate(candidate)
         val referenceObservation = executeReference(reference)
-        publishResult(controlObservation, referenceObservation, candidateObservation, sample).handleComparisonMismatch()
-        return controlObservation.value
+        publishResult(controlExperimentObservation, referenceObservation, candidateObservation, sample).handleComparisonMismatch()
+        return controlExperimentObservation.value
     }
 
     open fun runAsync(control: () -> T?, reference: () -> T?, candidate: () -> T?, sample: Sample = sampleFactory.create()) =
@@ -96,26 +96,26 @@ open class ControlledExperiment<T>(
                 controlObservation.value
             }
 
-    protected fun executeReference(reference: () -> T?): Observation<T> =
+    protected fun executeReference(reference: () -> T?): ExperimentObservation<T> =
             if (isEnabled()) {
                 execute("reference", referenceTimer, reference, false)
             } else {
                 scrap("reference")
             }
 
-    private suspend fun publishAsync(controlObservation: Observation<T>, deferredReferenceObservation: Deferred<Observation<T>>, deferredCandidateObservation: Deferred<Observation<T>>, sample: Sample): ControlledExperimentResult<T> {
+    private suspend fun publishAsync(controlExperimentObservation: ExperimentObservation<T>, deferredReferenceExperimentObservation: Deferred<ExperimentObservation<T>>, deferredCandidateExperimentObservation: Deferred<ExperimentObservation<T>>, sample: Sample): ControlledExperimentResult<T> {
         LOGGER.debug("Awaiting candidateObservation...")
-        val candidateObservation = deferredCandidateObservation.await()
+        val candidateObservation = deferredCandidateExperimentObservation.await()
         LOGGER.debug("candidateObservation is {}", candidateObservation)
         LOGGER.debug("Awaiting referenceObservation...")
-        val referenceObservation = deferredReferenceObservation.await()
+        val referenceObservation = deferredReferenceExperimentObservation.await()
         LOGGER.debug("referenceObservation is {}", referenceObservation)
-        return publishResult(controlObservation, referenceObservation, candidateObservation, sample)
+        return publishResult(controlExperimentObservation, referenceObservation, candidateObservation, sample)
     }
 
-    private fun publishResult(controlObservation: Observation<T>, referenceObservation: Observation<T>, candidateObservation: Observation<T>, sample: Sample): ControlledExperimentResult<T> {
+    private fun publishResult(controlExperimentObservation: ExperimentObservation<T>, referenceExperimentObservation: ExperimentObservation<T>, candidateExperimentObservation: ExperimentObservation<T>, sample: Sample): ControlledExperimentResult<T> {
         LOGGER.info("Creating Result...")
-        val result = ControlledExperimentResult(this, controlObservation, referenceObservation, candidateObservation, sample)
+        val result = ControlledExperimentResult(this, controlExperimentObservation, referenceExperimentObservation, candidateExperimentObservation, sample)
         LOGGER.info("Created Result")
         publish(result)
         return result

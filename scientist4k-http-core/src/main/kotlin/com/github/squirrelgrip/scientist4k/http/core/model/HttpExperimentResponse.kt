@@ -4,5 +4,5 @@ data class HttpExperimentResponse(
         val status: Int,
         val headers: Map<String, String>,
         val contentType: String,
-        val contents: String
+        val contents: String? = null
 )

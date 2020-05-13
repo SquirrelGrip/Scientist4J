@@ -1,15 +1,17 @@
 package com.github.squirrelgrip.scientist4k.controlled.http.server
 
 import com.github.squirrelgrip.scientist4k.controlled.ControlledExperiment
+import com.github.squirrelgrip.scientist4k.core.AbstractExperiment.Companion.DEFAULT_EVENT_BUS
 import com.github.squirrelgrip.scientist4k.core.comparator.ExperimentComparator
 import com.github.squirrelgrip.scientist4k.core.model.sample.Sample
 import com.github.squirrelgrip.scientist4k.core.model.sample.SampleFactory
+import com.github.squirrelgrip.scientist4k.http.controlled.AbstractControlledHttpExperiment
 import com.github.squirrelgrip.scientist4k.http.core.HttpExperimentUtil.CANDIDATE_COOKIE_STORE
 import com.github.squirrelgrip.scientist4k.http.core.HttpExperimentUtil.CONTROL_COOKIE_STORE
 import com.github.squirrelgrip.scientist4k.http.core.HttpExperimentUtil.REFERENCE_COOKIE_STORE
 import com.github.squirrelgrip.scientist4k.http.core.HttpExperimentUtil.createRequest
 import com.github.squirrelgrip.scientist4k.http.core.HttpExperimentUtil.processResponse
-import com.github.squirrelgrip.scientist4k.http.core.comparator.DefaultExperimentResponseComparator
+import com.github.squirrelgrip.scientist4k.http.core.comparator.DefaultHttpExperimentResponseComparator
 import com.github.squirrelgrip.scientist4k.http.core.configuration.EndPointConfiguration
 import com.github.squirrelgrip.scientist4k.http.core.configuration.MappingConfiguration
 import com.github.squirrelgrip.scientist4k.http.core.factory.RequestFactory
@@ -24,9 +26,7 @@ import javax.servlet.http.HttpServletResponse
 
 class ControlledHttpExperiment(
         name: String,
-        raiseOnMismatch: Boolean,
         metrics: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD"),
-        comparator: ExperimentComparator<ExperimentResponse?> = DefaultExperimentResponseComparator(),
         sampleFactory: SampleFactory = SampleFactory(),
         eventBus: EventBus = DEFAULT_EVENT_BUS,
         enabled: Boolean = true,
@@ -35,11 +35,9 @@ class ControlledHttpExperiment(
         controlConfig: EndPointConfiguration,
         referenceConfig: EndPointConfiguration,
         private val candidateConfig: EndPointConfiguration
-) : ControlledExperiment<ExperimentResponse>(
+) : AbstractControlledHttpExperiment(
         name,
-        raiseOnMismatch,
         metrics,
-        comparator,
         sampleFactory,
         eventBus,
         enabled,
@@ -48,10 +46,6 @@ class ControlledHttpExperiment(
     private val controlRequestFactory = RequestFactory(controlConfig, CONTROL_COOKIE_STORE)
     private val referenceRequestFactory = RequestFactory(referenceConfig, REFERENCE_COOKIE_STORE)
     private val candidateRequestFactory = RequestFactory(candidateConfig, CANDIDATE_COOKIE_STORE, mappings)
-
-    companion object {
-        private val LOGGER: Logger = LoggerFactory.getLogger(ControlledHttpExperiment::class.java)
-    }
 
     fun run(
             inboundRequest: HttpServletRequest,
@@ -78,6 +72,7 @@ class ControlledHttpExperiment(
     private fun createCandidateRequest(request: ExperimentRequest): () -> ExperimentResponse {
         return candidateRequestFactory.create(request)
     }
+
 }
 
 

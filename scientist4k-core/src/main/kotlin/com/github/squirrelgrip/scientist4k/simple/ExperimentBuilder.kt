@@ -1,5 +1,6 @@
-package com.github.squirrelgrip.scientist4k.core
+package com.github.squirrelgrip.scientist4k.simple
 
+import com.github.squirrelgrip.scientist4k.core.AbstractExperiment
 import com.github.squirrelgrip.scientist4k.core.comparator.DefaultExperimentComparator
 import com.github.squirrelgrip.scientist4k.core.comparator.ExperimentComparator
 import com.github.squirrelgrip.scientist4k.core.configuration.ExperimentConfiguration

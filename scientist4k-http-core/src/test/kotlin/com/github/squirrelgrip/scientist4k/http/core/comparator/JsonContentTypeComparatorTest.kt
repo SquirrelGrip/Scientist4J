@@ -1,7 +1,6 @@
 package com.github.squirrelgrip.scientist4k.http.core.comparator
 
 import com.github.squirrelgrip.extension.json.toJson
-import com.github.squirrelgrip.scientist4k.http.core.comparator.JsonContentTypeComparator
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
@@ -20,7 +19,7 @@ internal class JsonContentTypeComparatorTest {
                 Example(3, "QQQ", mapOf(1 to "CCC"), listOf(Item(1, "AAA3"), Item(2, "BBB3"))),
                 Example(4, "PPP", mapOf(1 to "DDD"), listOf(Item(1, "AAA4"), Item(2, "BBB4")))
         )
-        val comparisonResult = JsonContentTypeComparator().invoke(listA.toJson().toByteArray(), listB.toJson().toByteArray())
+        val comparisonResult = JsonContentTypeComparator().invoke(listA.toJson(), listB.toJson())
         assertThat(comparisonResult.matches).isTrue()
     }
 
@@ -38,7 +37,7 @@ internal class JsonContentTypeComparatorTest {
                 Example(2, "RRR", mapOf(1 to "BBB"), listOf(Item(1, "AAA2"), Item(2, "BBB2"))),
                 Example(4, "PPP", mapOf(1 to "DDD"), listOf(Item(1, "AAA4"), Item(2, "BBB4")))
         )
-        val comparisonResult = JsonContentTypeComparator().invoke(listA.toJson().toByteArray(), listB.toJson().toByteArray())
+        val comparisonResult = JsonContentTypeComparator().invoke(listA.toJson(), listB.toJson())
         assertThat(comparisonResult.matches).isFalse()
     }
 
@@ -56,7 +55,7 @@ internal class JsonContentTypeComparatorTest {
                 Example(3, "QQQ", mapOf(1 to "CCC"), listOf(Item(1, "AAA3"), Item(2, "BBB3"))),
                 Example(4, "PPP", mapOf(1 to "DDD"), listOf(Item(1, "AAA4"), Item(2, "BBB4")))
         )
-        val comparisonResult = JsonContentTypeComparator().invoke(listA.toJson().toByteArray(), listB.toJson().toByteArray())
+        val comparisonResult = JsonContentTypeComparator().invoke(listA.toJson(), listB.toJson())
         assertThat(comparisonResult.matches).isFalse()
     }
 
@@ -74,7 +73,7 @@ internal class JsonContentTypeComparatorTest {
                 Example(2, "RRR", mapOf(1 to "BBB"), listOf(Item(2, "BBB2"), Item(1, "AAA2"))),
                 Example(4, "PPP", mapOf(1 to "DDD"), listOf(Item(1, "AAA4"), Item(2, "BBB4")))
         )
-        val comparisonResult = JsonContentTypeComparator().invoke(listA.toJson().toByteArray(), listB.toJson().toByteArray())
+        val comparisonResult = JsonContentTypeComparator().invoke(listA.toJson(), listB.toJson())
         assertThat(comparisonResult.matches).isFalse()
     }
 
@@ -92,7 +91,7 @@ internal class JsonContentTypeComparatorTest {
                 Example(2, "RRR", mapOf(1 to "BBB"), listOf(Item(2, "BBB2"), Item(1, "AAA2"))),
                 Example(1, "SSS", mapOf(1 to "AAA"), listOf(Item(1, "AAA1"), Item(2, "BBB1")))
         )
-        val comparisonResult = JsonContentTypeComparator().invoke(listA.toJson().toByteArray(), listB.toJson().toByteArray())
+        val comparisonResult = JsonContentTypeComparator().invoke(listA.toJson(), listB.toJson())
         assertThat(comparisonResult.matches).isFalse()
     }
 }
