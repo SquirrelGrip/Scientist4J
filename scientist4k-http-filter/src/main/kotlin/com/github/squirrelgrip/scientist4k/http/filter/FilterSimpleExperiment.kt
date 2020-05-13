@@ -9,7 +9,7 @@ import com.github.squirrelgrip.scientist4k.http.core.configuration.MappingConfig
 import com.github.squirrelgrip.scientist4k.http.core.factory.RequestFactory
 import com.github.squirrelgrip.scientist4k.http.core.model.ExperimentResponse
 import com.github.squirrelgrip.scientist4k.http.core.wrapper.ExperimentResponseWrapper
-import com.github.squirrelgrip.scientist4k.http.simple.AbstractHttpExperiment
+import com.github.squirrelgrip.scientist4k.http.simple.AbstractHttpSimpleExperiment
 import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
 import com.google.common.eventbus.EventBus
 import javax.servlet.FilterChain
@@ -18,7 +18,7 @@ import javax.servlet.ServletResponse
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletRequestWrapper
 
-class FilterExperiment(
+class FilterSimpleExperiment(
         name: String,
         metrics: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD"),
         sampleFactory: SampleFactory = SampleFactory(),
@@ -27,7 +27,7 @@ class FilterExperiment(
         async: Boolean = true,
         mappings: List<MappingConfiguration> = emptyList(),
         private val detourConfig: EndPointConfiguration
-) : AbstractHttpExperiment(
+) : AbstractHttpSimpleExperiment(
         name,
         metrics,
         sampleFactory,

@@ -27,7 +27,7 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 import javax.servlet.DispatcherType
 
-internal class HttpFilterExperimentTest {
+internal class SimpleHttpFilterExperimentTest {
 
     companion object {
         private val HTTP_CONTROL_URL = "http://localhost:9003"

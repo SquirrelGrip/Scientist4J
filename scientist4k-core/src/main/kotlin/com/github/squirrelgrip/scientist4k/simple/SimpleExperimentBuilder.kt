@@ -8,7 +8,7 @@ import com.github.squirrelgrip.scientist4k.core.model.sample.SampleFactory
 import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
 import com.google.common.eventbus.EventBus
 
-class ExperimentBuilder<T>(
+class SimpleExperimentBuilder<T>(
         private var name: String = "Test",
         private var metricsProvider: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD"),
         private var raiseOnMismatch: Boolean = false,
@@ -23,43 +23,43 @@ class ExperimentBuilder<T>(
         experimentConfiguration.sampleFactory
     )
 
-    fun withName(name: String): ExperimentBuilder<T> {
+    fun withName(name: String): SimpleExperimentBuilder<T> {
         this.name = name
         return this
     }
 
-    fun withMetricsProvider(metricsProvider: String): ExperimentBuilder<T> {
+    fun withMetricsProvider(metricsProvider: String): SimpleExperimentBuilder<T> {
         this.metricsProvider = MetricsProvider.build(metricsProvider)
         return this
     }
 
-    fun withMetricsProvider(metricsProvider: MetricsProvider<*>): ExperimentBuilder<T> {
+    fun withMetricsProvider(metricsProvider: MetricsProvider<*>): SimpleExperimentBuilder<T> {
         this.metricsProvider = metricsProvider
         return this
     }
 
-    fun withComparator(comparator: ExperimentComparator<T?>): ExperimentBuilder<T> {
+    fun withComparator(comparator: ExperimentComparator<T?>): SimpleExperimentBuilder<T> {
         this.comparator = comparator
         return this
     }
 
-    fun withRaiseOnMismatch(raiseOnMismatch: Boolean): ExperimentBuilder<T> {
+    fun withRaiseOnMismatch(raiseOnMismatch: Boolean): SimpleExperimentBuilder<T> {
         this.raiseOnMismatch = raiseOnMismatch
         return this
     }
 
-    fun withSampleFactory(sampleFactory: SampleFactory): ExperimentBuilder<T> {
+    fun withSampleFactory(sampleFactory: SampleFactory): SimpleExperimentBuilder<T> {
         this.sampleFactory = sampleFactory
         return this
     }
 
-    fun withEventBus(eventBus: EventBus): ExperimentBuilder<T> {
+    fun withEventBus(eventBus: EventBus): SimpleExperimentBuilder<T> {
         this.eventBus = eventBus
         return this
     }
 
-    fun build(): Experiment<T> {
-        return Experiment(name, raiseOnMismatch, metricsProvider, comparator, sampleFactory, eventBus)
+    fun build(): SimpleExperiment<T> {
+        return SimpleExperiment(name, raiseOnMismatch, metricsProvider, comparator, sampleFactory, eventBus)
     }
 
 }

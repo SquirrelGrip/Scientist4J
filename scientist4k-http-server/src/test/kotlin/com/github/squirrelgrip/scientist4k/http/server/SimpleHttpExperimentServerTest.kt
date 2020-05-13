@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Test
 import java.io.File
 import java.util.concurrent.TimeUnit
 
-class HttpExperimentServerTest {
+class SimpleHttpExperimentServerTest {
 
     companion object {
         private val HTTP_CONTROL_URL = "http://localhost:9001"

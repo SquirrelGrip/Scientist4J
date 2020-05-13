@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
 import java.util.*
 
-class ExperimentAsyncTest {
+class SimpleExperimentAsyncTest {
     private fun exceptionThrowingFunction(): Int {
         throw RuntimeException("throw an exception")
     }
@@ -32,7 +32,7 @@ class ExperimentAsyncTest {
 
     @Test
     fun itThrowsAnExceptionWhenControlFails() {
-        val experiment = Experiment<Int>("test", NoopMetricsProvider())
+        val experiment = SimpleExperiment<Int>("test", NoopMetricsProvider())
         assertThrows(RuntimeException::class.java) {
             experiment.runAsync({ exceptionThrowingFunction() }, { exceptionThrowingFunction() })
         }
@@ -40,14 +40,14 @@ class ExperimentAsyncTest {
 
     @Test
     fun itDoesntThrowAnExceptionWhenCandidateFails() {
-        val experiment = Experiment<Int>("test", NoopMetricsProvider())
+        val experiment = SimpleExperiment<Int>("test", NoopMetricsProvider())
         val value = experiment.runAsync({ safeFunction() }, { exceptionThrowingFunction() })
         assertThat(value).isEqualTo(3)
     }
 
     @Test
     fun itThrowsOnMismatch() {
-        val experiment = Experiment<Int>("test", true, NoopMetricsProvider())
+        val experiment = SimpleExperiment<Int>("test", true, NoopMetricsProvider())
         assertThrows(MismatchException::class.java) {
             experiment.runAsync({ safeFunction() }, { safeFunctionWithDifferentResult() })
         }
@@ -55,21 +55,21 @@ class ExperimentAsyncTest {
 
     @Test
     fun itDoesNotThrowOnMatch() {
-        val experiment = Experiment<Int>("test", true, NoopMetricsProvider())
+        val experiment = SimpleExperiment<Int>("test", true, NoopMetricsProvider())
         val value = experiment.runAsync({ safeFunction() }, { safeFunction() })
         assertThat(value).isEqualTo(3)
     }
 
     @Test
     fun itWorksWithAnExtendedClass() {
-        val experiment = Experiment<Int>("test", NoopMetricsProvider())
+        val experiment = SimpleExperiment<Int>("test", NoopMetricsProvider())
         val value = experiment.run({ safeFunction() }, { safeFunction() })
         assertThat(value).isEqualTo(3)
     }
 
     @Test
     fun asyncRunsFaster() {
-        val experiment = Experiment<Int>("test", true, NoopMetricsProvider())
+        val experiment = SimpleExperiment<Int>("test", true, NoopMetricsProvider())
         val date1 = Date()
         val value = experiment.runAsync({ sleepFunction() }, { sleepFunction() })
         val date2 = Date()
@@ -81,8 +81,8 @@ class ExperimentAsyncTest {
 
     @Test
     fun raiseOnMismatchRunsSlower() {
-        val raisesOnMismatch = Experiment<Int>("raise", true, NoopMetricsProvider())
-        val doesNotRaiseOnMismatch = Experiment<Int>("does not raise", NoopMetricsProvider())
+        val raisesOnMismatch = SimpleExperiment<Int>("raise", true, NoopMetricsProvider())
+        val doesNotRaiseOnMismatch = SimpleExperiment<Int>("does not raise", NoopMetricsProvider())
         val raisesExecutionTime = timeExperiment(raisesOnMismatch)
         val doesNotRaiseExecutionTime = timeExperiment(doesNotRaiseOnMismatch)
         assertThat(raisesExecutionTime).isGreaterThan(doesNotRaiseExecutionTime)
@@ -90,9 +90,9 @@ class ExperimentAsyncTest {
         assertThat(doesNotRaiseExecutionTime).isLessThan(200)
     }
 
-    private fun timeExperiment(experiment: Experiment<Int>): Long {
+    private fun timeExperiment(simpleExperiment: SimpleExperiment<Int>): Long {
         val date1 = Date()
-        experiment.runAsync({ shortSleepFunction() }, { sleepFunction() })
+        simpleExperiment.runAsync({ shortSleepFunction() }, { sleepFunction() })
         val date2 = Date()
         return date2.time - date1.time
     }

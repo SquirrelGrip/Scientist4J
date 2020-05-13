@@ -6,7 +6,7 @@ import com.github.squirrelgrip.scientist4k.core.configuration.ExperimentConfigur
 import org.assertj.core.api.AssertionsForInterfaceTypes.assertThat
 import org.junit.jupiter.api.Test
 
-internal class ExperimentConfigurationTest {
+internal class SimpleExperimentConfigurationTest {
     @Test
     fun `serialise and deserialise should return same object`() {
         val experimentConfiguration1 = ExperimentConfiguration(

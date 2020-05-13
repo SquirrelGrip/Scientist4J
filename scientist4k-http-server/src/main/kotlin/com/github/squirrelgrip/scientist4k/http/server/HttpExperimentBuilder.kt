@@ -80,9 +80,9 @@ class HttpExperimentBuilder() {
         return this
     }
 
-    fun build(): HttpExperiment {
+    fun build(): HttpSimpleExperiment {
         if (controlConfig != null && candidateConfig != null) {
-            return HttpExperiment(name, metrics, sampleFactory, eventBus, mappings, enabled, async, controlConfig!!, candidateConfig!!)
+            return HttpSimpleExperiment(name, metrics, sampleFactory, eventBus, mappings, enabled, async, controlConfig!!, candidateConfig!!)
         }
         throw LaboratoryException("Both control and candidate configurations must be set")
     }

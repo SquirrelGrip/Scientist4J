@@ -6,15 +6,13 @@ import com.github.squirrelgrip.scientist4k.core.model.ExperimentObservation
 import com.github.squirrelgrip.scientist4k.http.core.comparator.DefaultHttpExperimentResponseComparator
 import com.github.squirrelgrip.scientist4k.http.core.comparator.HttpExperimentResponseComparator
 import com.github.squirrelgrip.scientist4k.http.core.model.*
-import com.github.squirrelgrip.scientist4k.simple.model.ExperimentResult
+import com.github.squirrelgrip.scientist4k.simple.model.SimpleExperimentResult
 
-fun ExperimentResult<ExperimentResponse>.toHttpExperimentResult(): HttpExperimentResult {
+fun SimpleExperimentResult<ExperimentResponse>.toHttpExperimentResult(): HttpExperimentResult {
     val experimentName = (this.sample.notes["experiment"] ?: "unknown").toString()
     val request = (this.sample.notes["request"] as ExperimentRequest).toHttpExperimentRequest()
-    val responses = mapOf("control" to this.control, "candidate" to this.candidate)
-            .filterValues { it != null }
-            .map { (key, value) -> key to value!!.toHttpExperimentObservation() }
-            .toMap()
+    val responses = listOfNotNull(control, candidate)
+            .map { it.toHttpExperimentObservation() }
     return HttpExperimentResult(
             this.sample.id,
             this.sample.startTime,
@@ -27,10 +25,8 @@ fun ExperimentResult<ExperimentResponse>.toHttpExperimentResult(): HttpExperimen
 fun ControlledExperimentResult<ExperimentResponse>.toHttpExperimentResult(): HttpExperimentResult {
     val experimentName = (this.sample.notes["experiment"] ?: "unknown").toString()
     val request = (this.sample.notes["request"] as ExperimentRequest).toHttpExperimentRequest()
-    val responses = mapOf("control" to this.control, "candidate" to this.candidate, "reference" to this.reference)
-            .filterValues { it != null }
-            .map { (key, value) -> key to value!!.toHttpExperimentObservation() }
-            .toMap()
+    val responses = listOfNotNull(control, candidate, reference)
+            .map { it.toHttpExperimentObservation() }
     return HttpExperimentResult(
             this.sample.id,
             this.sample.startTime,
@@ -45,7 +41,7 @@ fun ExperimentRequest.toHttpExperimentRequest(): HttpExperimentRequest {
 }
 
 fun ExperimentObservation<ExperimentResponse>.toHttpExperimentObservation(): HttpExperimentObservation {
-    return HttpExperimentObservation(this.value!!.toHttpExperimentResponse(), this.duration)
+    return HttpExperimentObservation(name, value!!.toHttpExperimentResponse(), duration)
 }
 
 fun ExperimentResponse.toHttpExperimentResponse(): HttpExperimentResponse {
@@ -53,7 +49,7 @@ fun ExperimentResponse.toHttpExperimentResponse(): HttpExperimentResponse {
 }
 
 fun HttpExperimentResult.compare(comparator: HttpExperimentResponseComparator = DefaultHttpExperimentResponseComparator()): ComparisonResult {
-    return comparator.invoke(responses["control"]!!.response, responses["candidate"]!!.response)
+    return comparator.invoke(this["control"]!!.response, this["candidate"]!!.response)
 }
 
 fun HttpExperimentResult.matches(comparator: HttpExperimentResponseComparator = DefaultHttpExperimentResponseComparator()): Boolean {
