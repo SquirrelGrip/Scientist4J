@@ -1,13 +1,11 @@
-package com.github.squirrelgrip.scientist4k.simple.model
+package com.github.squirrelgrip.scientist4k.core.model
 
+import com.github.squirrelgrip.scientist4k.core.AbstractExperiment
 import com.github.squirrelgrip.scientist4k.core.exception.MismatchException
-import com.github.squirrelgrip.scientist4k.core.model.ComparisonResult
-import com.github.squirrelgrip.scientist4k.core.model.ExperimentObservation
 import com.github.squirrelgrip.scientist4k.core.model.sample.Sample
-import com.github.squirrelgrip.scientist4k.simple.Experiment
 
-class ExperimentResult<T>(
-        private val experiment: Experiment<T>,
+open class ExperimentResult<T>(
+        private val simpleExperiment: AbstractExperiment<T>,
         val control: ExperimentObservation<T>,
         val candidate: ExperimentObservation<T>?,
         val sample: Sample
@@ -16,11 +14,11 @@ class ExperimentResult<T>(
         if (candidate == null) {
             ComparisonResult((listOf("Candidate observation is null")))
         } else {
-            experiment.compare(control, candidate)
+            simpleExperiment.compare(control, candidate)
         }
 
     fun handleComparisonMismatch() {
-        if (experiment.raiseOnMismatch && candidate != null && !match.matches) {
+        if (simpleExperiment.raiseOnMismatch && candidate != null && !match.matches) {
             val exception = candidate.exception
             val msg = if (exception != null) {
                 val stackTrace = exception.stackTrace.toString()
@@ -34,7 +32,7 @@ class ExperimentResult<T>(
     }
 
     override fun toString(): String {
-        return "${experiment.name} ($match)\n\tControl  => $control\n\tCandidate=> $candidate"
+        return "${simpleExperiment.name} ($match)\n\tControl  => $control\n\tCandidate=> $candidate"
     }
 
 }

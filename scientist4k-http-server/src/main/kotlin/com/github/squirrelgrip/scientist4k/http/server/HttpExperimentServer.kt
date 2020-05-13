@@ -15,7 +15,7 @@ class HttpExperimentServer(
 
     constructor(
             serverConfiguration: ServerConfiguration,
-            httpExperiment: HttpExperiment
+            httpExperiment: HttpSimpleExperiment
     ): this(serverConfiguration, HttpExperimentHandler(httpExperiment))
 }
 

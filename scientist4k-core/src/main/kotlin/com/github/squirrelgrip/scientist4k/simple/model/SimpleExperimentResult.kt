@@ -1,14 +1,13 @@
-package com.github.squirrelgrip.scientist4k.controlled.model
+package com.github.squirrelgrip.scientist4k.simple.model
 
-import com.github.squirrelgrip.scientist4k.controlled.ControlledExperiment
 import com.github.squirrelgrip.scientist4k.core.model.ExperimentObservation
 import com.github.squirrelgrip.scientist4k.core.model.ExperimentResult
 import com.github.squirrelgrip.scientist4k.core.model.sample.Sample
+import com.github.squirrelgrip.scientist4k.simple.SimpleExperiment
 
-class ControlledExperimentResult<T>(
-        experiment: ControlledExperiment<T>,
+class SimpleExperimentResult<T>(
+        private val experiment: SimpleExperiment<T>,
         control: ExperimentObservation<T>,
-        val reference: ExperimentObservation<T>?,
         candidate: ExperimentObservation<T>?,
         sample: Sample
 ): ExperimentResult<T>(

@@ -4,7 +4,7 @@ import com.github.squirrelgrip.scientist4k.core.comparator.ExperimentComparator
 import com.github.squirrelgrip.scientist4k.core.configuration.ExperimentConfiguration
 import com.github.squirrelgrip.scientist4k.core.exception.MismatchException
 import com.github.squirrelgrip.scientist4k.core.model.ComparisonResult
-import com.github.squirrelgrip.scientist4k.simple.model.ExperimentResult
+import com.github.squirrelgrip.scientist4k.simple.model.SimpleExperimentResult
 import com.github.squirrelgrip.scientist4k.metrics.dropwizard.DropwizardMetricsProvider
 import com.github.squirrelgrip.scientist4k.metrics.micrometer.MicrometerMetricsProvider
 import com.github.squirrelgrip.scientist4k.metrics.noop.NoopMetricsProvider
@@ -20,7 +20,7 @@ import org.mockito.BDDMockito.given
 import org.mockito.Mockito.verify
 import java.util.*
 
-class ExperimentTest {
+class SimpleExperimentTest {
     private fun exceptionThrowingFunction(): Int {
         throw Exception("throw an exception")
     }
@@ -41,20 +41,20 @@ class ExperimentTest {
     @Test
     fun itThrowsAnExceptionWhenControlFails() {
         assertThrows(Exception::class.java) {
-            Experiment<Int>("test", NoopMetricsProvider()).run({ exceptionThrowingFunction() }, { exceptionThrowingFunction() })
+            SimpleExperiment<Int>("test", NoopMetricsProvider()).run({ exceptionThrowingFunction() }, { exceptionThrowingFunction() })
         }
     }
 
     @Test
     fun itDoesntThrowAnExceptionWhenCandidateFails() {
-        val experiment = Experiment<Int>("test", NoopMetricsProvider())
+        val experiment = SimpleExperiment<Int>("test", NoopMetricsProvider())
         val value = experiment.run({ safeFunction() }, { exceptionThrowingFunction() })
         assertThat(value).isEqualTo(3)
     }
 
     @Test
     fun itThrowsOnMismatch() {
-        val experiment = Experiment<Int>("test", true, NoopMetricsProvider())
+        val experiment = SimpleExperiment<Int>("test", true, NoopMetricsProvider())
         assertThrows(MismatchException::class.java) {
             experiment.run({ safeFunction() }, { safeFunctionWithDifferentResult() })
         }
@@ -62,21 +62,21 @@ class ExperimentTest {
 
     @Test
     fun itDoesNotThrowOnMatch() {
-        val experiment = Experiment<Int>("test", true, NoopMetricsProvider())
+        val experiment = SimpleExperiment<Int>("test", true, NoopMetricsProvider())
         val value = experiment.run({ safeFunction() }, { safeFunction() })
         assertThat(value).isEqualTo(3)
     }
 
     @Test
     fun itHandlesNullValues() {
-        val experiment = Experiment<Int?>("test", true, NoopMetricsProvider())
+        val experiment = SimpleExperiment<Int?>("test", true, NoopMetricsProvider())
         val value = experiment.run({ null }, { null })
         assertThat(value).isNull()
     }
 
     @Test
     fun nonAsyncRunsLongTime() {
-        val experiment = Experiment<Int>("test", true, NoopMetricsProvider())
+        val experiment = SimpleExperiment<Int>("test", true, NoopMetricsProvider())
         val date1 = Date()
         val value = experiment.runSync({ sleepFunction() }, { sleepFunction() })
         val date2 = Date()
@@ -87,14 +87,14 @@ class ExperimentTest {
 
     @Test
     fun itWorksWithAnExtendedClass() {
-        val experiment = Experiment<Int>("test", NoopMetricsProvider())
+        val experiment = SimpleExperiment<Int>("test", NoopMetricsProvider())
         experiment.run({ safeFunction() }, { safeFunction() })
     }
 
     @Test
     fun candidateExceptionsAreCounted_dropwizard() {
         val provider = DropwizardMetricsProvider()
-        val experiment = Experiment<Int>("test", provider)
+        val experiment = SimpleExperiment<Int>("test", provider)
         experiment.run({ 1 }, { exceptionThrowingFunction() })
         val result = provider.registry.counters[MetricName.build("scientist", "test", "candidate", "exception")]
         assertThat(result!!.count).isEqualTo(1)
@@ -103,7 +103,7 @@ class ExperimentTest {
     @Test
     fun candidateExceptionsAreCounted_micrometer() {
         val provider = MicrometerMetricsProvider()
-        val experiment = Experiment<Int>("test", provider)
+        val experiment = SimpleExperiment<Int>("test", provider)
         experiment.run({ 1 }, { exceptionThrowingFunction() })
         val result = provider.registry["scientist.test.candidate.exception"].counter()
         assertThat(result.count()).isEqualTo(1.0)
@@ -114,7 +114,7 @@ class ExperimentTest {
     fun shouldUseCustomComparator() {
         val comparator = mock<ExperimentComparator<Int?>>()
         given(comparator.invoke(1, 2)).willReturn(ComparisonResult("An error"))
-        val experiment = ExperimentBuilder<Int>()
+        val experiment = SimpleExperimentBuilder<Int>()
                 .withName("test")
                 .withComparator(comparator)
                 .withMetricsProvider(NoopMetricsProvider())
@@ -132,7 +132,7 @@ class ExperimentTest {
                 emptyMap(),
                 "prefix"
         )
-        val experiment = ExperimentBuilder<Int>(experimentConfiguration).build()
+        val experiment = SimpleExperimentBuilder<Int>(experimentConfiguration).build()
 
         assertThat(experiment.name).isEqualTo("name")
         assertThat(experiment.raiseOnMismatch).isEqualTo(true)
@@ -143,11 +143,11 @@ class ExperimentTest {
     @Test
     fun `eventBus is called`() {
         val eventBus = mock<EventBus>()
-        val experiment = ExperimentBuilder<Int>()
+        val experiment = SimpleExperimentBuilder<Int>()
                 .withRaiseOnMismatch(true)
                 .withEventBus(eventBus)
                 .build()
         experiment.run({safeFunction()}, {safeFunction()})
-        verify(eventBus).post(isA<ExperimentResult<Int>>())
+        verify(eventBus).post(isA<SimpleExperimentResult<Int>>())
     }
 }

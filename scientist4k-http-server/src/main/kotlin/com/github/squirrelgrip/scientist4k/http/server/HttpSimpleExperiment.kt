@@ -1,6 +1,6 @@
 package com.github.squirrelgrip.scientist4k.http.server
 
-import com.github.squirrelgrip.scientist4k.simple.model.ExperimentResult
+import com.github.squirrelgrip.scientist4k.simple.model.SimpleExperimentResult
 import com.github.squirrelgrip.scientist4k.core.model.sample.Sample
 import com.github.squirrelgrip.scientist4k.core.model.sample.SampleFactory
 import com.github.squirrelgrip.scientist4k.http.core.HttpExperimentUtil
@@ -11,7 +11,7 @@ import com.github.squirrelgrip.scientist4k.http.core.extension.toHttpExperimentR
 import com.github.squirrelgrip.scientist4k.http.core.factory.RequestFactory
 import com.github.squirrelgrip.scientist4k.http.core.model.ExperimentRequest
 import com.github.squirrelgrip.scientist4k.http.core.model.ExperimentResponse
-import com.github.squirrelgrip.scientist4k.http.simple.AbstractHttpExperiment
+import com.github.squirrelgrip.scientist4k.http.simple.AbstractHttpSimpleExperiment
 import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
 import com.google.common.eventbus.EventBus
 import org.slf4j.Logger
@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
-class HttpExperiment(
+class HttpSimpleExperiment(
         name: String,
         metrics: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD"),
         sampleFactory: SampleFactory = SampleFactory(),
@@ -29,7 +29,7 @@ class HttpExperiment(
         async: Boolean = true,
         controlConfig: EndPointConfiguration,
         private val candidateConfig: EndPointConfiguration
-) : AbstractHttpExperiment(
+) : AbstractHttpSimpleExperiment(
         name,
         metrics,
         sampleFactory,
@@ -41,7 +41,7 @@ class HttpExperiment(
     private val candidateRequestFactory = RequestFactory(candidateConfig, HttpExperimentUtil.CANDIDATE_COOKIE_STORE, mappings)
 
     companion object {
-        private val LOGGER: Logger = LoggerFactory.getLogger(HttpExperiment::class.java)
+        private val LOGGER: Logger = LoggerFactory.getLogger(HttpSimpleExperiment::class.java)
     }
 
     fun run(
@@ -74,8 +74,8 @@ class HttpExperiment(
     }
 
     override fun publish(result: Any) {
-        if (result is ExperimentResult<*> && result.control.value is ExperimentResponse) {
-            eventBus.post((result as ExperimentResult<ExperimentResponse>).toHttpExperimentResult())
+        if (result is SimpleExperimentResult<*> && result.control.value is ExperimentResponse) {
+            eventBus.post((result as SimpleExperimentResult<ExperimentResponse>).toHttpExperimentResult())
         } else {
             super.publish(result)
         }

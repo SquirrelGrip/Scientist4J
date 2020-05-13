@@ -73,9 +73,9 @@ class FilterExperimentBuilder() {
         return this
     }
 
-    fun build(): FilterExperiment {
+    fun build(): FilterSimpleExperiment {
         if (detourConfig != null) {
-            return FilterExperiment(name, metrics, sampleFactory, eventBus, enabled, async, mappings, detourConfig!!)
+            return FilterSimpleExperiment(name, metrics, sampleFactory, eventBus, enabled, async, mappings, detourConfig!!)
         }
         throw LaboratoryException("Detour configurations must be set")
     }

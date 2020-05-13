@@ -7,5 +7,8 @@ data class HttpExperimentResult(
         val startTime: Instant,
         val experiment: String,
         val request: HttpExperimentRequest,
-        val responses: Map<String, HttpExperimentObservation> = emptyMap()
-)
+        val responses: List<HttpExperimentObservation> = emptyList()
+) {
+    operator fun get(name: String): HttpExperimentObservation? =
+            responses.firstOrNull { it.name == name }
+}

@@ -6,7 +6,7 @@ import javax.servlet.ServletRequest
 import javax.servlet.ServletResponse
 
 class ExperimentFilter(
-        val experiment: FilterExperiment
+        val experiment: FilterSimpleExperiment
 ) : Filter {
 
     override fun doFilter(request: ServletRequest, response: ServletResponse, chain: FilterChain) {

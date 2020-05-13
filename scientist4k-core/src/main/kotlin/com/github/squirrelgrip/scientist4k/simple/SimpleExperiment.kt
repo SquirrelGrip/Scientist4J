@@ -4,7 +4,7 @@ import com.github.squirrelgrip.scientist4k.core.AbstractExperiment
 import com.github.squirrelgrip.scientist4k.core.comparator.DefaultExperimentComparator
 import com.github.squirrelgrip.scientist4k.core.comparator.ExperimentComparator
 import com.github.squirrelgrip.scientist4k.core.model.ExperimentObservation
-import com.github.squirrelgrip.scientist4k.simple.model.ExperimentResult
+import com.github.squirrelgrip.scientist4k.simple.model.SimpleExperimentResult
 import com.github.squirrelgrip.scientist4k.core.model.sample.Sample
 import com.github.squirrelgrip.scientist4k.core.model.sample.SampleFactory
 import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
@@ -16,7 +16,7 @@ import kotlinx.coroutines.runBlocking
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-open class Experiment<T>(
+open class SimpleExperiment<T>(
         name: String,
         raiseOnMismatch: Boolean = false,
         metrics: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD"),
@@ -39,7 +39,7 @@ open class Experiment<T>(
     constructor(name: String, metrics: MetricsProvider<*>) : this(name, false, metrics)
 
     companion object {
-        private val LOGGER: Logger = LoggerFactory.getLogger(Experiment::class.java)
+        private val LOGGER: Logger = LoggerFactory.getLogger(SimpleExperiment::class.java)
     }
 
     open fun run(control: () -> T?, candidate: () -> T?, sample: Sample = sampleFactory.create()): T? {
@@ -82,16 +82,16 @@ open class Experiment<T>(
                 controlObservation.value
             }
 
-    private suspend fun publishAsync(controlExperimentObservation: ExperimentObservation<T>, deferredCandidateExperimentObservation: Deferred<ExperimentObservation<T>>, sample: Sample): ExperimentResult<T> {
+    private suspend fun publishAsync(controlExperimentObservation: ExperimentObservation<T>, deferredCandidateExperimentObservation: Deferred<ExperimentObservation<T>>, sample: Sample): SimpleExperimentResult<T> {
         LOGGER.trace("Awaiting candidateObservation...")
         val candidateObservation = deferredCandidateExperimentObservation.await()
         LOGGER.trace("candidateObservation is {}", candidateObservation)
         return publishResult(controlExperimentObservation, candidateObservation, sample)
     }
 
-    private fun publishResult(controlExperimentObservation: ExperimentObservation<T>, candidateExperimentObservation: ExperimentObservation<T>, sample: Sample): ExperimentResult<T> {
+    private fun publishResult(controlExperimentObservation: ExperimentObservation<T>, candidateExperimentObservation: ExperimentObservation<T>, sample: Sample): SimpleExperimentResult<T> {
         LOGGER.trace("Creating Result...")
-        val result = ExperimentResult(this, controlExperimentObservation, candidateExperimentObservation, sample)
+        val result = SimpleExperimentResult(this, controlExperimentObservation, candidateExperimentObservation, sample)
         LOGGER.trace("Publishing Result")
         publish(result)
         return result
