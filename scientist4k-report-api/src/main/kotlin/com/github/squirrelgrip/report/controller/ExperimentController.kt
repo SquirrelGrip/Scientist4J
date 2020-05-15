@@ -1,6 +1,7 @@
 package com.github.squirrelgrip.report.controller
 
 import com.github.squirrelgrip.report.model.ExperimentSummary
+import com.github.squirrelgrip.report.model.ExperimentUrl
 import com.github.squirrelgrip.report.repository.ExperimentRepository
 import com.github.squirrelgrip.scientist4k.http.core.model.HttpExperimentResult
 import org.slf4j.Logger
@@ -27,8 +28,8 @@ class ExperimentController(
     }
 
     @GetMapping("/api/v1/experiment/{name}/urls", produces = ["application/json"])
-    fun getExperimentUrlsByName(@PathVariable("name") name: String): Map<String, Map<String, Boolean>> {
-            return experimentRepository.findExperimentByName(name).experimentUriSummary
+    fun getExperimentUrlsByName(@PathVariable("name") name: String): List<ExperimentUrl> {
+            return experimentRepository.findExperimentByName(name).experimentUrls
     }
 
     @GetMapping("/api/v1/experiment/{name}/{id}", produces = ["application/json"])

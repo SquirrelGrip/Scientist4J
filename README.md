@@ -18,7 +18,7 @@ A port of Github's refactoring tool [Scientist](https://github.com/github/scient
 
 This Kotlin port supports most of the functionality of the original Scientist library in Ruby, however its interface is a bit different.
 
-The core component of this library is the `Experiment<T>` class. It's recommended to use this class as a Singleton. The main usage is as follows:
+The core component of this library is the `ExperimentSummary<T>` class. It's recommended to use this class as a Singleton. The main usage is as follows:
 
 ## Basic Usage
 
@@ -29,7 +29,7 @@ For a synchronous experiment, the order in which control and candidate functions
 To run a synchronous experiment:
 
 ```kotlin
-val e = Experiment("foo")
+val e = ExperimentSummary("foo")
 e.run(controlFunction, candidateFunction)
 ```
 
@@ -38,7 +38,7 @@ For an asynchronous experiment, the two functions are run asynchronously.
 To run an asynchronous experiment:
 
 ```kotlin
-val e = Experiment<Int>("foo")
+val e = ExperimentSummary<Int>("foo")
 e.runAsync(controlFunction, candidateFunction)
 ```
 

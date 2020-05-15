@@ -37,23 +37,23 @@ data class Experiment(
     val experimentSummary: ExperimentSummary
         get() = {
             update()
-            val matches = results.map {
+            val matches = results.partition {
                 it.matches()
             }
-            val pass = matches.count { it }
-            val fail = matches.count { !it }
+            val pass = matches.first.size
+            val fail = matches.second.size
             ExperimentSummary(name, lastUpdate, results.size, pass, fail)
         }.invoke()
 
-    val experimentUriSummary: Map<String, Map<String, Boolean>>
+    val experimentUrls: List<ExperimentUrl>
         get() = {
             update()
             results.groupBy {
-                "${it.request.method} ${it.request.url}"
+                it.request.method to it.request.url
             }.map {(key, value) ->
-                key to value.map {
-                    it.id to it.matches()
-                }.toMap()
-            }.toMap()
+                val partition = value.partition { it.matches() }
+                val ids = value.map { it.id }
+                ExperimentUrl(key.first, key.second, partition.first.size, partition.second.size, ids)
+            }
         }.invoke()
 }

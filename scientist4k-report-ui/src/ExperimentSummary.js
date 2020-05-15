@@ -4,6 +4,7 @@ import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import Box from "@material-ui/core/Box";
+import { useHistory } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -16,12 +17,14 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function Experiment(prop) {
+export default function ExperimentSummary(prop) {
   const classes = useStyles();
   const passPercentage = (prop.experiment.pass / prop.experiment.count * 100).toFixed(0)
+  const history = useHistory();
 
   function onExperimentClick() {
-    console.log(prop.experiment)
+    console.log(prop.experiment.name)
+    history.push("/experiment/" + prop.experiment.name);
   }
 
   return (
@@ -31,9 +34,6 @@ export default function Experiment(prop) {
           <Grid item xs>
             <Typography gutterBottom variant="subtitle1">{prop.experiment.name}</Typography>
             <Typography variant="body2" gutterBottom>{prop.url}</Typography>
-          </Grid>
-          <Grid item>
-            <Typography variant="body2" style={{cursor: 'pointer'}}>Remove</Typography>
           </Grid>
         </Grid>
         <Grid item>

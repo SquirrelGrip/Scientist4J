@@ -3,6 +3,8 @@ import {makeStyles} from '@material-ui/core/styles';
 import ExperimentGrid from "./ExperimentGrid";
 import Container from "@material-ui/core/Container";
 import Navigation from "./Navigation";
+import {BrowserRouter as Router, Switch, Route} from "react-router-dom";
+import ExperimentDetails from "./ExperimentDetails";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -15,11 +17,20 @@ export default function App() {
 
   return (
     <div className={classes.root}>
-      <Navigation heading={'Experiments'}/>
+      <Navigation heading={'Scientist'}/>
       <div style={{marginTop: '80px'}}>
-        <Container maxWidth='xl'>
-          <ExperimentGrid/>
-        </Container>
+        <Router>
+          <div>
+            <Switch>
+              <Route path="/experiment/:experiment" children={<ExperimentDetails />} />
+              <Route path="/">
+                <Container maxWidth='xl'>
+                  <ExperimentGrid/>
+                </Container>
+              </Route>
+            </Switch>
+          </div>
+        </Router>
       </div>
     </div>
   );

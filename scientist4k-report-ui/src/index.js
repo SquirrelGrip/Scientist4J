@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
-import Contacts from "./Contacts";
+import ExperimentDetails from "./ExperimentDetails";
 import * as serviceWorker from './serviceWorker';
 import {BrowserRouter, Route} from "react-router-dom";
 
@@ -10,7 +10,7 @@ const routing = (
   <BrowserRouter>
     <div>
       <Route path="/" component={App} />
-      <Route path="/contacts" component={Contacts} />
+      <Route path="/contacts" component={ExperimentDetails} />
     </div>
   </BrowserRouter>
 )
