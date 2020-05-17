@@ -7,6 +7,8 @@ import InputBase from '@material-ui/core/InputBase';
 import {fade, makeStyles} from '@material-ui/core/styles';
 import MenuIcon from '@material-ui/icons/Menu';
 import SearchIcon from '@material-ui/icons/Search';
+import Breadcrumbs from "@material-ui/core/Breadcrumbs";
+import {Link as RouterLink} from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -63,34 +65,62 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+function SimpleBreadcrumbs(props) {
+  const pathnames = props.location.pathname.split('/').filter(x => x);
+  return (
+    <Breadcrumbs aria-label="Breadcrumb">
+      {pathnames[0] ? (
+        <RouterLink color="inherit" to={"/"} key={"/"}>Experiments</RouterLink>
+      ): (
+        <Typography color="textPrimary" key={"/"}>Experiments</Typography>
+      )}
+      {pathnames.map((value, index) => {
+        const last = index === pathnames.length - 1;
+        const to = `/${pathnames.slice(0, index + 1).join('/')}`;
+        return last ? (
+          <Typography color="textPrimary" key={to}>{value}</Typography>
+        ) : (
+          <RouterLink color="inherit" to={to} key={to}>{value}</RouterLink>
+        );
+      })}
+    </Breadcrumbs>
+  );
+}
+
+
 export default function Navigation(props) {
   const classes = useStyles();
 
   return (
-    <AppBar position="fixed">
-      <Toolbar>
-        <IconButton
-          edge="start"
-          className={classes.menuButton}
-          color="inherit"
-          aria-label="open drawer">
-          <MenuIcon/>
-        </IconButton>
-        <Typography className={classes.title} variant="h6" noWrap>{props.heading}</Typography>
-        <div className={classes.search}>
-          <div className={classes.searchIcon}>
-            <SearchIcon/>
+    <div>
+      <AppBar position="fixed">
+        <Toolbar>
+          <IconButton
+            edge="start"
+            className={classes.menuButton}
+            color="inherit"
+            aria-label="open drawer">
+            <MenuIcon/>
+          </IconButton>
+          <Typography className={classes.title} variant="h6" noWrap>{props.heading}</Typography>
+          <div className={classes.search}>
+            <div className={classes.searchIcon}>
+              <SearchIcon/>
+            </div>
+            <InputBase
+              placeholder="Search…"
+              classes={{
+                root: classes.inputRoot,
+                input: classes.inputInput,
+              }}
+              inputProps={{'aria-label': 'search'}}
+            />
           </div>
-          <InputBase
-            placeholder="Search…"
-            classes={{
-              root: classes.inputRoot,
-              input: classes.inputInput,
-            }}
-            inputProps={{'aria-label': 'search'}}
-          />
-        </div>
-      </Toolbar>
-    </AppBar>
+        </Toolbar>
+      </AppBar>
+      <div style={{marginTop: '80px'}}>
+        <SimpleBreadcrumbs location={props.location}/>
+      </div>
+    </div>
   );
 }

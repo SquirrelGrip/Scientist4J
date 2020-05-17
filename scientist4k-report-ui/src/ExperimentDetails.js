@@ -1,16 +1,14 @@
-import React, {useEffect, useState} from 'react';
-import Typography from '@material-ui/core/Typography';
-import Breadcrumbs from "@material-ui/core/Breadcrumbs";
-import {useHistory, useParams} from "react-router-dom";
-import Link from "@material-ui/core/Link";
+import React, {Component} from 'react';
 import axios from "axios";
+import { withRouter } from "react-router-dom";
 
-export default function ExperimentDetails() {
-  const history = useHistory();
-  let {experiment} = useParams();
-  const [experimentDetails, setExperimentDetails] = useState();
+class ExperimentDetails extends Component {
+  state = {
+    experimentDetails: null
+  }
 
-  useEffect(() => {
+  componentDidMount() {
+    const experiment = this.props.match.params.experiment;
     axios
       .get(
         "http://localhost:9080/api/v1/experiment/" + experiment + "/urls",
@@ -21,28 +19,24 @@ export default function ExperimentDetails() {
           }
         }
       )
-      .then(({data}) => {
-        console.log(data);
-        setExperimentDetails(data);
+      .then(res => {
+        const experimentDetails = res.data;
+        this.setState({ experimentDetails });
       });
-  }, []);
-
-
-  function onExperimentsClick() {
-    history.push("/");
   }
 
-  return experimentDetails ? (
-    <div>
-      <Breadcrumbs maxItems={2} aria-label="breadcrumb">
-        <Link color="inherit" href="#" onClick={onExperimentsClick}>Experiments</Link>
-        <Typography color="textPrimary">{experimentDetails.name}</Typography>
-      </Breadcrumbs>
-      {experimentDetails.urls.map(url => (
-        <div><span>{url.method}</span> <span>{url.uri}</span></div>
-      ))}
-    </div>
-  ) : (
-    <div>Loading...</div>
-  );
+  render() {
+    const {experimentDetails} = this.state;
+    return experimentDetails ? (
+      <div>
+        {experimentDetails.urls.map(url => (
+          <div><span>{url.method}</span> <span>{url.uri}</span></div>
+        ))}
+      </div>
+    ) : (
+      <div>Loading...</div>
+    );
+  }
 }
+
+export default withRouter(ExperimentDetails);

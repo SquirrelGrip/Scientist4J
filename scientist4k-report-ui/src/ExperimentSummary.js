@@ -23,8 +23,7 @@ export default function ExperimentSummary(prop) {
   const history = useHistory();
 
   function onExperimentClick() {
-    console.log(prop.experiment.name)
-    history.push("/experiment/" + prop.experiment.name);
+    history.push("/" + prop.experiment.name);
   }
 
   return (
