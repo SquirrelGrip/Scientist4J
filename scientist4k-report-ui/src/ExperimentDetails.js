@@ -7,7 +7,7 @@ import axios from "axios";
 
 export default function ExperimentDetails() {
   const history = useHistory();
-  let { experiment } = useParams();
+  let {experiment} = useParams();
   const [experimentDetails, setExperimentDetails] = useState();
 
   useEffect(() => {
@@ -22,6 +22,7 @@ export default function ExperimentDetails() {
         }
       )
       .then(({data}) => {
+        console.log(data);
         setExperimentDetails(data);
       });
   }, []);
@@ -31,13 +32,17 @@ export default function ExperimentDetails() {
     history.push("/");
   }
 
-  return (
+  return experimentDetails ? (
     <div>
       <Breadcrumbs maxItems={2} aria-label="breadcrumb">
         <Link color="inherit" href="#" onClick={onExperimentsClick}>Experiments</Link>
-        <Typography color="textPrimary">{experiment}</Typography>
+        <Typography color="textPrimary">{experimentDetails.name}</Typography>
       </Breadcrumbs>
-      <Typography>{experimentDetails.name}</Typography>
+      {experimentDetails.urls.map(url => (
+        <div><span>{url.method}</span> <span>{url.uri}</span></div>
+      ))}
     </div>
+  ) : (
+    <div>Loading...</div>
   );
 }

@@ -56,4 +56,9 @@ data class Experiment(
                 ExperimentUrl(key.first, key.second, partition.first.size, partition.second.size, ids)
             }
         }.invoke()
+
+    val experimentDetails: ExperimentDetails
+        get() = {
+            ExperimentDetails(name, experimentUrls)
+        }.invoke()
 }
