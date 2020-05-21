@@ -65,8 +65,8 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function SimpleBreadcrumbs(props) {
-  const pathnames = props.location.pathname.split('/').filter(x => x);
+function SimpleBreadcrumbs() {
+  const pathnames = window.location.pathname.split('/').filter(x => x);
   return (
     <Breadcrumbs aria-label="Breadcrumb">
       {pathnames[0] ? (
@@ -90,7 +90,6 @@ function SimpleBreadcrumbs(props) {
 
 export default function Navigation(props) {
   const classes = useStyles();
-
   return (
     <div>
       <AppBar position="fixed">
@@ -119,7 +118,7 @@ export default function Navigation(props) {
         </Toolbar>
       </AppBar>
       <div style={{marginTop: '80px'}}>
-        <SimpleBreadcrumbs location={props.location}/>
+        <SimpleBreadcrumbs />
       </div>
     </div>
   );

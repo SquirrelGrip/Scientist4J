@@ -5,5 +5,5 @@ data class ExperimentUrl(
         val uri: String,
         val passCount: Int = 0,
         val failCount: Int = 0,
-        val experimentIds: List<String> = emptyList()
+        val experimentResults: List<ExperimentResult> = emptyList()
 )

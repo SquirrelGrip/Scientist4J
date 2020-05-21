@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import axios from "axios";
 import { withRouter } from "react-router-dom";
+import ExperimentDetail from "./ExperimentDetail";
 
 class ExperimentDetails extends Component {
   state = {
@@ -28,10 +29,10 @@ class ExperimentDetails extends Component {
   render() {
     const {experimentDetails} = this.state;
     return experimentDetails ? (
-      <div>
+      <div key={experimentDetails.name}>
         {experimentDetails.urls.map(url => (
-          <div><span>{url.method}</span> <span>{url.uri}</span></div>
-        ))}
+          <ExperimentDetail url={url} key={url.method + "_" + url.uri}/>
+        ))};
       </div>
     ) : (
       <div>Loading...</div>

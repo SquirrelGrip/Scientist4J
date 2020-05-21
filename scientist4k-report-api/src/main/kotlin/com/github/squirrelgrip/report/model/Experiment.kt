@@ -50,10 +50,10 @@ data class Experiment(
             update()
             results.groupBy {
                 it.request.method to it.request.url
-            }.map {(key, value) ->
-                val partition = value.partition { it.matches() }
-                val ids = value.map { it.id }
-                ExperimentUrl(key.first, key.second, partition.first.size, partition.second.size, ids)
+            }.map { (key, value) ->
+                val results = value.map { ExperimentResult(it.matches(), it) }
+                val partition = results.partition { it.match }
+                ExperimentUrl(key.first, key.second, partition.first.size, partition.second.size, results)
             }
         }.invoke()
 

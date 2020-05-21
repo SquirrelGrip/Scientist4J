@@ -19,12 +19,13 @@ const useStyles = makeStyles((theme) => ({
 
 export default function ExperimentSummary(prop) {
   const classes = useStyles();
-  const passPercentage = (prop.experiment.pass / prop.experiment.count * 100).toFixed(0)
   const history = useHistory();
 
   function onExperimentClick() {
     history.push("/" + prop.experiment.name);
   }
+
+  const passPercentage = (prop.experiment.pass / prop.experiment.count * 100).toFixed(0)
 
   return (
     <Paper className={classes.paper} variant={'elevation'} onClick={onExperimentClick}>
