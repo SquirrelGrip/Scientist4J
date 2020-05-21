@@ -4,6 +4,7 @@ import ExperimentGrid from "./ExperimentGrid";
 import Navigation from "./Navigation";
 import {BrowserRouter as Router, Route, Switch} from "react-router-dom";
 import ExperimentDetails from "./ExperimentDetails";
+import SimpleBreadcrumbs from "./SimpleBreadCrumbs";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -13,12 +14,14 @@ const useStyles = makeStyles((theme) => ({
 const classes = useStyles;
 
 export default class App extends Component {
-
   render() {
     return (
       <div className={classes.root}>
-        <Router forceRefresh={true}>
+        <Router>
           <Navigation heading={'Scientist'} />
+          <div style={{marginTop: '80px'}}>
+            <SimpleBreadcrumbs />
+          </div>
           <Switch>
             <Route path="/:experiment">
               <ExperimentDetails/>

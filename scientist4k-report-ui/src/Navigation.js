@@ -7,8 +7,6 @@ import InputBase from '@material-ui/core/InputBase';
 import {fade, makeStyles} from '@material-ui/core/styles';
 import MenuIcon from '@material-ui/icons/Menu';
 import SearchIcon from '@material-ui/icons/Search';
-import Breadcrumbs from "@material-ui/core/Breadcrumbs";
-import {Link as RouterLink} from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -65,29 +63,6 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function SimpleBreadcrumbs() {
-  const pathnames = window.location.pathname.split('/').filter(x => x);
-  return (
-    <Breadcrumbs aria-label="Breadcrumb">
-      {pathnames[0] ? (
-        <RouterLink color="inherit" to={"/"} key={"/"}>Experiments</RouterLink>
-      ): (
-        <Typography color="textPrimary" key={"/"}>Experiments</Typography>
-      )}
-      {pathnames.map((value, index) => {
-        const last = index === pathnames.length - 1;
-        const to = `/${pathnames.slice(0, index + 1).join('/')}`;
-        return last ? (
-          <Typography color="textPrimary" key={to}>{value}</Typography>
-        ) : (
-          <RouterLink color="inherit" to={to} key={to}>{value}</RouterLink>
-        );
-      })}
-    </Breadcrumbs>
-  );
-}
-
-
 export default function Navigation(props) {
   const classes = useStyles();
   return (
@@ -117,9 +92,6 @@ export default function Navigation(props) {
           </div>
         </Toolbar>
       </AppBar>
-      <div style={{marginTop: '80px'}}>
-        <SimpleBreadcrumbs />
-      </div>
     </div>
   );
 }

@@ -2,6 +2,7 @@ package com.github.squirrelgrip.report.configuration
 
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.PropertySource
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.builders.WebSecurity
@@ -13,6 +14,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 
 @Configuration
 @EnableWebSecurity
+@PropertySource(value = ["classpath:application.properties"])
 class WebSecurityConfiguration: WebSecurityConfigurerAdapter() {
     @Value("\${server.cors.enabled}")
     private val corsEnabled: Boolean = true
@@ -24,7 +26,7 @@ class WebSecurityConfiguration: WebSecurityConfigurerAdapter() {
 //        http.requiresChannel().anyRequest().requiresSecure()
         http
                 .antMatcher("/**").authorizeRequests()
-                .antMatchers("/", "/errors**", "/api/**").permitAll()
+                .antMatchers("/**").permitAll()
                 .anyRequest().authenticated()
     }
 
