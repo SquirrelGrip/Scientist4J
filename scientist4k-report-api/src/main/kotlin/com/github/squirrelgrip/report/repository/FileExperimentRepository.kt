@@ -1,10 +1,7 @@
 package com.github.squirrelgrip.report.repository
 
-import com.github.squirrelgrip.extension.json.toInstance
 import com.github.squirrelgrip.report.exception.ExperimentNotFoundException
-import com.github.squirrelgrip.report.model.ExperimentReport
-import com.github.squirrelgrip.report.model.ExperimentSummary
-import com.github.squirrelgrip.scientist4k.http.core.model.HttpExperimentResult
+import com.github.squirrelgrip.report.model.Experiment
 import org.springframework.stereotype.Repository
 import java.io.File
 
@@ -12,20 +9,23 @@ import java.io.File
 class FileExperimentRepository(
         val baseDirectory: File
 ) : ExperimentRepository {
-    override fun findAllExperiments(): List<ExperimentSummary> {
-        return baseDirectory
-                .listFiles { file, _ -> file.isDirectory }
-                .map { ExperimentSummary(it) }
+    val experiments : MutableMap<String, Experiment> = mutableMapOf()
+
+    override fun findAllExperiments(): List<Experiment> {
+        update()
+        return experiments.values.toList()
     }
 
-    override fun findExperimentByName(name: String): ExperimentReport {
-        val experimentDirectory = File(baseDirectory, name)
-        if (experimentDirectory.exists() && experimentDirectory.isDirectory) {
-            val list = experimentDirectory.listFiles().map {
-                it.toInstance<HttpExperimentResult>()
-            }
-            return ExperimentReport(name, list)
-        }
-        throw ExperimentNotFoundException()
+    override fun findExperimentByName(name: String): Experiment {
+        update()
+        return experiments[name] ?: throw ExperimentNotFoundException()
+    }
+
+    fun update() {
+        baseDirectory
+                .listFiles { file -> file.isDirectory() }
+                .map { Experiment(it) }
+                .filter { !experiments.containsKey(it.name) }
+                .forEach { experiments[it.name] = it }
     }
 }

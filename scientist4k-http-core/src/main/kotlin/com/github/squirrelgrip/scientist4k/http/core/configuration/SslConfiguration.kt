@@ -20,8 +20,6 @@ open class SslConfiguration(
         val needClientAuth: Boolean = false,
         val wantClientAuth: Boolean = false
 ) {
-
-
     fun sslContext(): SSLContext = SSLContext.getInstance(algorithm).apply {
         init(keyManagerFactory().keyManagers, trustManagerFactory().trustManagers, SecureRandom())
     }

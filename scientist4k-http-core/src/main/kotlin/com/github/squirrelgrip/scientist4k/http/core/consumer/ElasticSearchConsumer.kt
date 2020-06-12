@@ -7,11 +7,11 @@ import org.apache.http.entity.ContentType.APPLICATION_JSON
 import org.apache.http.entity.StringEntity
 import org.apache.http.impl.client.HttpClients
 
-class ElasticSearchConsumer<T>(
+class ElasticSearchConsumer(
         val url: String
-) {
+): Consumer<Any> {
     @Subscribe
-    fun receiveResult(experimentResult: Any) {
+    override fun receiveResult(experimentResult: Any) {
         val httpClient = HttpClients.createDefault()
         val json = experimentResult.toJson()
         val request = RequestBuilder.create("POST").apply {

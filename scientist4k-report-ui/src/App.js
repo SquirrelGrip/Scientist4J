@@ -1,26 +1,37 @@
-import React from 'react';
+import React, {Component} from 'react';
 import {makeStyles} from '@material-ui/core/styles';
 import ExperimentGrid from "./ExperimentGrid";
-import Container from "@material-ui/core/Container";
 import Navigation from "./Navigation";
+import {BrowserRouter as Router, Route, Switch} from "react-router-dom";
+import ExperimentDetails from "./ExperimentDetails";
+import SimpleBreadcrumbs from "./SimpleBreadCrumbs";
 
 const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
   },
 }));
+const classes = useStyles;
 
-export default function App() {
-  const classes = useStyles();
-
-  return (
-    <div className={classes.root}>
-      <Navigation heading={'Experiments'}/>
-      <div style={{marginTop: '80px'}}>
-        <Container maxWidth='xl'>
-          <ExperimentGrid/>
-        </Container>
+export default class App extends Component {
+  render() {
+    return (
+      <div className={classes.root}>
+        <Router>
+          <Navigation heading={'Scientist'} />
+          <div style={{marginTop: '80px'}}>
+            <SimpleBreadcrumbs />
+          </div>
+          <Switch>
+            <Route path="/:experiment">
+              <ExperimentDetails/>
+            </Route>
+            <Route path="/">
+              <ExperimentGrid/>
+            </Route>
+          </Switch>
+        </Router>
       </div>
-    </div>
-  );
+    );
+  }
 }
