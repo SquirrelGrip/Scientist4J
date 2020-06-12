@@ -7,9 +7,9 @@ import java.io.File
 
 class FileConsumer(
         val baseDirectory: File
-) {
+): Consumer<HttpExperimentResult> {
     @Subscribe
-    fun receiveResult(experimentResult: HttpExperimentResult) {
+    override fun receiveResult(experimentResult: HttpExperimentResult) {
         val experimentName = experimentResult.experiment
         val sampleId = experimentResult.id
         val experimentDirectory = File(baseDirectory, experimentName).apply {
