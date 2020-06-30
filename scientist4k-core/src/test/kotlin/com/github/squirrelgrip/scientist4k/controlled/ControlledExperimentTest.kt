@@ -3,11 +3,12 @@ package com.github.squirrelgrip.scientist4k.controlled
 import com.github.squirrelgrip.scientist4k.core.comparator.ExperimentComparator
 import com.github.squirrelgrip.scientist4k.core.exception.MismatchException
 import com.github.squirrelgrip.scientist4k.core.model.ComparisonResult
-import com.github.squirrelgrip.scientist4k.metrics.noop.NoopMetricsProvider
 import com.github.squirrelgrip.scientist4k.metrics.dropwizard.DropwizardMetricsProvider
 import com.github.squirrelgrip.scientist4k.metrics.micrometer.MicrometerMetricsProvider
+import com.github.squirrelgrip.scientist4k.metrics.noop.NoopMetricsProvider
 import io.dropwizard.metrics5.MetricName
 import org.assertj.core.api.Assertions.assertThat
+import org.awaitility.Awaitility
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
 import org.mockito.BDDMockito.given
@@ -100,6 +101,17 @@ class ControlledExperimentTest {
         val experiment = ControlledExperiment<Int>("test", provider)
         experiment.run({ 1 }, { 1 }, { exceptionThrowingFunction() })
         val result = provider.registry.counters[MetricName.build("scientist", "test", "candidate", "exception")]
+        Awaitility.await().until { result != null && result.count > 0 }
+        assertThat(result!!.count).isEqualTo(1)
+    }
+
+    @Test
+    fun candidateExceptionsWithSleep() {
+        val provider = DropwizardMetricsProvider()
+        val experiment = ControlledExperiment<Int>("test", provider)
+        experiment.run({ sleepFunction() }, { sleepFunction() }, { exceptionThrowingFunction() })
+        val result = provider.registry.counters[MetricName.build("scientist", "test", "candidate", "exception")]
+        Awaitility.await().until { result != null && result.count > 0 }
         assertThat(result!!.count).isEqualTo(1)
     }
 
