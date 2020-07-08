@@ -40,7 +40,6 @@
         <module>scientist4k-controlled-http-server</module>
         <module>scientist4k-controlled-http-filter</module>
 
-        <module>scientist4k-report-ui</module>
         <module>scientist4k-report-api</module>
 
         <module>scientist4k-bom</module>
