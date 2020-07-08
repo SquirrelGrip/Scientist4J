@@ -1,7 +1,6 @@
 package com.github.squirrelgrip.report.controller
 
-import com.github.squirrelgrip.report.model.ExperimentDetails
-import com.github.squirrelgrip.report.model.ExperimentSummary
+import com.github.squirrelgrip.report.model.Experiment
 import com.github.squirrelgrip.report.repository.ExperimentRepository
 import com.github.squirrelgrip.scientist4k.http.core.model.HttpExperimentResult
 import org.slf4j.Logger
@@ -17,27 +16,23 @@ class ExperimentController(
     companion object {
         val LOGGER: Logger = LoggerFactory.getLogger(ExperimentController::class.java)
     }
+
     @GetMapping("/api/v1/experiments", produces = ["application/json"])
-    fun getExperiments(): List<ExperimentSummary> {
-        return experimentRepository.findAllExperiments().map { it.experimentSummary }
+    fun getExperiments(): List<String> {
+        return experimentRepository.findAllExperiments().map { it.name }
     }
 
     @GetMapping("/api/v1/experiment/{name}", produces = ["application/json"])
-    fun getExperimentsByName(@PathVariable("name") name: String): ExperimentSummary {
-            return experimentRepository.findExperimentByName(name).experimentSummary
+    fun getExperimentsByName(@PathVariable("name") name: String): Experiment {
+            return experimentRepository.findExperimentByName(name)
     }
 
-    @GetMapping("/api/v1/experiment/{name}/urls", produces = ["application/json"])
-    fun getExperimentDetailsByName(@PathVariable("name") name: String): ExperimentDetails {
-            return experimentRepository.findExperimentByName(name).experimentDetails
-    }
-
-    @GetMapping("/api/v1/experiment/{name}/{id}", produces = ["application/json"])
-    fun getExperimentUrlsByName(
+    @GetMapping("/api/v1/experiment/{name}/results/{id}", produces = ["application/json"])
+    fun getExperimentResultsByName(
             @PathVariable("name") name: String,
             @PathVariable("id") id: String
     ): HttpExperimentResult {
-            return experimentRepository.findExperimentByName(name).findById(id)
+            return experimentRepository.findExperimentByName(name).getResult(id)
     }
 
 }

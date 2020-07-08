@@ -15,6 +15,7 @@ import org.mockito.BDDMockito.given
 import org.mockito.Mockito
 import org.mockito.Mockito.verify
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 class ControlledExperimentTest {
     private fun exceptionThrowingFunction(): Int {
@@ -121,6 +122,7 @@ class ControlledExperimentTest {
         val experiment = ControlledExperiment<Int>("test", provider)
         experiment.run({ 1 }, { 1 }, { exceptionThrowingFunction() })
         val result = provider.registry["scientist.test.candidate.exception"].counter()
+        Awaitility.await().atMost(5, TimeUnit.SECONDS).until { result.count().equals(1.0) }
         assertThat(result.count()).isEqualTo(1.0)
     }
 

@@ -4,21 +4,23 @@ import com.github.squirrelgrip.scientist4k.core.comparator.ExperimentComparator
 import com.github.squirrelgrip.scientist4k.core.configuration.ExperimentConfiguration
 import com.github.squirrelgrip.scientist4k.core.exception.MismatchException
 import com.github.squirrelgrip.scientist4k.core.model.ComparisonResult
-import com.github.squirrelgrip.scientist4k.simple.model.SimpleExperimentResult
 import com.github.squirrelgrip.scientist4k.metrics.dropwizard.DropwizardMetricsProvider
 import com.github.squirrelgrip.scientist4k.metrics.micrometer.MicrometerMetricsProvider
 import com.github.squirrelgrip.scientist4k.metrics.noop.NoopMetricsProvider
+import com.github.squirrelgrip.scientist4k.simple.model.SimpleExperimentResult
 import com.google.common.eventbus.EventBus
 import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.isA
 import com.nhaarman.mockitokotlin2.mock
 import io.dropwizard.metrics5.MetricName
 import org.assertj.core.api.Assertions.assertThat
+import org.awaitility.Awaitility
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
 import org.mockito.BDDMockito.given
 import org.mockito.Mockito.verify
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 class SimpleExperimentTest {
     private fun exceptionThrowingFunction(): Int {
@@ -105,6 +107,10 @@ class SimpleExperimentTest {
         val provider = MicrometerMetricsProvider()
         val experiment = SimpleExperiment<Int>("test", provider)
         experiment.run({ 1 }, { exceptionThrowingFunction() })
+        Awaitility.await().atMost(5, TimeUnit.SECONDS).until {
+            val result = provider.registry["scientist.test.candidate.exception"].counter()
+            result.count().equals(1.0)
+        }
         val result = provider.registry["scientist.test.candidate.exception"].counter()
         assertThat(result.count()).isEqualTo(1.0)
     }
