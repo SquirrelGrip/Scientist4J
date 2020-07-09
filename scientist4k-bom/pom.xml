@@ -48,11 +48,6 @@
             </dependency>
             <dependency>
                 <groupId>com.github.squirrelgrip</groupId>
-                <artifactId>scientist4k-report-ui</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.github.squirrelgrip</groupId>
                 <artifactId>scientist4k-report-api</artifactId>
                 <version>${project.version}</version>
             </dependency>
