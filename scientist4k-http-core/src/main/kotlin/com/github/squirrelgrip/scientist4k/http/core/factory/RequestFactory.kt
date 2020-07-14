@@ -16,8 +16,10 @@ import org.apache.http.impl.client.BasicCookieStore
 import org.apache.http.impl.client.CloseableHttpClient
 import org.apache.http.impl.client.HttpClients
 import org.apache.http.protocol.HTTP.CONTENT_LEN
+import org.apache.http.protocol.HTTP.TARGET_HOST
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.net.URL
 
 class RequestFactory(
         val endPointConfig: EndPointConfiguration,
@@ -78,12 +80,15 @@ class RequestFactory(
         return "${endPointConfig.url}$url"
     }
 
-    private fun createRequest(request: ExperimentRequest, url: String): HttpUriRequest =
+    private fun createRequest(request: ExperimentRequest, targetUrl: String): HttpUriRequest =
             RequestBuilder.create(request.method).apply {
-                setUri(url)
+                setUri(targetUrl)
                 version = HTTP_1_1
                 request.headers.forEach { (headerName, headerValue) ->
-                    if (headerName != CONTENT_LEN) {
+                    if (headerName == TARGET_HOST) {
+                        val url = URL(targetUrl)
+                        setHeader(TARGET_HOST, "${url.host}:${url.port}")
+                    } else if (headerName != CONTENT_LEN) {
                         setHeader(headerName, headerValue)
                     }
                 }
