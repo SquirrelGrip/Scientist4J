@@ -4,7 +4,7 @@
     <parent>
         <artifactId>scientist4k</artifactId>
         <groupId>com.github.squirrelgrip</groupId>
-        <version>0.8.6</version>
+        <version>0.8.7-SNAPSHOT</version>
     </parent>
     <artifactId>scientist4k-bom</artifactId>
     <packaging>pom</packaging>
