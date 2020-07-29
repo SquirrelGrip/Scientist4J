@@ -20,8 +20,8 @@ class ContentComparator : ExperimentComparator<HttpExperimentResponse> {
 
     override fun invoke(control: HttpExperimentResponse, candidate: HttpExperimentResponse): ComparisonResult {
         LOGGER.trace("Comparing Contents...")
-        val controlContentType = control.contentType.toMediaType()
-        val candidateContentType = candidate.contentType.toMediaType()
+        val controlContentType = control.contentType().toMediaType()
+        val candidateContentType = candidate.contentType().toMediaType()
         if (controlContentType != null && controlContentType.withoutParameters() == candidateContentType?.withoutParameters()) {
             val controlContent = control.contents
             val candidateContent = candidate.contents

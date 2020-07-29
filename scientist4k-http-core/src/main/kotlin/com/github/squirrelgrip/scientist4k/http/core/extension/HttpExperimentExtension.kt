@@ -45,7 +45,7 @@ fun ExperimentObservation<ExperimentResponse>.toHttpExperimentObservation(): Htt
 }
 
 fun ExperimentResponse.toHttpExperimentResponse(): HttpExperimentResponse {
-    return HttpExperimentResponse(status, headers, contentType ?: "", contents)
+    return HttpExperimentResponse(status, headers, contents)
 }
 
 fun HttpExperimentResult.compare(comparator: HttpExperimentResponseComparator = DefaultHttpExperimentResponseComparator()): ComparisonResult {
