@@ -224,3 +224,6 @@ travis/all.gpg
 /certs/**/*.key
 /scientist4k-report-api/report/
 /scientist4k-report-api/src/main/resources/static/
+/scientist4k-report-ui/build/
+/scientist4k-report-ui/node/
+/scientist4k-report-ui/node_modules/
