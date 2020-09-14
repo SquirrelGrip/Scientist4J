@@ -3,7 +3,7 @@
     <parent>
         <artifactId>scientist4k</artifactId>
         <groupId>com.github.squirrelgrip</groupId>
-        <version>0.8.6</version>
+        <version>0.8.7</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
