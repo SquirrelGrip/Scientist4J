@@ -1,0 +1,7 @@
+spring.
+spring:
+  cloud:
+    config:
+      uri: http://localhost:8888
+  application:
+    name: scientist4k-report-api
