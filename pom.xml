@@ -47,7 +47,7 @@
 
     <properties>
         <cheti.version>1.1.13</cheti.version>
-        <extensions.version>1.0.23</extensions.version>
+        <extensions.version>1.0.24</extensions.version>
     </properties>
 
     <dependencyManagement>
