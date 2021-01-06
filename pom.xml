@@ -5,10 +5,10 @@
     <parent>
         <groupId>com.github.squirrelgrip</groupId>
         <artifactId>root</artifactId>
-        <version>1.0.23</version>
+        <version>1.0.24</version>
     </parent>
     <artifactId>scientist4k</artifactId>
-    <version>0.8.8</version>
+    <version>0.8.9</version>
     <packaging>pom</packaging>
 
     <name>${project.artifactId}</name>
@@ -47,7 +47,7 @@
 
     <properties>
         <cheti.version>1.1.13</cheti.version>
-        <extensions.version>1.0.23</extensions.version>
+        <extensions.version>1.0.24</extensions.version>
     </properties>
 
     <dependencyManagement>
