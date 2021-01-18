@@ -3,7 +3,7 @@ package com.github.squirrelgrip.scientist4k.controlled.http.server
 import com.github.squirrelgrip.scientist4k.core.AbstractExperiment
 import com.github.squirrelgrip.scientist4k.core.exception.LaboratoryException
 import com.github.squirrelgrip.scientist4k.core.model.sample.SampleFactory
-import com.github.squirrelgrip.scientist4k.http.core.configuration.ControlledHttpExperimentConfiguration
+import com.github.squirrelgrip.scientist4k.http.core.configuration.HttpExperimentConfiguration
 import com.github.squirrelgrip.scientist4k.http.core.configuration.EndPointConfiguration
 import com.github.squirrelgrip.scientist4k.http.core.configuration.MappingConfiguration
 import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
@@ -21,14 +21,14 @@ class ControlledHttpExperimentBuilder() {
     private var candidateConfig: EndPointConfiguration? = null
     private var referenceConfig: EndPointConfiguration? = null
 
-    constructor(controlledHttpExperimentConfiguration: ControlledHttpExperimentConfiguration) : this() {
-        name = controlledHttpExperimentConfiguration.experiment.name
-        metrics = controlledHttpExperimentConfiguration.experiment.metrics
-        sampleFactory = controlledHttpExperimentConfiguration.experiment.sampleFactory
-        controlConfig = controlledHttpExperimentConfiguration.control
-        candidateConfig = controlledHttpExperimentConfiguration.candidate
-        referenceConfig = controlledHttpExperimentConfiguration.reference
-        mappings = controlledHttpExperimentConfiguration.mappings.map { (control, candidate) ->
+    constructor(httpExperimentConfiguration: HttpExperimentConfiguration) : this() {
+        name = httpExperimentConfiguration.experiment.name
+        metrics = httpExperimentConfiguration.experiment.metrics
+        sampleFactory = httpExperimentConfiguration.experiment.sampleFactory
+        controlConfig = httpExperimentConfiguration.control
+        candidateConfig = httpExperimentConfiguration.candidate
+        referenceConfig = httpExperimentConfiguration.reference
+        mappings = httpExperimentConfiguration.mappings.map { (control, candidate) ->
             MappingConfiguration(control, candidate)
         }
     }

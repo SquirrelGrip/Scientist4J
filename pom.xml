@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.github.squirrelgrip</groupId>
         <artifactId>root</artifactId>
-        <version>1.0.24</version>
+        <version>1.0.27</version>
     </parent>
     <artifactId>scientist4k</artifactId>
     <version>0.8.10-SNAPSHOT</version>
@@ -41,6 +41,7 @@
         <module>scientist4k-controlled-http-filter</module>
 
         <module>scientist4k-report-api</module>
+        <module>scientist4k-ui</module>
 
         <module>scientist4k-bom</module>
     </modules>

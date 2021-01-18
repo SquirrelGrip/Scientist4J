@@ -2,7 +2,7 @@ package com.github.squirrelgrip.scientist4k.http.core.configuration
 
 import com.github.squirrelgrip.scientist4k.core.configuration.ExperimentConfiguration
 
-data class ControlledHttpExperimentConfiguration(
+data class HttpExperimentConfiguration(
         val server: ServerConfiguration,
         val experiment: ExperimentConfiguration,
         val control: EndPointConfiguration,

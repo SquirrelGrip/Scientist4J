@@ -1,9 +1,9 @@
-package com.github.squirrelgrip.report
+package com.github.squirrelgrip.ui
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
-@SpringBootApplication(scanBasePackages = ["com.github.squirrelgrip.report"])
+@SpringBootApplication(scanBasePackages = ["com.github.squirrelgrip.report", "com.github.squirrelgrip.ui"])
 class Application {
     companion object {
         @JvmStatic

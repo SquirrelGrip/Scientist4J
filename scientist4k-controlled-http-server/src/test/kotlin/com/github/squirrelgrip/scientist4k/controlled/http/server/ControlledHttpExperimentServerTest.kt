@@ -2,7 +2,7 @@ package com.github.squirrelgrip.scientist4k.controlled.http.server
 
 import com.github.squirrelgrip.cheti.Cheti
 import com.github.squirrelgrip.extension.json.toInstance
-import com.github.squirrelgrip.scientist4k.http.core.configuration.ControlledHttpExperimentConfiguration
+import com.github.squirrelgrip.scientist4k.http.core.configuration.HttpExperimentConfiguration
 import com.github.squirrelgrip.scientist4k.http.core.extension.failureReasons
 import com.github.squirrelgrip.scientist4k.http.core.extension.matches
 import com.github.squirrelgrip.scientist4k.http.core.model.HttpExperimentResult
@@ -36,7 +36,7 @@ class ControlledHttpExperimentServerTest {
         private const val HTTP_EXPERIMENT_URL = "http://localhost:8999"
         private const val HTTPS_EXPERIMENT_URL = "https://localhost:9000"
 
-        val controlledHttpExperimentConfiguration = File("controlled-experiment-config.json").toInstance<ControlledHttpExperimentConfiguration>()
+        val controlledHttpExperimentConfiguration = File("controlled-experiment-config.json").toInstance<HttpExperimentConfiguration>()
 
         @JvmStatic
         @BeforeAll

@@ -2,13 +2,13 @@ package com.github.squirrelgrip.report.model.file
 
 import com.github.squirrelgrip.extension.json.toInstance
 import com.github.squirrelgrip.report.exception.ExperimentResultNotFoundException
-import com.github.squirrelgrip.report.model.Experiment
+import com.github.squirrelgrip.report.model.ExperimentResult
 import com.github.squirrelgrip.scientist4k.http.core.model.HttpExperimentResult
 import java.io.File
 
-data class FileExperiment(
+data class FileExperimentResult(
         private val experimentDirectory: File
-): Experiment {
+): ExperimentResult {
     override val name: String = experimentDirectory.name
     private var lastUpdate: Long = 0
     private val resultsMap = mutableMapOf<String, File>()

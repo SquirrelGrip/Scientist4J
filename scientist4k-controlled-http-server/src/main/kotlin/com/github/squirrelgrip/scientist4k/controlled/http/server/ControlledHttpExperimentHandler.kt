@@ -1,6 +1,6 @@
 package com.github.squirrelgrip.scientist4k.controlled.http.server
 
-import com.github.squirrelgrip.scientist4k.http.core.configuration.ControlledHttpExperimentConfiguration
+import com.github.squirrelgrip.scientist4k.http.core.configuration.HttpExperimentConfiguration
 import org.eclipse.jetty.server.Request
 import org.eclipse.jetty.server.handler.AbstractHandler
 import javax.servlet.http.HttpServletRequest
@@ -10,7 +10,7 @@ class ControlledHttpExperimentHandler(
         val controlledHttpExperiment: ControlledHttpExperiment
 ) : AbstractHandler() {
 
-    constructor(controlledHttpExperimentConfiguration: ControlledHttpExperimentConfiguration): this(ControlledHttpExperimentBuilder(controlledHttpExperimentConfiguration).build())
+    constructor(httpExperimentConfiguration: HttpExperimentConfiguration): this(ControlledHttpExperimentBuilder(httpExperimentConfiguration).build())
 
     override fun handle(
             target: String,

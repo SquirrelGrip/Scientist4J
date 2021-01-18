@@ -1,22 +1,22 @@
 package com.github.squirrelgrip.report.repository
 
 import com.github.squirrelgrip.report.exception.ExperimentNotFoundException
-import com.github.squirrelgrip.report.model.file.FileExperiment
+import com.github.squirrelgrip.report.model.file.FileExperimentResult
 import org.springframework.stereotype.Repository
 import java.io.File
 
 @Repository
-class FileExperimentRepository(
+class FileExperimentReportRepository(
         val baseDirectory: File
-) : ExperimentRepository {
-    private val experiments : MutableMap<String, FileExperiment> = mutableMapOf()
+) : ExperimentReportRepository {
+    private val experiments : MutableMap<String, FileExperimentResult> = mutableMapOf()
 
-    override fun findAllExperiments(): List<FileExperiment> {
+    override fun findAllExperiments(): List<FileExperimentResult> {
         update()
         return experiments.values.toList()
     }
 
-    override fun findExperimentByName(name: String): FileExperiment {
+    override fun findExperimentByName(name: String): FileExperimentResult {
         update()
         return experiments[name] ?: throw ExperimentNotFoundException()
     }
@@ -24,7 +24,7 @@ class FileExperimentRepository(
     fun update() {
         baseDirectory
                 .listFiles { file -> file.isDirectory() }
-                .map { FileExperiment(it) }
+                .map { FileExperimentResult(it) }
                 .filter { !experiments.containsKey(it.name) }
                 .forEach { experiments[it.name] = it }
     }
