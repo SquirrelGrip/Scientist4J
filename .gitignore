@@ -222,7 +222,7 @@ travis/all.gpg
 /certs/*.jks
 /certs/**/*.crt
 /certs/**/*.key
-/scientist4k-report-api/report/
+/scientist4k-web/report/
 /scientist4k-report-api/src/main/resources/static/
 /scientist4k-report-ui/build/
 /scientist4k-report-ui/node/

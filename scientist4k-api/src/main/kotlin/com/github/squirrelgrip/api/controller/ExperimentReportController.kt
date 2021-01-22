@@ -1,7 +1,7 @@
 package com.github.squirrelgrip.api.controller
 
-import com.github.squirrelgrip.api.model.ExperimentResult
-import com.github.squirrelgrip.api.repository.ExperimentReportRepository
+import com.github.squirrelgrip.api.model.ExperimentResults
+import com.github.squirrelgrip.api.service.ExperimentReportService
 import com.github.squirrelgrip.scientist4k.http.core.model.HttpExperimentResult
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class ExperimentReportController(
-        val experimentReportRepository: ExperimentReportRepository
+        val experimentReportService: ExperimentReportService
 ) {
     companion object {
         val LOGGER: Logger = LoggerFactory.getLogger(ExperimentReportController::class.java)
@@ -19,12 +19,12 @@ class ExperimentReportController(
 
     @GetMapping("/api/v1/experiments/results", produces = ["application/json"])
     fun getExperiments(): List<String> {
-        return experimentReportRepository.findAllExperiments().map { it.name }
+        return experimentReportService.findAllExperiments().map { it.name }
     }
 
     @GetMapping("/api/v1/experiment/results/{name}", produces = ["application/json"])
-    fun getExperimentsByName(@PathVariable("name") name: String): ExperimentResult {
-            return experimentReportRepository.findExperimentByName(name)
+    fun getExperimentsByName(@PathVariable("name") name: String): ExperimentResults {
+            return experimentReportService.getExperimentResultsByName(name)
     }
 
     @GetMapping("/api/v1/experiment/results/{name}/{id}", produces = ["application/json"])
@@ -32,7 +32,16 @@ class ExperimentReportController(
             @PathVariable("name") name: String,
             @PathVariable("id") id: String
     ): HttpExperimentResult {
-            return experimentReportRepository.findExperimentByName(name).getResult(id)
+        return experimentReportService.getExperimentResult(name, id)
     }
+
+    @GetMapping("/api/v1/experiment/results/{name}/urls", produces = ["application/json"])
+    fun getExperimentResultsByName(
+            @PathVariable("name") name: String,
+    ): List<String> {
+        return experimentReportService.getExperimentResultUrls(name)
+    }
+
+
 
 }

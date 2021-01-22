@@ -1,8 +1,8 @@
 package com.github.squirrelgrip.api.repository
 
-import com.github.squirrelgrip.api.model.ExperimentResult
+import com.github.squirrelgrip.api.model.ExperimentResults
 
 interface ExperimentReportRepository {
-    fun findAllExperiments(): List<ExperimentResult>
-    fun findExperimentByName(name: String): ExperimentResult
+    fun findAllExperiments(): List<ExperimentResults>
+    fun findExperimentByName(name: String): ExperimentResults
 }
