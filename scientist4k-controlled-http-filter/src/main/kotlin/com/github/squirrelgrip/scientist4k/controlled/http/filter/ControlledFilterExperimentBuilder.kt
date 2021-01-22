@@ -2,11 +2,13 @@ package com.github.squirrelgrip.scientist4k.controlled.http.filter
 
 import com.github.squirrelgrip.scientist4k.core.AbstractExperiment.Companion.DEFAULT_EVENT_BUS
 import com.github.squirrelgrip.scientist4k.core.exception.LaboratoryException
+import com.github.squirrelgrip.scientist4k.core.model.ExperimentOption
 import com.github.squirrelgrip.scientist4k.core.model.sample.SampleFactory
 import com.github.squirrelgrip.scientist4k.http.core.configuration.EndPointConfiguration
 import com.github.squirrelgrip.scientist4k.http.core.configuration.MappingConfiguration
 import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
 import com.google.common.eventbus.EventBus
+import java.util.*
 
 class ControlledFilterExperimentBuilder() {
     private var mappings: List<MappingConfiguration> = emptyList()
@@ -14,8 +16,7 @@ class ControlledFilterExperimentBuilder() {
     private var metrics: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD")
     private var sampleFactory: SampleFactory = SampleFactory()
     private var eventBus: EventBus = DEFAULT_EVENT_BUS
-    private var enabled: Boolean = true
-    private var async: Boolean = true
+    private var experimentFlags: EnumSet<ExperimentOption> = ExperimentOption.DEFAULT
     private var detourConfig: EndPointConfiguration? = null
     private var referenceConfig: EndPointConfiguration? = null
 
@@ -23,6 +24,7 @@ class ControlledFilterExperimentBuilder() {
         name = httpExperimentConfiguration.experiment.name
         metrics = httpExperimentConfiguration.experiment.metrics
         sampleFactory = httpExperimentConfiguration.experiment.sampleFactory
+        experimentFlags = httpExperimentConfiguration.experiment.experimentFlags
         detourConfig = httpExperimentConfiguration.detour
         referenceConfig = httpExperimentConfiguration.reference
         mappings = httpExperimentConfiguration.mappings.map { (control, candidate) ->
@@ -70,19 +72,14 @@ class ControlledFilterExperimentBuilder() {
         return this
     }
 
-    fun withEnabled(enabled: Boolean): ControlledFilterExperimentBuilder {
-        this.enabled = enabled
-        return this
-    }
-
-    fun withAsync(async: Boolean): ControlledFilterExperimentBuilder {
-        this.async = async
+    fun withExperimentFlags(vararg experimentOption: ExperimentOption): ControlledFilterExperimentBuilder {
+        this.experimentFlags = EnumSet.copyOf(experimentOption.toList())
         return this
     }
 
     fun build(): ControlledFilterExperiment {
         if (detourConfig != null) {
-            return ControlledFilterExperiment(name, metrics, sampleFactory, eventBus, enabled, async, mappings, detourConfig!!, referenceConfig!!)
+            return ControlledFilterExperiment(name, metrics, sampleFactory, eventBus, experimentFlags, mappings, detourConfig!!, referenceConfig!!)
         }
         throw LaboratoryException("Detour configurations must be set")
     }

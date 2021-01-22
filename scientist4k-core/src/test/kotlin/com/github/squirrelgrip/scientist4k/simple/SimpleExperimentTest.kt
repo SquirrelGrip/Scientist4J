@@ -4,6 +4,7 @@ import com.github.squirrelgrip.scientist4k.core.comparator.ExperimentComparator
 import com.github.squirrelgrip.scientist4k.core.configuration.ExperimentConfiguration
 import com.github.squirrelgrip.scientist4k.core.exception.MismatchException
 import com.github.squirrelgrip.scientist4k.core.model.ComparisonResult
+import com.github.squirrelgrip.scientist4k.core.model.ExperimentOption
 import com.github.squirrelgrip.scientist4k.metrics.dropwizard.DropwizardMetricsProvider
 import com.github.squirrelgrip.scientist4k.metrics.micrometer.MicrometerMetricsProvider
 import com.github.squirrelgrip.scientist4k.metrics.noop.NoopMetricsProvider
@@ -43,7 +44,9 @@ class SimpleExperimentTest {
     @Test
     fun itThrowsAnExceptionWhenControlFails() {
         assertThrows(Exception::class.java) {
-            SimpleExperiment<Int>("test", NoopMetricsProvider()).run({ exceptionThrowingFunction() }, { exceptionThrowingFunction() })
+            SimpleExperiment<Int>("test", NoopMetricsProvider()).run(
+                { exceptionThrowingFunction() },
+                { exceptionThrowingFunction() })
         }
     }
 
@@ -56,7 +59,7 @@ class SimpleExperimentTest {
 
     @Test
     fun itThrowsOnMismatch() {
-        val experiment = SimpleExperiment<Int>("test", true, NoopMetricsProvider())
+        val experiment = SimpleExperiment<Int>("test", NoopMetricsProvider(), experimentFlags = ExperimentOption.MISMATCHED_EXCEPTION)
         assertThrows(MismatchException::class.java) {
             experiment.run({ safeFunction() }, { safeFunctionWithDifferentResult() })
         }
@@ -64,21 +67,21 @@ class SimpleExperimentTest {
 
     @Test
     fun itDoesNotThrowOnMatch() {
-        val experiment = SimpleExperiment<Int>("test", true, NoopMetricsProvider())
+        val experiment = SimpleExperiment<Int>("test", NoopMetricsProvider(), experimentFlags = ExperimentOption.MISMATCHED_EXCEPTION)
         val value = experiment.run({ safeFunction() }, { safeFunction() })
         assertThat(value).isEqualTo(3)
     }
 
     @Test
     fun itHandlesNullValues() {
-        val experiment = SimpleExperiment<Int?>("test", true, NoopMetricsProvider())
+        val experiment = SimpleExperiment<Int?>("test", NoopMetricsProvider(), experimentFlags = ExperimentOption.MISMATCHED_EXCEPTION)
         val value = experiment.run({ null }, { null })
         assertThat(value).isNull()
     }
 
     @Test
     fun nonAsyncRunsLongTime() {
-        val experiment = SimpleExperiment<Int>("test", true, NoopMetricsProvider())
+        val experiment = SimpleExperiment<Int>("test", NoopMetricsProvider(), experimentFlags = ExperimentOption.MISMATCHED_EXCEPTION)
         val date1 = Date()
         val value = experiment.runSync({ sleepFunction() }, { sleepFunction() })
         val date2 = Date()
@@ -121,10 +124,10 @@ class SimpleExperimentTest {
         val comparator = mock<ExperimentComparator<Int?>>()
         given(comparator.invoke(1, 2)).willReturn(ComparisonResult("An error"))
         val experiment = SimpleExperimentBuilder<Int>()
-                .withName("test")
-                .withComparator(comparator)
-                .withMetricsProvider(NoopMetricsProvider())
-                .build()
+            .withName("test")
+            .withComparator(comparator)
+            .withMetricsProvider(NoopMetricsProvider())
+            .build()
         experiment.run({ 1 }, { 2 })
         verify(comparator).invoke(eq(1), eq(2))
     }
@@ -132,16 +135,15 @@ class SimpleExperimentTest {
     @Test
     fun `build() using ExperimentConfiguration`() {
         val experimentConfiguration = ExperimentConfiguration(
-                "name",
-                true,
-                "NOOP",
-                emptyMap(),
-                "prefix"
+            "name",
+            "NOOP",
+            emptyMap(),
+            "prefix",
+            ExperimentOption.MISMATCHED_EXCEPTION
         )
         val experiment = SimpleExperimentBuilder<Int>(experimentConfiguration).build()
 
         assertThat(experiment.name).isEqualTo("name")
-        assertThat(experiment.raiseOnMismatch).isEqualTo(true)
         assertThat(experiment.metrics.javaClass).isEqualTo(NoopMetricsProvider::class.java)
         assertThat(experiment.sampleFactory.prefix).isEqualTo("prefix")
     }
@@ -150,10 +152,10 @@ class SimpleExperimentTest {
     fun `eventBus is called`() {
         val eventBus = mock<EventBus>()
         val experiment = SimpleExperimentBuilder<Int>()
-                .withRaiseOnMismatch(true)
-                .withEventBus(eventBus)
-                .build()
-        experiment.run({safeFunction()}, {safeFunction()})
+            .withExperimentFlags(ExperimentOption.RAISE_ON_MISMATCH, ExperimentOption.ENABLED, ExperimentOption.ASYNC)
+            .withEventBus(eventBus)
+            .build()
+        experiment.run({ safeFunction() }, { safeFunction() })
         verify(eventBus).post(isA<SimpleExperimentResult<Int>>())
     }
 }

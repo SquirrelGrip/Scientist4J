@@ -5,6 +5,7 @@ import com.github.squirrelgrip.scientist4k.core.comparator.ExperimentComparator
 import com.github.squirrelgrip.scientist4k.core.model.ComparisonResult
 import com.github.squirrelgrip.scientist4k.core.model.ExperimentObservation
 import com.github.squirrelgrip.scientist4k.core.model.ExperimentObservationStatus
+import com.github.squirrelgrip.scientist4k.core.model.ExperimentOption
 import com.github.squirrelgrip.scientist4k.core.model.sample.SampleFactory
 import com.github.squirrelgrip.scientist4k.metrics.Counter
 import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
@@ -12,16 +13,15 @@ import com.github.squirrelgrip.scientist4k.metrics.Timer
 import com.google.common.eventbus.EventBus
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.util.*
 
 abstract class AbstractExperiment<T>(
         val name: String,
-        val raiseOnMismatch: Boolean = false,
         val metrics: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD"),
         val comparator: ExperimentComparator<T?> = DefaultExperimentComparator(),
         val sampleFactory: SampleFactory = SampleFactory(),
         val eventBus: EventBus = DEFAULT_EVENT_BUS,
-        val enabled: Boolean = true,
-        val async: Boolean = true
+        val experimentFlags: EnumSet<ExperimentOption> = ExperimentOption.DEFAULT
 ) {
     /**
      * Note that if `raiseOnMismatch` is true, [.runAsync] will block waiting for
@@ -36,7 +36,6 @@ abstract class AbstractExperiment<T>(
     private val totalCount: Counter = metrics.counter(NAMESPACE_PREFIX, name, "total")
 
     constructor(metrics: MetricsProvider<*>) : this("Experiment", metrics)
-    constructor(name: String, metrics: MetricsProvider<*>) : this(name, false, metrics)
 
     companion object {
         private val LOGGER: Logger = LoggerFactory.getLogger(AbstractExperiment::class.java)
@@ -45,7 +44,7 @@ abstract class AbstractExperiment<T>(
     }
 
     protected fun executeCandidate(candidate: () -> T?): ExperimentObservation<T> =
-            if (isEnabled()) {
+            if (experimentFlags.contains(ExperimentOption.ENABLED)) {
                 execute("candidate", candidateTimer, candidate, false)
             } else {
                 scrap("candidate")
@@ -75,13 +74,6 @@ abstract class AbstractExperiment<T>(
         experimentObservation.status = ExperimentObservationStatus.SCRAPPED
         return experimentObservation
     }
-
-    open fun isEnabled(): Boolean {
-        return enabled
-    }
-
-    open val isAsync: Boolean
-        get() = async
 
     open fun publish(result: Any) {
         eventBus.post(result)

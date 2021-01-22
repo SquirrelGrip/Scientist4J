@@ -18,12 +18,10 @@ class ControlHandler : AbstractHandler() {
         private val LOGGER: Logger = LoggerFactory.getLogger(ControlHandler::class.java)
 
         val serverConfiguration = ServerConfiguration(
-                listOf(
-                        ConnectorConfiguration(9001),
-                        ConnectorConfiguration(9002,
-                                Main.sslConfiguration
-                        )
-                )
+            listOf(
+                ConnectorConfiguration(9001),
+                ConnectorConfiguration(9002, Main.sslConfiguration)
+            )
         )
 
         fun handleRequest(request: HttpServletRequest, response: HttpServletResponse, target: String) {
@@ -91,12 +89,24 @@ class ControlHandler : AbstractHandler() {
                 "/json" -> {
                     response.contentType = MediaType.JSON_UTF_8.toString()
                     response.status = HttpServletResponse.SC_OK
-                    out.println(mapOf("1" to "AAA", "2" to listOf("BBB", "CCC"), "3" to mapOf("4" to listOf("DDD", "EEE"))).toJson())
+                    out.println(
+                        mapOf(
+                            "1" to "AAA",
+                            "2" to listOf("BBB", "CCC"),
+                            "3" to mapOf("4" to listOf("DDD", "EEE"))
+                        ).toJson()
+                    )
                 }
                 "/jsonDifferent" -> {
                     response.contentType = MediaType.JSON_UTF_8.toString()
                     response.status = HttpServletResponse.SC_OK
-                    out.println(mapOf("1" to "AAA", "2" to listOf("BBB", "CCC"), "3" to mapOf("4" to listOf("DDD", "EEE"))).toJson())
+                    out.println(
+                        mapOf(
+                            "1" to "AAA",
+                            "2" to listOf("BBB", "CCC"),
+                            "3" to mapOf("4" to listOf("DDD", "EEE"))
+                        ).toJson()
+                    )
                 }
                 else -> {
                     response.status = HttpServletResponse.SC_NOT_FOUND
@@ -106,10 +116,10 @@ class ControlHandler : AbstractHandler() {
     }
 
     override fun handle(
-            target: String,
-            baseRequest: Request,
-            request: HttpServletRequest,
-            response: HttpServletResponse
+        target: String,
+        baseRequest: Request,
+        request: HttpServletRequest,
+        response: HttpServletResponse
     ) {
         handleRequest(request, response, target)
         baseRequest.isHandled = true

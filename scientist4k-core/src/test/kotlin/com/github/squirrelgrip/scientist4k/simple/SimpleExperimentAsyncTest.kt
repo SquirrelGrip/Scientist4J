@@ -1,6 +1,7 @@
 package com.github.squirrelgrip.scientist4k.simple
 
 import com.github.squirrelgrip.scientist4k.core.exception.MismatchException
+import com.github.squirrelgrip.scientist4k.core.model.ExperimentOption
 import com.github.squirrelgrip.scientist4k.metrics.noop.NoopMetricsProvider
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertThrows
@@ -47,7 +48,7 @@ class SimpleExperimentAsyncTest {
 
     @Test
     fun itThrowsOnMismatch() {
-        val experiment = SimpleExperiment<Int>("test", true, NoopMetricsProvider())
+        val experiment = SimpleExperiment<Int>("test", NoopMetricsProvider(), experimentFlags = ExperimentOption.MISMATCHED_EXCEPTION)
         assertThrows(MismatchException::class.java) {
             experiment.runAsync({ safeFunction() }, { safeFunctionWithDifferentResult() })
         }
@@ -55,7 +56,7 @@ class SimpleExperimentAsyncTest {
 
     @Test
     fun itDoesNotThrowOnMatch() {
-        val experiment = SimpleExperiment<Int>("test", true, NoopMetricsProvider())
+        val experiment = SimpleExperiment<Int>("test", NoopMetricsProvider(), experimentFlags = ExperimentOption.MISMATCHED_EXCEPTION)
         val value = experiment.runAsync({ safeFunction() }, { safeFunction() })
         assertThat(value).isEqualTo(3)
     }
@@ -69,7 +70,7 @@ class SimpleExperimentAsyncTest {
 
     @Test
     fun asyncRunsFaster() {
-        val experiment = SimpleExperiment<Int>("test", true, NoopMetricsProvider())
+        val experiment = SimpleExperiment<Int>("test", NoopMetricsProvider(), experimentFlags = ExperimentOption.MISMATCHED_EXCEPTION)
         val date1 = Date()
         val value = experiment.runAsync({ sleepFunction() }, { sleepFunction() })
         val date2 = Date()
@@ -81,7 +82,7 @@ class SimpleExperimentAsyncTest {
 
     @Test
     fun raiseOnMismatchRunsSlower() {
-        val raisesOnMismatch = SimpleExperiment<Int>("raise", true, NoopMetricsProvider())
+        val raisesOnMismatch = SimpleExperiment<Int>("raise", NoopMetricsProvider(), experimentFlags = ExperimentOption.MISMATCHED_EXCEPTION)
         val doesNotRaiseOnMismatch = SimpleExperiment<Int>("does not raise", NoopMetricsProvider())
         val raisesExecutionTime = timeExperiment(raisesOnMismatch)
         val doesNotRaiseExecutionTime = timeExperiment(doesNotRaiseOnMismatch)

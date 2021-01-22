@@ -3,6 +3,7 @@ package com.github.squirrelgrip.scientist4k.controlled
 import com.github.squirrelgrip.scientist4k.core.comparator.ExperimentComparator
 import com.github.squirrelgrip.scientist4k.core.exception.MismatchException
 import com.github.squirrelgrip.scientist4k.core.model.ComparisonResult
+import com.github.squirrelgrip.scientist4k.core.model.ExperimentOption.Companion.MISMATCHED_EXCEPTION
 import com.github.squirrelgrip.scientist4k.metrics.dropwizard.DropwizardMetricsProvider
 import com.github.squirrelgrip.scientist4k.metrics.micrometer.MicrometerMetricsProvider
 import com.github.squirrelgrip.scientist4k.metrics.noop.NoopMetricsProvider
@@ -18,6 +19,7 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 
 class ControlledExperimentTest {
+
     private fun exceptionThrowingFunction(): Int {
         throw Exception("throw an exception")
     }
@@ -59,7 +61,7 @@ class ControlledExperimentTest {
 
     @Test
     fun itThrowsOnMismatch() {
-        val controlledExperiment = ControlledExperiment<Int>("test", true, NoopMetricsProvider())
+        val controlledExperiment = ControlledExperiment<Int>("test", NoopMetricsProvider(), experimentFlags = MISMATCHED_EXCEPTION)
         assertThrows(MismatchException::class.java) {
             controlledExperiment.run({ safeFunction() }, { safeFunction() }, { safeFunctionWithDifferentResult() })
         }
@@ -67,21 +69,21 @@ class ControlledExperimentTest {
 
     @Test
     fun itDoesNotThrowOnMatch() {
-        val experiment = ControlledExperiment<Int>("test", true, NoopMetricsProvider())
+        val experiment = ControlledExperiment<Int>("test", NoopMetricsProvider(), experimentFlags = MISMATCHED_EXCEPTION)
         val value = experiment.run({ safeFunction() }, { safeFunction() }, { safeFunction() })
         assertThat(value).isEqualTo(3)
     }
 
     @Test
     fun itHandlesNullValues() {
-        val experiment = ControlledExperiment<Int?>("test", true, NoopMetricsProvider())
+        val experiment = ControlledExperiment<Int?>("test", NoopMetricsProvider(), experimentFlags = MISMATCHED_EXCEPTION)
         val value = experiment.run({ null }, { null }, { null })
         assertThat(value).isNull()
     }
 
     @Test
     fun nonAsyncRunsLongTime() {
-        val experiment = ControlledExperiment<Int>("test", true, NoopMetricsProvider())
+        val experiment = ControlledExperiment<Int>("test", NoopMetricsProvider(), experimentFlags = MISMATCHED_EXCEPTION)
         val date1 = Date()
         val value = experiment.runSync({ sleepFunction() }, { sleepFunction() }, { sleepFunction() })
         val date2 = Date()

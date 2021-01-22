@@ -18,7 +18,7 @@ open class ExperimentResult<T>(
         }
 
     fun handleComparisonMismatch() {
-        if (simpleExperiment.raiseOnMismatch && candidate != null && !match.matches) {
+        if (simpleExperiment.experimentFlags.contains(ExperimentOption.RAISE_ON_MISMATCH) && candidate != null && !match.matches) {
             val exception = candidate.exception
             val msg = if (exception != null) {
                 val stackTrace = exception.stackTrace.toString()

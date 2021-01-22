@@ -7,5 +7,5 @@ data class ControlledFilterExperimentConfiguration(
         val experiment: ExperimentConfiguration,
         val detour: EndPointConfiguration,
         val reference: EndPointConfiguration,
-        val mappings: Map<String, String> = emptyMap()
+        val mappings: Map<String, String> = emptyMap(),
 )
