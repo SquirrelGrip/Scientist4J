@@ -2,7 +2,7 @@ package com.github.squirrelgrip.scientist4k.http.server
 
 import com.github.squirrelgrip.scientist4k.core.AbstractExperiment
 import com.github.squirrelgrip.scientist4k.core.exception.LaboratoryException
-import com.github.squirrelgrip.scientist4k.core.model.ExperimentOption
+import com.github.squirrelgrip.scientist4k.core.model.ExperimentFlag
 import com.github.squirrelgrip.scientist4k.core.model.sample.SampleFactory
 import com.github.squirrelgrip.scientist4k.http.core.configuration.EndPointConfiguration
 import com.github.squirrelgrip.scientist4k.http.core.configuration.MappingConfiguration
@@ -16,7 +16,7 @@ class HttpExperimentBuilder() {
     private var metrics: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD")
     private var sampleFactory: SampleFactory = SampleFactory()
     private var eventBus: EventBus = AbstractExperiment.DEFAULT_EVENT_BUS
-    private var experimentFlags: EnumSet<ExperimentOption> = ExperimentOption.DEFAULT
+    private var experimentFlags: EnumSet<ExperimentFlag> = ExperimentFlag.DEFAULT
     private var controlConfig: EndPointConfiguration? = null
     private var candidateConfig: EndPointConfiguration? = null
 
@@ -72,8 +72,8 @@ class HttpExperimentBuilder() {
         return this
     }
 
-    fun withExperimentFlags(vararg experimentOption: ExperimentOption): HttpExperimentBuilder {
-        this.experimentFlags = EnumSet.copyOf(experimentOption.asList())
+    fun withExperimentFlags(vararg experimentFlag: ExperimentFlag): HttpExperimentBuilder {
+        this.experimentFlags = EnumSet.copyOf(experimentFlag.asList())
         return this
     }
 
