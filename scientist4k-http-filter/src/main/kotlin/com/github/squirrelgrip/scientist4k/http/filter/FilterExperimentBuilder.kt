@@ -2,7 +2,7 @@ package com.github.squirrelgrip.scientist4k.http.filter
 
 import com.github.squirrelgrip.scientist4k.core.AbstractExperiment
 import com.github.squirrelgrip.scientist4k.core.exception.LaboratoryException
-import com.github.squirrelgrip.scientist4k.core.model.ExperimentOption
+import com.github.squirrelgrip.scientist4k.core.model.ExperimentFlag
 import com.github.squirrelgrip.scientist4k.core.model.sample.SampleFactory
 import com.github.squirrelgrip.scientist4k.http.core.configuration.EndPointConfiguration
 import com.github.squirrelgrip.scientist4k.http.core.configuration.MappingConfiguration
@@ -17,7 +17,7 @@ class FilterExperimentBuilder() {
     private var sampleFactory: SampleFactory = SampleFactory()
     private var detourConfig: EndPointConfiguration? = null
     private var eventBus: EventBus = AbstractExperiment.DEFAULT_EVENT_BUS
-    private var experimentFlags: EnumSet<ExperimentOption> = ExperimentOption.DEFAULT
+    private var experimentFlags: EnumSet<ExperimentFlag> = ExperimentFlag.DEFAULT
 
     constructor(httpExperimentConfiguration: FilterExperimentConfiguration) : this() {
         name = httpExperimentConfiguration.experiment.name
@@ -65,8 +65,8 @@ class FilterExperimentBuilder() {
         return this
     }
 
-    fun withExperimentFlags(vararg experimentOption: ExperimentOption): FilterExperimentBuilder {
-        this.experimentFlags = EnumSet.copyOf(experimentOption.toList())
+    fun withExperimentFlags(vararg experimentFlag: ExperimentFlag): FilterExperimentBuilder {
+        this.experimentFlags = EnumSet.copyOf(experimentFlag.toList())
         return this
     }
 

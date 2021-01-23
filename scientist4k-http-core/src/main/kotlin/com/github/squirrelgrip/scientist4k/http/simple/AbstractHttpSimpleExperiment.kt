@@ -2,7 +2,7 @@ package com.github.squirrelgrip.scientist4k.http.simple
 
 import com.github.squirrelgrip.scientist4k.core.AbstractExperiment
 import com.github.squirrelgrip.scientist4k.core.comparator.NoopComparator
-import com.github.squirrelgrip.scientist4k.core.model.ExperimentOption
+import com.github.squirrelgrip.scientist4k.core.model.ExperimentFlag
 import com.github.squirrelgrip.scientist4k.core.model.sample.SampleFactory
 import com.github.squirrelgrip.scientist4k.http.core.extension.toHttpExperimentResult
 import com.github.squirrelgrip.scientist4k.http.core.model.ExperimentResponse
@@ -17,7 +17,7 @@ open class AbstractHttpSimpleExperiment(
     metrics: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD"),
     sampleFactory: SampleFactory = SampleFactory(),
     eventBus: EventBus = AbstractExperiment.DEFAULT_EVENT_BUS,
-    experimentFlags: EnumSet<ExperimentOption> = ExperimentOption.DEFAULT
+    experimentFlags: EnumSet<ExperimentFlag> = ExperimentFlag.DEFAULT
 ) : SimpleExperiment<ExperimentResponse>(
     name,
     metrics,

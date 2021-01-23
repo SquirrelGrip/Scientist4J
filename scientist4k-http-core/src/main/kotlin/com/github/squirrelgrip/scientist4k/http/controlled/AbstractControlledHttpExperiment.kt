@@ -3,7 +3,7 @@ package com.github.squirrelgrip.scientist4k.http.controlled
 import com.github.squirrelgrip.scientist4k.controlled.ControlledExperiment
 import com.github.squirrelgrip.scientist4k.controlled.model.ControlledExperimentResult
 import com.github.squirrelgrip.scientist4k.core.comparator.NoopComparator
-import com.github.squirrelgrip.scientist4k.core.model.ExperimentOption
+import com.github.squirrelgrip.scientist4k.core.model.ExperimentFlag
 import com.github.squirrelgrip.scientist4k.core.model.sample.SampleFactory
 import com.github.squirrelgrip.scientist4k.http.core.extension.toHttpExperimentResult
 import com.github.squirrelgrip.scientist4k.http.core.model.ExperimentResponse
@@ -16,7 +16,7 @@ open class AbstractControlledHttpExperiment(
     metrics: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD"),
     sampleFactory: SampleFactory = SampleFactory(),
     eventBus: EventBus = DEFAULT_EVENT_BUS,
-    experimentFlags: EnumSet<ExperimentOption> = ExperimentOption.DEFAULT
+    experimentFlags: EnumSet<ExperimentFlag> = ExperimentFlag.DEFAULT
 ) : ControlledExperiment<ExperimentResponse>(
         name,
         metrics,

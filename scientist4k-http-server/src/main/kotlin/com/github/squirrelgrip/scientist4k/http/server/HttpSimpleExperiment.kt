@@ -1,6 +1,6 @@
 package com.github.squirrelgrip.scientist4k.http.server
 
-import com.github.squirrelgrip.scientist4k.core.model.ExperimentOption
+import com.github.squirrelgrip.scientist4k.core.model.ExperimentFlag
 import com.github.squirrelgrip.scientist4k.core.model.sample.Sample
 import com.github.squirrelgrip.scientist4k.core.model.sample.SampleFactory
 import com.github.squirrelgrip.scientist4k.http.core.HttpExperimentUtil
@@ -27,7 +27,7 @@ class HttpSimpleExperiment(
     sampleFactory: SampleFactory = SampleFactory(),
     eventBus: EventBus = DEFAULT_EVENT_BUS,
     mappings: List<MappingConfiguration> = emptyList(),
-    experimentFlags: EnumSet<ExperimentOption> = ExperimentOption.DEFAULT,
+    experimentFlags: EnumSet<ExperimentFlag> = ExperimentFlag.DEFAULT,
     controlConfig: EndPointConfiguration,
     private val candidateConfig: EndPointConfiguration
 ) : AbstractHttpSimpleExperiment(
@@ -51,16 +51,19 @@ class HttpSimpleExperiment(
         sample: Sample = sampleFactory.create()
     ) {
         val experimentRequest = HttpExperimentUtil.createRequest(inboundRequest, sample)
-        val controlRequest = createControlRequest(experimentRequest)
 
-        val controlResponse =
+        val controlRequest = createControlRequest(experimentRequest)
+        val candidateRequest = createCandidateRequest(experimentRequest)
+
+        val resultResponse =
             if (candidateConfig.allowedMethods.contains("*") or candidateConfig.allowedMethods.contains(inboundRequest.method)) {
-                val candidateRequest = createCandidateRequest(experimentRequest)
                 run(controlRequest, candidateRequest, sample)
+            } else if (experimentFlags.contains(ExperimentFlag.RETURN_CANDIDATE)) {
+                candidateRequest.invoke()
             } else {
                 controlRequest.invoke()
             }
-        processResponse(inboundResponse, controlResponse)
+        processResponse(inboundResponse, resultResponse)
     }
 
     private fun createControlRequest(

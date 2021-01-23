@@ -4,7 +4,7 @@ import com.github.squirrelgrip.scientist4k.core.AbstractExperiment
 import com.github.squirrelgrip.scientist4k.core.comparator.DefaultExperimentComparator
 import com.github.squirrelgrip.scientist4k.core.comparator.ExperimentComparator
 import com.github.squirrelgrip.scientist4k.core.model.ExperimentObservation
-import com.github.squirrelgrip.scientist4k.core.model.ExperimentOption
+import com.github.squirrelgrip.scientist4k.core.model.ExperimentFlag
 import com.github.squirrelgrip.scientist4k.core.model.sample.Sample
 import com.github.squirrelgrip.scientist4k.core.model.sample.SampleFactory
 import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
@@ -24,7 +24,7 @@ open class SimpleExperiment<T>(
     comparator: ExperimentComparator<T?> = DefaultExperimentComparator(),
     sampleFactory: SampleFactory = SampleFactory(),
     eventBus: EventBus = DEFAULT_EVENT_BUS,
-    experimentFlags: EnumSet<ExperimentOption> = ExperimentOption.DEFAULT
+    experimentFlags: EnumSet<ExperimentFlag> = ExperimentFlag.DEFAULT
 ) : AbstractExperiment<T>(
     name,
     metrics,
@@ -41,20 +41,24 @@ open class SimpleExperiment<T>(
 
     open fun run(control: () -> T?, candidate: () -> T?, sample: Sample = sampleFactory.create()): T? {
         sample.addNote("experiment", name)
-        return if (experimentFlags.contains(ExperimentOption.ASYNC)) {
-            LOGGER.trace("Running async")
-            runAsync(control, candidate, sample)
-        } else {
+        return if (experimentFlags.contains(ExperimentFlag.SYNC)) {
             LOGGER.trace("Running sync")
             runSync(control, candidate, sample)
+        } else {
+            LOGGER.trace("Running async")
+            runAsync(control, candidate, sample)
         }
     }
 
     open fun runSync(control: () -> T?, candidate: () -> T?, sample: Sample = sampleFactory.create()): T? {
-        val controlExperimentObservation: ExperimentObservation<T> = executeControl(control)
-        val candidateExperimentObservation: ExperimentObservation<T> = executeCandidate(candidate)
-        publishResult(controlExperimentObservation, candidateExperimentObservation, sample).handleComparisonMismatch()
-        return controlExperimentObservation.value
+        val controlObservation: ExperimentObservation<T> = executeControl(control)
+        val candidateObservation: ExperimentObservation<T> = executeCandidate(candidate)
+        publishResult(controlObservation, candidateObservation, sample).handleComparisonMismatch()
+        return if (experimentFlags.contains(ExperimentFlag.RETURN_CANDIDATE)) {
+            candidateObservation.value
+        } else {
+            controlObservation.value
+        }
     }
 
     open fun runAsync(control: () -> T?, candidate: () -> T?, sample: Sample = sampleFactory.create()) =
@@ -62,32 +66,33 @@ open class SimpleExperiment<T>(
             val deferredControlObservation = GlobalScope.async {
                 executeControl(control)
             }
-            val deferredCandidateObservation =
-                GlobalScope.async {
-                    executeCandidate(candidate)
-                }
-
-            LOGGER.trace("Awaiting deferredControlObservation...")
-            val controlObservation = deferredControlObservation.await()
-            LOGGER.trace("deferredControlObservation is {}", controlObservation)
-            val deferred = GlobalScope.async {
-                publishAsync(controlObservation, deferredCandidateObservation, sample)
+            val deferredCandidateObservation = GlobalScope.async {
+                executeCandidate(candidate)
             }
-            if (experimentFlags.contains(ExperimentOption.RAISE_ON_MISMATCH)) {
+
+            val deferred = GlobalScope.async {
+                publishAsync(deferredControlObservation, deferredCandidateObservation, sample)
+            }
+            if (experimentFlags.contains(ExperimentFlag.RAISE_ON_MISMATCH)) {
                 deferred.await().handleComparisonMismatch()
             }
-            controlObservation.value
+            if (experimentFlags.contains(ExperimentFlag.RETURN_CANDIDATE)) {
+                deferredCandidateObservation.await().value
+            } else {
+                deferredControlObservation.await().value
+            }
         }
 
     private suspend fun publishAsync(
-        controlExperimentObservation: ExperimentObservation<T>,
+        deferredControlExperimentObservation: Deferred<ExperimentObservation<T>>,
         deferredCandidateExperimentObservation: Deferred<ExperimentObservation<T>>,
         sample: Sample
     ): SimpleExperimentResult<T> {
-        LOGGER.trace("Awaiting candidateObservation...")
+        val controlObservation = deferredControlExperimentObservation.await()
+        LOGGER.trace("controlObservation is {}", controlObservation)
         val candidateObservation = deferredCandidateExperimentObservation.await()
         LOGGER.trace("candidateObservation is {}", candidateObservation)
-        return publishResult(controlExperimentObservation, candidateObservation, sample)
+        return publishResult(controlObservation, candidateObservation, sample)
     }
 
     private fun publishResult(

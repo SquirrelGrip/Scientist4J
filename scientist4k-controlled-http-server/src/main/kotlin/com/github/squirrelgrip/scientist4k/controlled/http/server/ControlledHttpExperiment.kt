@@ -1,6 +1,6 @@
 package com.github.squirrelgrip.scientist4k.controlled.http.server
 
-import com.github.squirrelgrip.scientist4k.core.model.ExperimentOption
+import com.github.squirrelgrip.scientist4k.core.model.ExperimentFlag
 import com.github.squirrelgrip.scientist4k.core.model.sample.Sample
 import com.github.squirrelgrip.scientist4k.core.model.sample.SampleFactory
 import com.github.squirrelgrip.scientist4k.http.controlled.AbstractControlledHttpExperiment
@@ -21,15 +21,15 @@ import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 class ControlledHttpExperiment(
-        name: String,
-        metrics: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD"),
-        sampleFactory: SampleFactory = SampleFactory(),
-        eventBus: EventBus = DEFAULT_EVENT_BUS,
-        experimentFlags: EnumSet<ExperimentOption> = ExperimentOption.DEFAULT,
-        mappings: List<MappingConfiguration> = emptyList(),
-        controlConfig: EndPointConfiguration,
-        referenceConfig: EndPointConfiguration,
-        private val candidateConfig: EndPointConfiguration
+    name: String,
+    metrics: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD"),
+    sampleFactory: SampleFactory = SampleFactory(),
+    eventBus: EventBus = DEFAULT_EVENT_BUS,
+    experimentFlags: EnumSet<ExperimentFlag> = ExperimentFlag.DEFAULT,
+    mappings: List<MappingConfiguration> = emptyList(),
+    controlConfig: EndPointConfiguration,
+    referenceConfig: EndPointConfiguration,
+    private val candidateConfig: EndPointConfiguration
 ) : AbstractControlledHttpExperiment(
         name,
         metrics,

@@ -5,7 +5,7 @@ import com.github.squirrelgrip.scientist4k.core.comparator.ExperimentComparator
 import com.github.squirrelgrip.scientist4k.core.model.ComparisonResult
 import com.github.squirrelgrip.scientist4k.core.model.ExperimentObservation
 import com.github.squirrelgrip.scientist4k.core.model.ExperimentObservationStatus
-import com.github.squirrelgrip.scientist4k.core.model.ExperimentOption
+import com.github.squirrelgrip.scientist4k.core.model.ExperimentFlag
 import com.github.squirrelgrip.scientist4k.core.model.sample.SampleFactory
 import com.github.squirrelgrip.scientist4k.metrics.Counter
 import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
@@ -21,7 +21,7 @@ abstract class AbstractExperiment<T>(
         val comparator: ExperimentComparator<T?> = DefaultExperimentComparator(),
         val sampleFactory: SampleFactory = SampleFactory(),
         val eventBus: EventBus = DEFAULT_EVENT_BUS,
-        val experimentFlags: EnumSet<ExperimentOption> = ExperimentOption.DEFAULT
+        val experimentFlags: EnumSet<ExperimentFlag> = ExperimentFlag.DEFAULT
 ) {
     /**
      * Note that if `raiseOnMismatch` is true, [.runAsync] will block waiting for
@@ -44,14 +44,14 @@ abstract class AbstractExperiment<T>(
     }
 
     protected fun executeCandidate(candidate: () -> T?): ExperimentObservation<T> =
-            if (experimentFlags.contains(ExperimentOption.ENABLED)) {
-                execute("candidate", candidateTimer, candidate, false)
-            } else {
+            if (experimentFlags.contains(ExperimentFlag.DISABLED)) {
                 scrap("candidate")
+            } else {
+                execute("candidate", candidateTimer, candidate, experimentFlags.contains(ExperimentFlag.RETURN_CANDIDATE))
             }
 
     protected fun executeControl(control: () -> T?): ExperimentObservation<T> =
-            execute("control", controlTimer, control, true)
+            execute("control", controlTimer, control, !experimentFlags.contains(ExperimentFlag.RETURN_CANDIDATE))
 
     private fun countExceptions(experimentObservation: ExperimentObservation<T>, exceptions: Counter) {
         if (experimentObservation.exception != null) {

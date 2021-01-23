@@ -2,7 +2,7 @@ package com.github.squirrelgrip.scientist4k.controlled.http.filter
 
 import com.github.squirrelgrip.scientist4k.core.AbstractExperiment.Companion.DEFAULT_EVENT_BUS
 import com.github.squirrelgrip.scientist4k.core.exception.LaboratoryException
-import com.github.squirrelgrip.scientist4k.core.model.ExperimentOption
+import com.github.squirrelgrip.scientist4k.core.model.ExperimentFlag
 import com.github.squirrelgrip.scientist4k.core.model.sample.SampleFactory
 import com.github.squirrelgrip.scientist4k.http.core.configuration.EndPointConfiguration
 import com.github.squirrelgrip.scientist4k.http.core.configuration.MappingConfiguration
@@ -16,7 +16,7 @@ class ControlledFilterExperimentBuilder() {
     private var metrics: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD")
     private var sampleFactory: SampleFactory = SampleFactory()
     private var eventBus: EventBus = DEFAULT_EVENT_BUS
-    private var experimentFlags: EnumSet<ExperimentOption> = ExperimentOption.DEFAULT
+    private var experimentFlags: EnumSet<ExperimentFlag> = ExperimentFlag.DEFAULT
     private var detourConfig: EndPointConfiguration? = null
     private var referenceConfig: EndPointConfiguration? = null
 
@@ -72,8 +72,8 @@ class ControlledFilterExperimentBuilder() {
         return this
     }
 
-    fun withExperimentFlags(vararg experimentOption: ExperimentOption): ControlledFilterExperimentBuilder {
-        this.experimentFlags = EnumSet.copyOf(experimentOption.toList())
+    fun withExperimentFlags(vararg experimentFlag: ExperimentFlag): ControlledFilterExperimentBuilder {
+        this.experimentFlags = EnumSet.copyOf(experimentFlag.toList())
         return this
     }
 

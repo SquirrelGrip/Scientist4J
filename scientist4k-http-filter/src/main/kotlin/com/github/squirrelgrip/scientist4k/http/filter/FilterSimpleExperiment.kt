@@ -1,7 +1,7 @@
 package com.github.squirrelgrip.scientist4k.http.filter
 
 import com.github.squirrelgrip.scientist4k.core.AbstractExperiment
-import com.github.squirrelgrip.scientist4k.core.model.ExperimentOption
+import com.github.squirrelgrip.scientist4k.core.model.ExperimentFlag
 import com.github.squirrelgrip.scientist4k.core.model.sample.Sample
 import com.github.squirrelgrip.scientist4k.core.model.sample.SampleFactory
 import com.github.squirrelgrip.scientist4k.http.core.HttpExperimentUtil
@@ -25,7 +25,7 @@ class FilterSimpleExperiment(
     metrics: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD"),
     sampleFactory: SampleFactory = SampleFactory(),
     eventBus: EventBus = AbstractExperiment.DEFAULT_EVENT_BUS,
-    experimentFlags: EnumSet<ExperimentOption> = ExperimentOption.DEFAULT,
+    experimentFlags: EnumSet<ExperimentFlag> = ExperimentFlag.DEFAULT,
     mappings: List<MappingConfiguration> = emptyList(),
     private val detourConfig: EndPointConfiguration
 ) : AbstractHttpSimpleExperiment(

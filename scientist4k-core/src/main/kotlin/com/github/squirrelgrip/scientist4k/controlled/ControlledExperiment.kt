@@ -5,7 +5,7 @@ import com.github.squirrelgrip.scientist4k.core.AbstractExperiment
 import com.github.squirrelgrip.scientist4k.core.comparator.DefaultExperimentComparator
 import com.github.squirrelgrip.scientist4k.core.comparator.ExperimentComparator
 import com.github.squirrelgrip.scientist4k.core.model.ExperimentObservation
-import com.github.squirrelgrip.scientist4k.core.model.ExperimentOption
+import com.github.squirrelgrip.scientist4k.core.model.ExperimentFlag
 import com.github.squirrelgrip.scientist4k.core.model.sample.Sample
 import com.github.squirrelgrip.scientist4k.core.model.sample.SampleFactory
 import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
@@ -25,7 +25,7 @@ open class ControlledExperiment<T>(
     comparator: ExperimentComparator<T?> = DefaultExperimentComparator(),
     sampleFactory: SampleFactory = SampleFactory(),
     eventBus: EventBus = DEFAULT_EVENT_BUS,
-    experimentFlags: EnumSet<ExperimentOption> = ExperimentOption.DEFAULT
+    experimentFlags: EnumSet<ExperimentFlag> = ExperimentFlag.DEFAULT
 ) : AbstractExperiment<T>(
     name,
     metrics,
@@ -54,12 +54,12 @@ open class ControlledExperiment<T>(
         candidate: () -> T?,
         sample: Sample = sampleFactory.create()
     ): T? {
-        return if (experimentFlags.contains(ExperimentOption.ASYNC)) {
-            LOGGER.trace("Running async")
-            runAsync(control, reference, candidate, sample)
-        } else {
+        return if (experimentFlags.contains(ExperimentFlag.SYNC)) {
             LOGGER.trace("Running sync")
             runSync(control, reference, candidate, sample)
+        } else {
+            LOGGER.trace("Running async")
+            runAsync(control, reference, candidate, sample)
         }
     }
 
@@ -107,17 +107,17 @@ open class ControlledExperiment<T>(
             val deferred = GlobalScope.async {
                 publishAsync(controlObservation, deferredReferenceObservation, deferredCandidateObservation, sample)
             }
-            if (experimentFlags.contains(ExperimentOption.RAISE_ON_MISMATCH)) {
+            if (experimentFlags.contains(ExperimentFlag.RAISE_ON_MISMATCH)) {
                 deferred.await().handleComparisonMismatch()
             }
             controlObservation.value
         }
 
     protected fun executeReference(reference: () -> T?): ExperimentObservation<T> =
-        if (experimentFlags.contains(ExperimentOption.ENABLED)) {
-            execute("reference", referenceTimer, reference, false)
-        } else {
+        if (experimentFlags.contains(ExperimentFlag.DISABLED)) {
             scrap("reference")
+        } else {
+            execute("reference", referenceTimer, reference, false)
         }
 
     private suspend fun publishAsync(

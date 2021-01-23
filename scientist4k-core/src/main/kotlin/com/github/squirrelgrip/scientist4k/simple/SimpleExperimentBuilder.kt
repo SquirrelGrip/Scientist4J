@@ -4,7 +4,7 @@ import com.github.squirrelgrip.scientist4k.core.AbstractExperiment
 import com.github.squirrelgrip.scientist4k.core.comparator.DefaultExperimentComparator
 import com.github.squirrelgrip.scientist4k.core.comparator.ExperimentComparator
 import com.github.squirrelgrip.scientist4k.core.configuration.ExperimentConfiguration
-import com.github.squirrelgrip.scientist4k.core.model.ExperimentOption
+import com.github.squirrelgrip.scientist4k.core.model.ExperimentFlag
 import com.github.squirrelgrip.scientist4k.core.model.sample.SampleFactory
 import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
 import com.google.common.eventbus.EventBus
@@ -16,7 +16,7 @@ class SimpleExperimentBuilder<T>(
     private var sampleFactory: SampleFactory = SampleFactory(),
     private var comparator: ExperimentComparator<T?> = DefaultExperimentComparator(),
     private var eventBus: EventBus = AbstractExperiment.DEFAULT_EVENT_BUS,
-    private var experimentFlags: EnumSet<ExperimentOption> = ExperimentOption.DEFAULT
+    private var experimentFlags: EnumSet<ExperimentFlag> = ExperimentFlag.DEFAULT
 ) {
     constructor(experimentConfiguration: ExperimentConfiguration) : this(
         experimentConfiguration.name,
@@ -57,8 +57,8 @@ class SimpleExperimentBuilder<T>(
         return this
     }
 
-    fun withExperimentFlags(vararg experimentOption: ExperimentOption): SimpleExperimentBuilder<T> {
-        this.experimentFlags = EnumSet.copyOf(experimentOption.toList())
+    fun withExperimentFlags(vararg experimentFlag: ExperimentFlag): SimpleExperimentBuilder<T> {
+        this.experimentFlags = EnumSet.copyOf(experimentFlag.toList())
         return this
     }
 
