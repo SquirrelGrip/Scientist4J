@@ -20,7 +20,6 @@
   },
   "experiment": {
     "name": "scientist4k-http-server",
-    "raiseOnMismatch": false,
     "metricsProvider": "DROPWIZARD",
     "sampleFactory": {
       "prefix": ""

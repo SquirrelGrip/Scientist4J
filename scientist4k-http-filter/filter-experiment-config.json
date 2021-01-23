@@ -1,7 +1,6 @@
 {
   "experiment": {
     "name": "scientist4k-http-filter",
-    "raiseOnMismatch": false,
     "metricsProvider": "DROPWIZARD",
     "sampleFactory": {
       "prefix": ""

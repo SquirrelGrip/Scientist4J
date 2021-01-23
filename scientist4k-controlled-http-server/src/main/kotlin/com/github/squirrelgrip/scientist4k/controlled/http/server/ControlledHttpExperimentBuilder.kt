@@ -2,12 +2,14 @@ package com.github.squirrelgrip.scientist4k.controlled.http.server
 
 import com.github.squirrelgrip.scientist4k.core.AbstractExperiment
 import com.github.squirrelgrip.scientist4k.core.exception.LaboratoryException
+import com.github.squirrelgrip.scientist4k.core.model.ExperimentFlag
 import com.github.squirrelgrip.scientist4k.core.model.sample.SampleFactory
-import com.github.squirrelgrip.scientist4k.http.core.configuration.ControlledHttpExperimentConfiguration
 import com.github.squirrelgrip.scientist4k.http.core.configuration.EndPointConfiguration
+import com.github.squirrelgrip.scientist4k.http.core.configuration.HttpExperimentConfiguration
 import com.github.squirrelgrip.scientist4k.http.core.configuration.MappingConfiguration
 import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
 import com.google.common.eventbus.EventBus
+import java.util.*
 
 class ControlledHttpExperimentBuilder() {
     private var mappings: List<MappingConfiguration> = emptyList()
@@ -15,20 +17,21 @@ class ControlledHttpExperimentBuilder() {
     private var metrics: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD")
     private var sampleFactory: SampleFactory = SampleFactory()
     private var eventBus: EventBus = AbstractExperiment.DEFAULT_EVENT_BUS
-    private var enabled: Boolean = true
-    private var async: Boolean = true
+    private var experimentFlags: EnumSet<ExperimentFlag> = ExperimentFlag.DEFAULT
     private var controlConfig: EndPointConfiguration? = null
     private var candidateConfig: EndPointConfiguration? = null
     private var referenceConfig: EndPointConfiguration? = null
 
-    constructor(controlledHttpExperimentConfiguration: ControlledHttpExperimentConfiguration) : this() {
-        name = controlledHttpExperimentConfiguration.experiment.name
-        metrics = controlledHttpExperimentConfiguration.experiment.metrics
-        sampleFactory = controlledHttpExperimentConfiguration.experiment.sampleFactory
-        controlConfig = controlledHttpExperimentConfiguration.control
-        candidateConfig = controlledHttpExperimentConfiguration.candidate
-        referenceConfig = controlledHttpExperimentConfiguration.reference
-        mappings = controlledHttpExperimentConfiguration.mappings.map { (control, candidate) ->
+
+    constructor(httpExperimentConfiguration: HttpExperimentConfiguration) : this() {
+        name = httpExperimentConfiguration.experiment.name
+        metrics = httpExperimentConfiguration.experiment.metrics
+        sampleFactory = httpExperimentConfiguration.experiment.sampleFactory
+        experimentFlags = httpExperimentConfiguration.experiment.experimentFlags
+        controlConfig = httpExperimentConfiguration.control
+        candidateConfig = httpExperimentConfiguration.candidate
+        referenceConfig = httpExperimentConfiguration.reference
+        mappings = httpExperimentConfiguration.mappings.map { (control, candidate) ->
             MappingConfiguration(control, candidate)
         }
     }
@@ -73,13 +76,8 @@ class ControlledHttpExperimentBuilder() {
         return this
     }
 
-    fun withEnabled(enabled: Boolean): ControlledHttpExperimentBuilder {
-        this.enabled = enabled
-        return this
-    }
-
-    fun withAsync(async: Boolean): ControlledHttpExperimentBuilder {
-        this.async = async
+    fun withExperimentFlags(vararg experimentFlag: ExperimentFlag): ControlledHttpExperimentBuilder {
+        this.experimentFlags = EnumSet.copyOf(experimentFlag.toList())
         return this
     }
 
@@ -90,7 +88,7 @@ class ControlledHttpExperimentBuilder() {
 
     fun build(): ControlledHttpExperiment {
         if (controlConfig != null && referenceConfig != null && candidateConfig != null) {
-            return ControlledHttpExperiment(name, metrics, sampleFactory, eventBus, enabled, async, mappings, controlConfig!!, referenceConfig!!, candidateConfig!!)
+            return ControlledHttpExperiment(name, metrics, sampleFactory, eventBus, experimentFlags, mappings, controlConfig!!, referenceConfig!!, candidateConfig!!)
         }
         throw LaboratoryException("primaryControl, secondaryControl and candidate configurations must be set")
     }

@@ -5,9 +5,9 @@ import com.github.squirrelgrip.scientist4k.http.core.configuration.EndPointConfi
 import com.github.squirrelgrip.scientist4k.http.core.configuration.ServerConfiguration
 
 data class HttpExperimentConfiguration(
-        val server: ServerConfiguration,
-        val experiment: ExperimentConfiguration,
-        val control: EndPointConfiguration,
-        val candidate: EndPointConfiguration,
-        val mappings: Map<String, String> = emptyMap()
+    val server: ServerConfiguration,
+    val experiment: ExperimentConfiguration,
+    val control: EndPointConfiguration,
+    val candidate: EndPointConfiguration,
+    val mappings: Map<String, String> = emptyMap(),
 )

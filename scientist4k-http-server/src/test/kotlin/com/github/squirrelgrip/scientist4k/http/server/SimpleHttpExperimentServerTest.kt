@@ -3,6 +3,8 @@ package com.github.squirrelgrip.scientist4k.http.server
 import com.github.squirrelgrip.cheti.Cheti
 import com.github.squirrelgrip.extension.json.toInstance
 import com.github.squirrelgrip.scientist4k.core.AbstractExperiment
+import com.github.squirrelgrip.scientist4k.core.model.ExperimentFlag
+import com.github.squirrelgrip.scientist4k.core.model.ExperimentFlag.RETURN_CANDIDATE
 import com.github.squirrelgrip.scientist4k.http.core.consumer.FileConsumer
 import com.github.squirrelgrip.scientist4k.http.core.extension.failureReasons
 import com.github.squirrelgrip.scientist4k.http.core.extension.matches
@@ -22,6 +24,7 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.io.File
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 class SimpleHttpExperimentServerTest {
@@ -48,17 +51,17 @@ class SimpleHttpExperimentServerTest {
             candidateServer.start()
         }
 
-        fun isRunning(url: String): Boolean {
+        fun isRunning(url: String, expectedStatus: Int = 200): Boolean {
             val sslConfiguration = httpExperimentConfiguration.candidate.sslConfiguration
             val httpClient = HttpClients.custom().setSSLSocketFactory(
-                    SSLConnectionSocketFactory(
-                            sslConfiguration!!.sslContext(),
-                            SSLConnectionSocketFactory.getDefaultHostnameVerifier()
-                    )
+                SSLConnectionSocketFactory(
+                    sslConfiguration!!.sslContext(),
+                    SSLConnectionSocketFactory.getDefaultHostnameVerifier()
+                )
             ).build()
             val request = RequestBuilder.get(url).build()
             val response = httpClient.execute(request)
-            return response.statusLine.statusCode == 200
+            return response.statusLine.statusCode == expectedStatus
         }
     }
 
@@ -84,18 +87,24 @@ class SimpleHttpExperimentServerTest {
         testSubject.stop()
     }
 
-    private fun createExperimentServer(controlUrl: String, candidateUrl: String) {
+    private fun createExperimentServer(
+        controlUrl: String,
+        candidateUrl: String,
+        experimentFlags: EnumSet<ExperimentFlag> = ExperimentFlag.DEFAULT
+    ) {
         assertIsRunning(controlUrl)
         assertIsRunning(candidateUrl)
         val control = httpExperimentConfiguration.control.copy(url = controlUrl)
         val candidate = httpExperimentConfiguration.candidate.copy(url = candidateUrl)
+        val experiment = httpExperimentConfiguration.experiment.copy(experimentFlags = experimentFlags)
         val configuration = httpExperimentConfiguration.copy(
-                control = control,
-                candidate = candidate
+            experiment = experiment,
+            control = control,
+            candidate = candidate,
         )
         testSubject = HttpExperimentServer(configuration)
         testSubject.start()
-        val file = File(File(System.getenv("user.dir"), ".."), "scientist4k-report-api/report")
+        val file = File(File(System.getenv("user.dir"), ".."), "scientist4k-api/report")
         (testSubject.handler as HttpExperimentHandler).httpExperiment.eventBus.register(FileConsumer(file))
 
         assertIsRunning(HTTP_EXPERIMENT_URL)
@@ -140,7 +149,20 @@ class SimpleHttpExperimentServerTest {
         val result = awaitResult("/status")
         assertThat(result.matches()).isFalse()
         assertThat(result.failureReasons()).containsExactlyInAnyOrder(
-                "Control returned status 200 and Candidate returned status 201."
+            "Control returned status 200 and Candidate returned status 201."
+        )
+    }
+
+    @Test
+    fun `requests with different status and candidate is returned`() {
+        createExperimentServer(HTTPS_CONTROL_URL, HTTPS_CANDIDATE_URL, EnumSet.of(RETURN_CANDIDATE))
+
+        assertThat(isRunning("$HTTPS_EXPERIMENT_URL/status", 201)).isTrue()
+
+        val result = awaitResult("/status")
+        assertThat(result.matches()).isFalse()
+        assertThat(result.failureReasons()).containsExactlyInAnyOrder(
+            "Control returned status 200 and Candidate returned status 201."
         )
     }
 
@@ -153,8 +175,22 @@ class SimpleHttpExperimentServerTest {
         val result = awaitResult("/control")
         assertThat(result.matches()).isFalse()
         assertThat(result.failureReasons()).containsExactlyInAnyOrder(
-                "Control returned status 200 and Candidate returned status 404.",
-                "Content-Type is different: text/plain; charset=iso-8859-1 != null."
+            "Control returned status 200 and Candidate returned status 404.",
+            "Content-Type is different: text/plain; charset=iso-8859-1 != null."
+        )
+    }
+
+    @Test
+    fun `requests should be different when candidate doesn't exist and candidate is returned`() {
+        createExperimentServer(HTTPS_CONTROL_URL, HTTPS_CANDIDATE_URL, EnumSet.of(RETURN_CANDIDATE))
+
+        assertThat(isRunning("$HTTPS_EXPERIMENT_URL/control", 404)).isTrue()
+
+        val result = awaitResult("/control")
+        assertThat(result.matches()).isFalse()
+        assertThat(result.failureReasons()).containsExactlyInAnyOrder(
+            "Control returned status 200 and Candidate returned status 404.",
+            "Content-Type is different: text/plain; charset=iso-8859-1 != null."
         )
     }
 
@@ -178,8 +214,8 @@ class SimpleHttpExperimentServerTest {
         val result = awaitResult("/candidate")
         assertThat(result.matches()).isFalse()
         assertThat(result.failureReasons()).containsExactlyInAnyOrder(
-                "Control returned status 404 and Candidate returned status 200.",
-                "Content-Type is different: null != text/plain; charset=iso-8859-1."
+            "Control returned status 404 and Candidate returned status 200.",
+            "Content-Type is different: null != text/plain; charset=iso-8859-1."
         )
     }
 
@@ -192,7 +228,7 @@ class SimpleHttpExperimentServerTest {
         val result = awaitResult("/jsonDifferent")
         assertThat(result.matches()).isFalse()
         assertThat(result.failureReasons()).containsExactlyInAnyOrder(
-                """{"op":"move","from":"/1","path":"/5"}"""
+            """{"op":"move","from":"/1","path":"/5"}"""
         )
     }
 

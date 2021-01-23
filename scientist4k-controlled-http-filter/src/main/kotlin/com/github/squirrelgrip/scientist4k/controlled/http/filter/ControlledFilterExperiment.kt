@@ -1,5 +1,6 @@
 package com.github.squirrelgrip.scientist4k.controlled.http.filter
 
+import com.github.squirrelgrip.scientist4k.core.model.ExperimentFlag
 import com.github.squirrelgrip.scientist4k.core.model.sample.Sample
 import com.github.squirrelgrip.scientist4k.core.model.sample.SampleFactory
 import com.github.squirrelgrip.scientist4k.http.controlled.AbstractControlledHttpExperiment
@@ -12,6 +13,7 @@ import com.github.squirrelgrip.scientist4k.http.core.model.ExperimentResponse
 import com.github.squirrelgrip.scientist4k.http.core.wrapper.ExperimentResponseWrapper
 import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
 import com.google.common.eventbus.EventBus
+import java.util.*
 import javax.servlet.FilterChain
 import javax.servlet.ServletRequest
 import javax.servlet.ServletResponse
@@ -19,22 +21,20 @@ import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletRequestWrapper
 
 class ControlledFilterExperiment(
-        name: String,
-        metrics: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD"),
-        sampleFactory: SampleFactory = SampleFactory(),
-        eventBus: EventBus = DEFAULT_EVENT_BUS,
-        enabled: Boolean = true,
-        async: Boolean = true,
-        mappings: List<MappingConfiguration> = emptyList(),
-        detourConfig: EndPointConfiguration,
-        referenceConfig: EndPointConfiguration
+    name: String,
+    metrics: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD"),
+    sampleFactory: SampleFactory = SampleFactory(),
+    eventBus: EventBus = DEFAULT_EVENT_BUS,
+    experimentFlags: EnumSet<ExperimentFlag> = ExperimentFlag.DEFAULT,
+    mappings: List<MappingConfiguration> = emptyList(),
+    detourConfig: EndPointConfiguration,
+    referenceConfig: EndPointConfiguration
 ) : AbstractControlledHttpExperiment(
         name,
         metrics,
         sampleFactory,
         eventBus,
-        enabled,
-        async
+        experimentFlags
 ) {
     private val detourRequestFactory = RequestFactory(detourConfig, HttpExperimentUtil.DETOUR_COOKIE_STORE, mappings)
     private val referenceRequestFactory = RequestFactory(referenceConfig, HttpExperimentUtil.REFERENCE_COOKIE_STORE)

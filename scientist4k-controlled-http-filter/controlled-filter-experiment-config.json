@@ -1,7 +1,6 @@
 {
   "experiment": {
     "name": "filter",
-    "raiseOnMismatch": false,
     "metricsProvider": "DROPWIZARD",
     "sampleFactory": {
       "prefix": ""

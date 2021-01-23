@@ -2,11 +2,13 @@ package com.github.squirrelgrip.scientist4k.http.server
 
 import com.github.squirrelgrip.scientist4k.core.AbstractExperiment
 import com.github.squirrelgrip.scientist4k.core.exception.LaboratoryException
+import com.github.squirrelgrip.scientist4k.core.model.ExperimentFlag
 import com.github.squirrelgrip.scientist4k.core.model.sample.SampleFactory
 import com.github.squirrelgrip.scientist4k.http.core.configuration.EndPointConfiguration
 import com.github.squirrelgrip.scientist4k.http.core.configuration.MappingConfiguration
 import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
 import com.google.common.eventbus.EventBus
+import java.util.*
 
 class HttpExperimentBuilder() {
     private var mappings: List<MappingConfiguration> = emptyList()
@@ -14,8 +16,7 @@ class HttpExperimentBuilder() {
     private var metrics: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD")
     private var sampleFactory: SampleFactory = SampleFactory()
     private var eventBus: EventBus = AbstractExperiment.DEFAULT_EVENT_BUS
-    private var enabled: Boolean = true
-    private var async: Boolean = true
+    private var experimentFlags: EnumSet<ExperimentFlag> = ExperimentFlag.DEFAULT
     private var controlConfig: EndPointConfiguration? = null
     private var candidateConfig: EndPointConfiguration? = null
 
@@ -23,6 +24,7 @@ class HttpExperimentBuilder() {
         name = httpExperimentConfiguration.experiment.name
         metrics = httpExperimentConfiguration.experiment.metrics
         sampleFactory = httpExperimentConfiguration.experiment.sampleFactory
+        experimentFlags = httpExperimentConfiguration.experiment.experimentFlags
         controlConfig = httpExperimentConfiguration.control
         candidateConfig = httpExperimentConfiguration.candidate
         mappings = httpExperimentConfiguration.mappings.map { (control, candidate) ->
@@ -70,19 +72,23 @@ class HttpExperimentBuilder() {
         return this
     }
 
-    fun withEnabled(enabled: Boolean): HttpExperimentBuilder {
-        this.enabled = enabled
-        return this
-    }
-
-    fun withAsync(async: Boolean): HttpExperimentBuilder {
-        this.async = async
+    fun withExperimentFlags(vararg experimentFlag: ExperimentFlag): HttpExperimentBuilder {
+        this.experimentFlags = EnumSet.copyOf(experimentFlag.asList())
         return this
     }
 
     fun build(): HttpSimpleExperiment {
         if (controlConfig != null && candidateConfig != null) {
-            return HttpSimpleExperiment(name, metrics, sampleFactory, eventBus, mappings, enabled, async, controlConfig!!, candidateConfig!!)
+            return HttpSimpleExperiment(
+                name,
+                metrics,
+                sampleFactory,
+                eventBus,
+                mappings,
+                experimentFlags,
+                controlConfig!!,
+                candidateConfig!!
+            )
         }
         throw LaboratoryException("Both control and candidate configurations must be set")
     }

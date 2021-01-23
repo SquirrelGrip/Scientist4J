@@ -1,8 +1,6 @@
 package com.github.squirrelgrip.scientist4k.controlled.http.server
 
-import com.github.squirrelgrip.scientist4k.controlled.ControlledExperiment
-import com.github.squirrelgrip.scientist4k.core.AbstractExperiment.Companion.DEFAULT_EVENT_BUS
-import com.github.squirrelgrip.scientist4k.core.comparator.ExperimentComparator
+import com.github.squirrelgrip.scientist4k.core.model.ExperimentFlag
 import com.github.squirrelgrip.scientist4k.core.model.sample.Sample
 import com.github.squirrelgrip.scientist4k.core.model.sample.SampleFactory
 import com.github.squirrelgrip.scientist4k.http.controlled.AbstractControlledHttpExperiment
@@ -11,7 +9,6 @@ import com.github.squirrelgrip.scientist4k.http.core.HttpExperimentUtil.CONTROL_
 import com.github.squirrelgrip.scientist4k.http.core.HttpExperimentUtil.REFERENCE_COOKIE_STORE
 import com.github.squirrelgrip.scientist4k.http.core.HttpExperimentUtil.createRequest
 import com.github.squirrelgrip.scientist4k.http.core.HttpExperimentUtil.processResponse
-import com.github.squirrelgrip.scientist4k.http.core.comparator.DefaultHttpExperimentResponseComparator
 import com.github.squirrelgrip.scientist4k.http.core.configuration.EndPointConfiguration
 import com.github.squirrelgrip.scientist4k.http.core.configuration.MappingConfiguration
 import com.github.squirrelgrip.scientist4k.http.core.factory.RequestFactory
@@ -19,29 +16,26 @@ import com.github.squirrelgrip.scientist4k.http.core.model.ExperimentRequest
 import com.github.squirrelgrip.scientist4k.http.core.model.ExperimentResponse
 import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
 import com.google.common.eventbus.EventBus
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
+import java.util.*
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 class ControlledHttpExperiment(
-        name: String,
-        metrics: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD"),
-        sampleFactory: SampleFactory = SampleFactory(),
-        eventBus: EventBus = DEFAULT_EVENT_BUS,
-        enabled: Boolean = true,
-        async: Boolean = true,
-        mappings: List<MappingConfiguration> = emptyList(),
-        controlConfig: EndPointConfiguration,
-        referenceConfig: EndPointConfiguration,
-        private val candidateConfig: EndPointConfiguration
+    name: String,
+    metrics: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD"),
+    sampleFactory: SampleFactory = SampleFactory(),
+    eventBus: EventBus = DEFAULT_EVENT_BUS,
+    experimentFlags: EnumSet<ExperimentFlag> = ExperimentFlag.DEFAULT,
+    mappings: List<MappingConfiguration> = emptyList(),
+    controlConfig: EndPointConfiguration,
+    referenceConfig: EndPointConfiguration,
+    private val candidateConfig: EndPointConfiguration
 ) : AbstractControlledHttpExperiment(
         name,
         metrics,
         sampleFactory,
         eventBus,
-        enabled,
-        async
+        experimentFlags
 ) {
     private val controlRequestFactory = RequestFactory(controlConfig, CONTROL_COOKIE_STORE)
     private val referenceRequestFactory = RequestFactory(referenceConfig, REFERENCE_COOKIE_STORE)

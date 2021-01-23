@@ -21,7 +21,6 @@
   "experiment": {
     "name": "name",
     "context": {},
-    "raiseOnMismatch": false,
     "metricsProvider": "DROPWIZARD",
     "sampleFactory": {
       "prefix": ""

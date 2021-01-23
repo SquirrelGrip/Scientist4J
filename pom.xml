@@ -5,10 +5,10 @@
     <parent>
         <groupId>com.github.squirrelgrip</groupId>
         <artifactId>root</artifactId>
-        <version>1.0.24</version>
+        <version>1.1.1</version>
     </parent>
     <artifactId>scientist4k</artifactId>
-    <version>0.8.9</version>
+    <version>0.9.1</version>
     <packaging>pom</packaging>
 
     <name>${project.artifactId}</name>
@@ -40,14 +40,15 @@
         <module>scientist4k-controlled-http-server</module>
         <module>scientist4k-controlled-http-filter</module>
 
-        <module>scientist4k-report-api</module>
+        <module>scientist4k-api</module>
+        <module>scientist4k-web</module>
 
         <module>scientist4k-bom</module>
     </modules>
 
     <properties>
         <cheti.version>1.1.13</cheti.version>
-        <extensions.version>1.0.24</extensions.version>
+        <extensions.version>1.1.0</extensions.version>
     </properties>
 
     <dependencyManagement>
