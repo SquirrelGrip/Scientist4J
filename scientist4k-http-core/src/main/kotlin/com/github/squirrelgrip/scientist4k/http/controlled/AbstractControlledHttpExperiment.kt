@@ -19,7 +19,7 @@ open class AbstractControlledHttpExperiment(
     sampleFactory: SampleFactory = SampleFactory(),
     eventBus: EventBus = DEFAULT_EVENT_BUS,
     experimentOptions: EnumSet<ExperimentOption> = ExperimentOption.DEFAULT,
-    val mappingConfiguration: MappingConfiguration
+    val mappingConfiguration: List<MappingConfiguration> = emptyList()
 ) : ControlledExperiment<ExperimentResponse>(
     name,
     metrics,
@@ -39,6 +39,9 @@ open class AbstractControlledHttpExperiment(
     }
 
     fun getRunOptions(inboundRequest: HttpServletRequest): EnumSet<ExperimentOption> {
-        return ExperimentOption.DEFAULT
+        return mappingConfiguration.firstOrNull {
+            it.matches(inboundRequest.pathInfo)
+        }?.options ?: ExperimentOption.DEFAULT
     }
+
 }

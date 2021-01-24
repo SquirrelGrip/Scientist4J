@@ -26,7 +26,7 @@ class ControlledHttpExperiment(
     sampleFactory: SampleFactory = SampleFactory(),
     eventBus: EventBus = DEFAULT_EVENT_BUS,
     experimentOptions: EnumSet<ExperimentOption> = ExperimentOption.DEFAULT,
-    mappings: List<MappingConfiguration> = emptyList(),
+    mappingConfiguration: List<MappingConfiguration> = emptyList(),
     controlConfig: EndPointConfiguration,
     referenceConfig: EndPointConfiguration,
     private val candidateConfig: EndPointConfiguration
@@ -35,17 +35,17 @@ class ControlledHttpExperiment(
     metrics,
     sampleFactory,
     eventBus,
-    experimentOptions
+    experimentOptions,
+    mappingConfiguration
 ) {
     private val controlRequestFactory = RequestFactory(controlConfig, CONTROL_COOKIE_STORE)
     private val referenceRequestFactory = RequestFactory(referenceConfig, REFERENCE_COOKIE_STORE)
-    private val candidateRequestFactory = RequestFactory(candidateConfig, CANDIDATE_COOKIE_STORE, mappings)
+    private val candidateRequestFactory = RequestFactory(candidateConfig, CANDIDATE_COOKIE_STORE, mappingConfiguration)
 
     fun run(
         inboundRequest: HttpServletRequest,
         inboundResponse: HttpServletResponse,
-        sample: Sample = sampleFactory.create(),
-        runOptions: EnumSet<ExperimentOption> = ExperimentOption.DEFAULT
+        sample: Sample = sampleFactory.create()
     ) {
         val experimentRequest = createRequest(inboundRequest, sample)
         val controlResponse =
@@ -55,7 +55,7 @@ class ControlledHttpExperiment(
                     createReferenceRequest(experimentRequest),
                     createCandidateRequest(experimentRequest),
                     sample,
-                    runOptions
+                    getRunOptions(inboundRequest)
                 )
             } else {
                 createControlRequest(experimentRequest).invoke()
