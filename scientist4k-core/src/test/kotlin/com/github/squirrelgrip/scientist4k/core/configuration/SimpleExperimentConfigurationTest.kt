@@ -2,7 +2,7 @@ package com.github.squirrelgrip.scientist4k.core.configuration
 
 import com.github.squirrelgrip.extension.json.toInstance
 import com.github.squirrelgrip.extension.json.toJson
-import com.github.squirrelgrip.scientist4k.core.model.ExperimentFlag
+import com.github.squirrelgrip.scientist4k.core.model.ExperimentOption
 import org.assertj.core.api.AssertionsForInterfaceTypes.assertThat
 import org.junit.jupiter.api.Test
 
@@ -21,6 +21,6 @@ internal class SimpleExperimentConfigurationTest {
         assertThat(experimentConfiguration2.metrics.javaClass).isEqualTo(experimentConfiguration1.metrics.javaClass)
         assertThat(experimentConfiguration2.context).containsAllEntriesOf(experimentConfiguration1.context)
         assertThat(experimentConfiguration2.samplePrefix).isEqualTo(experimentConfiguration1.samplePrefix)
-        assertThat(experimentConfiguration2.experimentFlags).containsAll(ExperimentFlag.DEFAULT)
+        assertThat(experimentConfiguration2.experimentOptions).containsAll(ExperimentOption.DEFAULT)
     }
 }

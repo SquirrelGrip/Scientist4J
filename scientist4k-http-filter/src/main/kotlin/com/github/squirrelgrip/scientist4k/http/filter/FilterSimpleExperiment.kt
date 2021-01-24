@@ -1,7 +1,6 @@
 package com.github.squirrelgrip.scientist4k.http.filter
 
-import com.github.squirrelgrip.scientist4k.core.AbstractExperiment
-import com.github.squirrelgrip.scientist4k.core.model.ExperimentFlag
+import com.github.squirrelgrip.scientist4k.core.model.ExperimentOption
 import com.github.squirrelgrip.scientist4k.core.model.sample.Sample
 import com.github.squirrelgrip.scientist4k.core.model.sample.SampleFactory
 import com.github.squirrelgrip.scientist4k.http.core.HttpExperimentUtil
@@ -10,7 +9,7 @@ import com.github.squirrelgrip.scientist4k.http.core.configuration.MappingConfig
 import com.github.squirrelgrip.scientist4k.http.core.factory.RequestFactory
 import com.github.squirrelgrip.scientist4k.http.core.model.ExperimentResponse
 import com.github.squirrelgrip.scientist4k.http.core.wrapper.ExperimentResponseWrapper
-import com.github.squirrelgrip.scientist4k.http.simple.AbstractHttpSimpleExperiment
+import com.github.squirrelgrip.scientist4k.http.core.AbstractHttpSimpleExperiment
 import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
 import com.google.common.eventbus.EventBus
 import java.util.*
@@ -24,8 +23,8 @@ class FilterSimpleExperiment(
     name: String,
     metrics: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD"),
     sampleFactory: SampleFactory = SampleFactory(),
-    eventBus: EventBus = AbstractExperiment.DEFAULT_EVENT_BUS,
-    experimentFlags: EnumSet<ExperimentFlag> = ExperimentFlag.DEFAULT,
+    eventBus: EventBus = DEFAULT_EVENT_BUS,
+    experimentOptions: EnumSet<ExperimentOption> = ExperimentOption.DEFAULT,
     mappings: List<MappingConfiguration> = emptyList(),
     private val detourConfig: EndPointConfiguration
 ) : AbstractHttpSimpleExperiment(
@@ -33,7 +32,7 @@ class FilterSimpleExperiment(
     metrics,
     sampleFactory,
     eventBus,
-    experimentFlags
+    experimentOptions
 ) {
     private val detourRequestFactory = RequestFactory(detourConfig, HttpExperimentUtil.DETOUR_COOKIE_STORE, mappings)
 
@@ -41,14 +40,15 @@ class FilterSimpleExperiment(
         inboundRequest: ServletRequest,
         inboundResponse: ServletResponse,
         chain: FilterChain,
-        sample: Sample = sampleFactory.create()
+        sample: Sample = sampleFactory.create(),
+        runOptions: EnumSet<ExperimentOption> = ExperimentOption.DEFAULT
     ) {
         val wrappedRequest = HttpServletRequestWrapper(inboundRequest as HttpServletRequest)
         val routeRequest = createRouteRequest(wrappedRequest, inboundResponse, chain)
         val detourRequest = createDetourRequest(wrappedRequest, sample)
 
         if (detourConfig.allowedMethods.contains("*") or detourConfig.allowedMethods.contains(inboundRequest.method)) {
-            run(routeRequest, detourRequest, sample)
+            run(routeRequest, detourRequest, sample, runOptions)
         } else {
             routeRequest.invoke()
         }

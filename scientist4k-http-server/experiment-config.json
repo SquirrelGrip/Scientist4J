@@ -25,9 +25,17 @@
       "prefix": ""
     }
   },
-  "mappings": {
-    "/mappedControl": "/mappedCandidate"
-  },
+  "mappings": [
+    {
+      "control": "\\/mappedControl",
+      "candidate": "/mappedCandidate"
+    },
+    {
+      "control": "\\/mappedControlDifferent",
+      "candidate": "/mappedCandidateDifferent",
+      "options": ["RETURN_CANDIDATE"]
+    }
+  ],
   "control": {
     "url": "https://localhost:9002",
     "sslConfiguration": {

@@ -1,7 +1,7 @@
 package com.github.squirrelgrip.scientist4k.controlled
 
 import com.github.squirrelgrip.scientist4k.core.exception.MismatchException
-import com.github.squirrelgrip.scientist4k.core.model.ExperimentFlag.RAISE_ON_MISMATCH
+import com.github.squirrelgrip.scientist4k.core.model.ExperimentOption.RAISE_ON_MISMATCH
 import com.github.squirrelgrip.scientist4k.metrics.noop.NoopMetricsProvider
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertThrows
@@ -49,7 +49,7 @@ class ControlledExperimentAsyncTest {
     @Test
     fun itThrowsOnMismatch() {
         val experiment =
-            ControlledExperiment<Int>("test", NoopMetricsProvider(), experimentFlags = EnumSet.of(RAISE_ON_MISMATCH))
+            ControlledExperiment<Int>("test", NoopMetricsProvider(), experimentOptions = EnumSet.of(RAISE_ON_MISMATCH))
         assertThrows(MismatchException::class.java) {
             experiment.runAsync({ safeFunction() }, { safeFunction() }, { safeFunctionWithDifferentResult() })
         }
@@ -58,7 +58,7 @@ class ControlledExperimentAsyncTest {
     @Test
     fun itDoesNotThrowOnMatch() {
         val experiment =
-            ControlledExperiment<Int>("test", NoopMetricsProvider(), experimentFlags = EnumSet.of(RAISE_ON_MISMATCH))
+            ControlledExperiment<Int>("test", NoopMetricsProvider(), experimentOptions = EnumSet.of(RAISE_ON_MISMATCH))
         val value = experiment.runAsync({ safeFunction() }, { safeFunction() }, { safeFunction() })
         assertThat(value).isEqualTo(3)
     }
@@ -73,7 +73,7 @@ class ControlledExperimentAsyncTest {
     @Test
     fun asyncRunsFaster() {
         val experiment =
-            ControlledExperiment<Int>("test", NoopMetricsProvider(), experimentFlags = EnumSet.of(RAISE_ON_MISMATCH))
+            ControlledExperiment<Int>("test", NoopMetricsProvider(), experimentOptions = EnumSet.of(RAISE_ON_MISMATCH))
         val date1 = Date()
         val value = experiment.runAsync({ sleepFunction() }, { sleepFunction() }, { sleepFunction() })
         val date2 = Date()
@@ -86,7 +86,7 @@ class ControlledExperimentAsyncTest {
     @Test
     fun raiseOnMismatchRunsSlower() {
         val raisesOnMismatch =
-            ControlledExperiment<Int>("raise", NoopMetricsProvider(), experimentFlags = EnumSet.of(RAISE_ON_MISMATCH))
+            ControlledExperiment<Int>("raise", NoopMetricsProvider(), experimentOptions = EnumSet.of(RAISE_ON_MISMATCH))
         val doesNotRaiseOnMismatch = ControlledExperiment<Int>("does not raise", NoopMetricsProvider())
         val raisesExecutionTime = timeExperiment(raisesOnMismatch)
         val doesNotRaiseExecutionTime = timeExperiment(doesNotRaiseOnMismatch)

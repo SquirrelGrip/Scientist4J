@@ -1,8 +1,9 @@
 package com.github.squirrelgrip.scientist4k.http.server
 
-import com.github.squirrelgrip.scientist4k.core.model.ExperimentFlag
+import com.github.squirrelgrip.scientist4k.core.model.ExperimentOption
 import com.github.squirrelgrip.scientist4k.core.model.sample.Sample
 import com.github.squirrelgrip.scientist4k.core.model.sample.SampleFactory
+import com.github.squirrelgrip.scientist4k.http.core.AbstractHttpSimpleExperiment
 import com.github.squirrelgrip.scientist4k.http.core.HttpExperimentUtil
 import com.github.squirrelgrip.scientist4k.http.core.HttpExperimentUtil.processResponse
 import com.github.squirrelgrip.scientist4k.http.core.configuration.EndPointConfiguration
@@ -11,7 +12,6 @@ import com.github.squirrelgrip.scientist4k.http.core.extension.toHttpExperimentR
 import com.github.squirrelgrip.scientist4k.http.core.factory.RequestFactory
 import com.github.squirrelgrip.scientist4k.http.core.model.ExperimentRequest
 import com.github.squirrelgrip.scientist4k.http.core.model.ExperimentResponse
-import com.github.squirrelgrip.scientist4k.http.simple.AbstractHttpSimpleExperiment
 import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
 import com.github.squirrelgrip.scientist4k.simple.model.SimpleExperimentResult
 import com.google.common.eventbus.EventBus
@@ -26,8 +26,8 @@ class HttpSimpleExperiment(
     metrics: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD"),
     sampleFactory: SampleFactory = SampleFactory(),
     eventBus: EventBus = DEFAULT_EVENT_BUS,
-    mappings: List<MappingConfiguration> = emptyList(),
-    experimentFlags: EnumSet<ExperimentFlag> = ExperimentFlag.DEFAULT,
+    mappingConfiguration: List<MappingConfiguration> = emptyList(),
+    experimentOptions: EnumSet<ExperimentOption> = ExperimentOption.DEFAULT,
     controlConfig: EndPointConfiguration,
     private val candidateConfig: EndPointConfiguration
 ) : AbstractHttpSimpleExperiment(
@@ -35,11 +35,12 @@ class HttpSimpleExperiment(
     metrics,
     sampleFactory,
     eventBus,
-    experimentFlags
+    experimentOptions,
+    mappingConfiguration
 ) {
     private val controlRequestFactory = RequestFactory(controlConfig, HttpExperimentUtil.CONTROL_COOKIE_STORE)
     private val candidateRequestFactory =
-        RequestFactory(candidateConfig, HttpExperimentUtil.CANDIDATE_COOKIE_STORE, mappings)
+        RequestFactory(candidateConfig, HttpExperimentUtil.CANDIDATE_COOKIE_STORE, mappingConfiguration)
 
     companion object {
         private val LOGGER: Logger = LoggerFactory.getLogger(HttpSimpleExperiment::class.java)
@@ -57,8 +58,8 @@ class HttpSimpleExperiment(
 
         val resultResponse =
             if (candidateConfig.allowedMethods.contains("*") or candidateConfig.allowedMethods.contains(inboundRequest.method)) {
-                run(controlRequest, candidateRequest, sample)
-            } else if (experimentFlags.contains(ExperimentFlag.RETURN_CANDIDATE)) {
+                run(controlRequest, candidateRequest, sample, getRunOptions(inboundRequest))
+            } else if (experimentOptions.contains(ExperimentOption.RETURN_CANDIDATE)) {
                 candidateRequest.invoke()
             } else {
                 controlRequest.invoke()
@@ -78,13 +79,16 @@ class HttpSimpleExperiment(
         return candidateRequestFactory.create(request)
     }
 
-    override fun publish(result: Any) {
-        if (result is SimpleExperimentResult<*> && result.control.value is ExperimentResponse) {
-            eventBus.post((result as SimpleExperimentResult<ExperimentResponse>).toHttpExperimentResult())
-        } else {
-            super.publish(result)
+    override fun publish(result: Any, runOptions: EnumSet<ExperimentOption>) {
+        if (isPublishable(runOptions)) {
+            if (result is SimpleExperimentResult<*> && result.control.value is ExperimentResponse) {
+                eventBus.post((result as SimpleExperimentResult<ExperimentResponse>).toHttpExperimentResult())
+            } else {
+                super.publish(result, runOptions)
+            }
         }
     }
+
 }
 
 

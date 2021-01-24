@@ -48,6 +48,11 @@ class ControlHandler : AbstractHandler() {
                     response.status = HttpServletResponse.SC_OK
                     out.println("mapped")
                 }
+                "/mappedControlDifferent" -> {
+                    response.contentType = "text/plain;charset=utf-8"
+                    response.status = HttpServletResponse.SC_OK
+                    out.println("mappedDifferentControl")
+                }
                 "/status" -> {
                     response.contentType = "text/html;charset=utf-8"
                     response.status = HttpServletResponse.SC_OK

@@ -4,7 +4,7 @@ import com.github.squirrelgrip.scientist4k.core.AbstractExperiment.Companion.DEF
 import com.github.squirrelgrip.scientist4k.core.comparator.DefaultExperimentComparator
 import com.github.squirrelgrip.scientist4k.core.comparator.ExperimentComparator
 import com.github.squirrelgrip.scientist4k.core.configuration.ExperimentConfiguration
-import com.github.squirrelgrip.scientist4k.core.model.ExperimentFlag
+import com.github.squirrelgrip.scientist4k.core.model.ExperimentOption
 import com.github.squirrelgrip.scientist4k.core.model.sample.SampleFactory
 import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
 import com.google.common.eventbus.EventBus
@@ -16,7 +16,7 @@ class ControlledExperimentBuilder<T>(
     private var sampleFactory: SampleFactory = SampleFactory(),
     private var comparator: ExperimentComparator<T?> = DefaultExperimentComparator(),
     private var eventBus: EventBus = DEFAULT_EVENT_BUS,
-    private var experimentFlags: EnumSet<ExperimentFlag> = ExperimentFlag.DEFAULT
+    private var experimentOptions: EnumSet<ExperimentOption> = ExperimentOption.DEFAULT
 ) {
     constructor(experimentConfiguration: ExperimentConfiguration): this(
         experimentConfiguration.name,
@@ -24,7 +24,7 @@ class ControlledExperimentBuilder<T>(
         experimentConfiguration.sampleFactory,
         DefaultExperimentComparator(),
         DEFAULT_EVENT_BUS,
-        experimentConfiguration.experimentFlags
+        experimentConfiguration.experimentOptions
     )
 
     fun withName(name: String): ControlledExperimentBuilder<T> {
@@ -42,8 +42,8 @@ class ControlledExperimentBuilder<T>(
         return this
     }
 
-    fun withExperimentFlags(vararg experimentFlag: ExperimentFlag): ControlledExperimentBuilder<T> {
-        this.experimentFlags = EnumSet.copyOf(experimentFlag.asList())
+    fun withExperimentFlags(vararg experimentOption: ExperimentOption): ControlledExperimentBuilder<T> {
+        this.experimentOptions = EnumSet.copyOf(experimentOption.asList())
         return this
     }
 

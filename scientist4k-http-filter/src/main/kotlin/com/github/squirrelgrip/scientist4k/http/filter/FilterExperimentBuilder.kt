@@ -2,7 +2,7 @@ package com.github.squirrelgrip.scientist4k.http.filter
 
 import com.github.squirrelgrip.scientist4k.core.AbstractExperiment
 import com.github.squirrelgrip.scientist4k.core.exception.LaboratoryException
-import com.github.squirrelgrip.scientist4k.core.model.ExperimentFlag
+import com.github.squirrelgrip.scientist4k.core.model.ExperimentOption
 import com.github.squirrelgrip.scientist4k.core.model.sample.SampleFactory
 import com.github.squirrelgrip.scientist4k.http.core.configuration.EndPointConfiguration
 import com.github.squirrelgrip.scientist4k.http.core.configuration.MappingConfiguration
@@ -17,13 +17,13 @@ class FilterExperimentBuilder() {
     private var sampleFactory: SampleFactory = SampleFactory()
     private var detourConfig: EndPointConfiguration? = null
     private var eventBus: EventBus = AbstractExperiment.DEFAULT_EVENT_BUS
-    private var experimentFlags: EnumSet<ExperimentFlag> = ExperimentFlag.DEFAULT
+    private var experimentOptions: EnumSet<ExperimentOption> = ExperimentOption.DEFAULT
 
     constructor(httpExperimentConfiguration: FilterExperimentConfiguration) : this() {
         name = httpExperimentConfiguration.experiment.name
         metrics = httpExperimentConfiguration.experiment.metrics
         sampleFactory = httpExperimentConfiguration.experiment.sampleFactory
-        experimentFlags = httpExperimentConfiguration.experiment.experimentFlags
+        experimentOptions = httpExperimentConfiguration.experiment.experimentOptions
         detourConfig = httpExperimentConfiguration.detour
         mappings = httpExperimentConfiguration.mappings.map { (control, candidate) ->
             MappingConfiguration(control, candidate)
@@ -65,14 +65,14 @@ class FilterExperimentBuilder() {
         return this
     }
 
-    fun withExperimentFlags(vararg experimentFlag: ExperimentFlag): FilterExperimentBuilder {
-        this.experimentFlags = EnumSet.copyOf(experimentFlag.toList())
+    fun withExperimentFlags(vararg experimentOption: ExperimentOption): FilterExperimentBuilder {
+        this.experimentOptions = EnumSet.copyOf(experimentOption.toList())
         return this
     }
 
     fun build(): FilterSimpleExperiment {
         if (detourConfig != null) {
-            return FilterSimpleExperiment(name, metrics, sampleFactory, eventBus, experimentFlags, mappings, detourConfig!!)
+            return FilterSimpleExperiment(name, metrics, sampleFactory, eventBus, experimentOptions, mappings, detourConfig!!)
         }
         throw LaboratoryException("Detour configurations must be set")
     }

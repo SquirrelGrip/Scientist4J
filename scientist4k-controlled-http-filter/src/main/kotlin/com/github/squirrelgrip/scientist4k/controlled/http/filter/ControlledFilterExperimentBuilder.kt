@@ -2,7 +2,7 @@ package com.github.squirrelgrip.scientist4k.controlled.http.filter
 
 import com.github.squirrelgrip.scientist4k.core.AbstractExperiment.Companion.DEFAULT_EVENT_BUS
 import com.github.squirrelgrip.scientist4k.core.exception.LaboratoryException
-import com.github.squirrelgrip.scientist4k.core.model.ExperimentFlag
+import com.github.squirrelgrip.scientist4k.core.model.ExperimentOption
 import com.github.squirrelgrip.scientist4k.core.model.sample.SampleFactory
 import com.github.squirrelgrip.scientist4k.http.core.configuration.EndPointConfiguration
 import com.github.squirrelgrip.scientist4k.http.core.configuration.MappingConfiguration
@@ -16,7 +16,7 @@ class ControlledFilterExperimentBuilder() {
     private var metrics: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD")
     private var sampleFactory: SampleFactory = SampleFactory()
     private var eventBus: EventBus = DEFAULT_EVENT_BUS
-    private var experimentFlags: EnumSet<ExperimentFlag> = ExperimentFlag.DEFAULT
+    private var experimentOptions: EnumSet<ExperimentOption> = ExperimentOption.DEFAULT
     private var detourConfig: EndPointConfiguration? = null
     private var referenceConfig: EndPointConfiguration? = null
 
@@ -24,7 +24,7 @@ class ControlledFilterExperimentBuilder() {
         name = httpExperimentConfiguration.experiment.name
         metrics = httpExperimentConfiguration.experiment.metrics
         sampleFactory = httpExperimentConfiguration.experiment.sampleFactory
-        experimentFlags = httpExperimentConfiguration.experiment.experimentFlags
+        experimentOptions = httpExperimentConfiguration.experiment.experimentOptions
         detourConfig = httpExperimentConfiguration.detour
         referenceConfig = httpExperimentConfiguration.reference
         mappings = httpExperimentConfiguration.mappings.map { (control, candidate) ->
@@ -72,14 +72,14 @@ class ControlledFilterExperimentBuilder() {
         return this
     }
 
-    fun withExperimentFlags(vararg experimentFlag: ExperimentFlag): ControlledFilterExperimentBuilder {
-        this.experimentFlags = EnumSet.copyOf(experimentFlag.toList())
+    fun withExperimentOptions(vararg experimentOption: ExperimentOption): ControlledFilterExperimentBuilder {
+        this.experimentOptions = EnumSet.copyOf(experimentOption.toList())
         return this
     }
 
     fun build(): ControlledFilterExperiment {
         if (detourConfig != null) {
-            return ControlledFilterExperiment(name, metrics, sampleFactory, eventBus, experimentFlags, mappings, detourConfig!!, referenceConfig!!)
+            return ControlledFilterExperiment(name, metrics, sampleFactory, eventBus, experimentOptions, mappings, detourConfig!!, referenceConfig!!)
         }
         throw LaboratoryException("Detour configurations must be set")
     }

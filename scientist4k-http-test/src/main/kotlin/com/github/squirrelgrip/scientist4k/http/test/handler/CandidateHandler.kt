@@ -48,6 +48,11 @@ class CandidateHandler : AbstractHandler() {
                     response.status = HttpServletResponse.SC_OK
                     out.println("mapped")
                 }
+                "/mappedCandidateDifferent" -> {
+                    response.contentType = "text/plain;charset=utf-8"
+                    response.status = HttpServletResponse.SC_CREATED
+                    out.println("mappedDifferentCandidate")
+                }
                 "/status" -> {
                     response.contentType = "text/html;charset=utf-8"
                     response.status = HttpServletResponse.SC_CREATED
