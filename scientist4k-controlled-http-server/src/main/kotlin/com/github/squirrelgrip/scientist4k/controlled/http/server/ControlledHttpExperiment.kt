@@ -1,6 +1,6 @@
 package com.github.squirrelgrip.scientist4k.controlled.http.server
 
-import com.github.squirrelgrip.scientist4k.core.model.ExperimentFlag
+import com.github.squirrelgrip.scientist4k.core.model.ExperimentOption
 import com.github.squirrelgrip.scientist4k.core.model.sample.Sample
 import com.github.squirrelgrip.scientist4k.core.model.sample.SampleFactory
 import com.github.squirrelgrip.scientist4k.http.controlled.AbstractControlledHttpExperiment
@@ -25,33 +25,41 @@ class ControlledHttpExperiment(
     metrics: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD"),
     sampleFactory: SampleFactory = SampleFactory(),
     eventBus: EventBus = DEFAULT_EVENT_BUS,
-    experimentFlags: EnumSet<ExperimentFlag> = ExperimentFlag.DEFAULT,
+    experimentOptions: EnumSet<ExperimentOption> = ExperimentOption.DEFAULT,
     mappings: List<MappingConfiguration> = emptyList(),
     controlConfig: EndPointConfiguration,
     referenceConfig: EndPointConfiguration,
     private val candidateConfig: EndPointConfiguration
 ) : AbstractControlledHttpExperiment(
-        name,
-        metrics,
-        sampleFactory,
-        eventBus,
-        experimentFlags
+    name,
+    metrics,
+    sampleFactory,
+    eventBus,
+    experimentOptions
 ) {
     private val controlRequestFactory = RequestFactory(controlConfig, CONTROL_COOKIE_STORE)
     private val referenceRequestFactory = RequestFactory(referenceConfig, REFERENCE_COOKIE_STORE)
     private val candidateRequestFactory = RequestFactory(candidateConfig, CANDIDATE_COOKIE_STORE, mappings)
 
     fun run(
-            inboundRequest: HttpServletRequest,
-            inboundResponse: HttpServletResponse,
-            sample: Sample = sampleFactory.create()
+        inboundRequest: HttpServletRequest,
+        inboundResponse: HttpServletResponse,
+        sample: Sample = sampleFactory.create(),
+        runOptions: EnumSet<ExperimentOption> = ExperimentOption.DEFAULT
     ) {
         val experimentRequest = createRequest(inboundRequest, sample)
-        val controlResponse = if (candidateConfig.allowedMethods.contains("*") or candidateConfig.allowedMethods.contains(inboundRequest.method)) {
-            run(createControlRequest(experimentRequest), createReferenceRequest(experimentRequest), createCandidateRequest(experimentRequest), sample)
-        } else {
-            createControlRequest(experimentRequest).invoke()
-        }
+        val controlResponse =
+            if (candidateConfig.allowedMethods.contains("*") or candidateConfig.allowedMethods.contains(inboundRequest.method)) {
+                run(
+                    createControlRequest(experimentRequest),
+                    createReferenceRequest(experimentRequest),
+                    createCandidateRequest(experimentRequest),
+                    sample,
+                    runOptions
+                )
+            } else {
+                createControlRequest(experimentRequest).invoke()
+            }
         processResponse(inboundResponse, controlResponse)
     }
 

@@ -10,6 +10,7 @@ class ExperimentFilter(
 ) : Filter {
 
     override fun doFilter(request: ServletRequest, response: ServletResponse, chain: FilterChain) {
+        // TODO Deal with runOptions and mappingConfiguration
         experiment.run(request, response, chain)
     }
 

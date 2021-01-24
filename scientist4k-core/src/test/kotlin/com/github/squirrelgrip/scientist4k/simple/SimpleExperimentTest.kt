@@ -4,9 +4,9 @@ import com.github.squirrelgrip.scientist4k.core.comparator.ExperimentComparator
 import com.github.squirrelgrip.scientist4k.core.configuration.ExperimentConfiguration
 import com.github.squirrelgrip.scientist4k.core.exception.MismatchException
 import com.github.squirrelgrip.scientist4k.core.model.ComparisonResult
-import com.github.squirrelgrip.scientist4k.core.model.ExperimentFlag
-import com.github.squirrelgrip.scientist4k.core.model.ExperimentFlag.RAISE_ON_MISMATCH
-import com.github.squirrelgrip.scientist4k.core.model.ExperimentFlag.RETURN_CANDIDATE
+import com.github.squirrelgrip.scientist4k.core.model.ExperimentOption
+import com.github.squirrelgrip.scientist4k.core.model.ExperimentOption.RAISE_ON_MISMATCH
+import com.github.squirrelgrip.scientist4k.core.model.ExperimentOption.RETURN_CANDIDATE
 import com.github.squirrelgrip.scientist4k.metrics.dropwizard.DropwizardMetricsProvider
 import com.github.squirrelgrip.scientist4k.metrics.micrometer.MicrometerMetricsProvider
 import com.github.squirrelgrip.scientist4k.metrics.noop.NoopMetricsProvider
@@ -78,7 +78,7 @@ class SimpleExperimentTest {
     @Test
     fun itCandidateReturnsDifferentValueAndCandidateIsReturned() {
         val experiment =
-            SimpleExperiment<Int>("test", NoopMetricsProvider(), experimentFlags = EnumSet.of(RETURN_CANDIDATE))
+            SimpleExperiment<Int>("test", NoopMetricsProvider(), experimentOptions = EnumSet.of(RETURN_CANDIDATE))
         val value = experiment.runSync({ safeFunction() }, { safeFunctionWithDifferentResult() })
         assertThat(value).isEqualTo(4)
     }
@@ -86,7 +86,7 @@ class SimpleExperimentTest {
     @Test
     fun itThrowsAnExceptionWhenCandidateFailsAndIsReturned() {
         assertThrows(Exception::class.java) {
-            SimpleExperiment<Int>("test", NoopMetricsProvider(), experimentFlags = EnumSet.of(RETURN_CANDIDATE))
+            SimpleExperiment<Int>("test", NoopMetricsProvider(), experimentOptions = EnumSet.of(RETURN_CANDIDATE))
                 .runSync({ safeFunction() }, { exceptionThrowingFunction() })
         }
     }
@@ -101,7 +101,7 @@ class SimpleExperimentTest {
     @Test
     fun itThrowsOnMismatch() {
         val experiment =
-            SimpleExperiment<Int>("test", NoopMetricsProvider(), experimentFlags = EnumSet.of(RAISE_ON_MISMATCH))
+            SimpleExperiment<Int>("test", NoopMetricsProvider(), experimentOptions = EnumSet.of(RAISE_ON_MISMATCH))
         assertThrows(MismatchException::class.java) {
             experiment.runSync({ safeFunction() }, { safeFunctionWithDifferentResult() })
         }
@@ -110,7 +110,7 @@ class SimpleExperimentTest {
     @Test
     fun itDoesNotThrowOnMatch() {
         val experiment =
-            SimpleExperiment<Int>("test", NoopMetricsProvider(), experimentFlags = EnumSet.of(RAISE_ON_MISMATCH))
+            SimpleExperiment<Int>("test", NoopMetricsProvider(), experimentOptions = EnumSet.of(RAISE_ON_MISMATCH))
         val value = experiment.runSync({ safeFunction() }, { safeFunction() })
         assertThat(value).isEqualTo(3)
     }
@@ -118,7 +118,7 @@ class SimpleExperimentTest {
     @Test
     fun itHandlesNullValues() {
         val experiment =
-            SimpleExperiment<Int?>("test", NoopMetricsProvider(), experimentFlags = EnumSet.of(RAISE_ON_MISMATCH))
+            SimpleExperiment<Int?>("test", NoopMetricsProvider(), experimentOptions = EnumSet.of(RAISE_ON_MISMATCH))
         val value = experiment.runSync({ null }, { null })
         assertThat(value).isNull()
     }
@@ -126,7 +126,7 @@ class SimpleExperimentTest {
     @Test
     fun nonAsyncRunsLongTime() {
         val experiment =
-            SimpleExperiment<Int>("test", NoopMetricsProvider(), experimentFlags = EnumSet.of(RAISE_ON_MISMATCH))
+            SimpleExperiment<Int>("test", NoopMetricsProvider(), experimentOptions = EnumSet.of(RAISE_ON_MISMATCH))
         val date1 = Date()
         val value = experiment.runSync({ sleepFunction() }, { sleepFunction() })
         val date2 = Date()
@@ -197,7 +197,7 @@ class SimpleExperimentTest {
     fun `eventBus is called`() {
         val eventBus = mock<EventBus>()
         val experiment = SimpleExperimentBuilder<Int>()
-            .withExperimentFlags(ExperimentFlag.RAISE_ON_MISMATCH)
+            .withExperimentFlags(ExperimentOption.RAISE_ON_MISMATCH)
             .withEventBus(eventBus)
             .build()
         experiment.run({ safeFunction() }, { safeFunction() })

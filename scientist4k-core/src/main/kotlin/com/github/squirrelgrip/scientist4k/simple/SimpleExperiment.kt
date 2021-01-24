@@ -4,7 +4,7 @@ import com.github.squirrelgrip.scientist4k.core.AbstractExperiment
 import com.github.squirrelgrip.scientist4k.core.comparator.DefaultExperimentComparator
 import com.github.squirrelgrip.scientist4k.core.comparator.ExperimentComparator
 import com.github.squirrelgrip.scientist4k.core.model.ExperimentObservation
-import com.github.squirrelgrip.scientist4k.core.model.ExperimentFlag
+import com.github.squirrelgrip.scientist4k.core.model.ExperimentOption
 import com.github.squirrelgrip.scientist4k.core.model.sample.Sample
 import com.github.squirrelgrip.scientist4k.core.model.sample.SampleFactory
 import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
@@ -24,14 +24,14 @@ open class SimpleExperiment<T>(
     comparator: ExperimentComparator<T?> = DefaultExperimentComparator(),
     sampleFactory: SampleFactory = SampleFactory(),
     eventBus: EventBus = DEFAULT_EVENT_BUS,
-    experimentFlags: EnumSet<ExperimentFlag> = ExperimentFlag.DEFAULT
+    experimentOptions: EnumSet<ExperimentOption> = ExperimentOption.DEFAULT
 ) : AbstractExperiment<T>(
     name,
     metrics,
     comparator,
     sampleFactory,
     eventBus,
-    experimentFlags
+    experimentOptions
 ) {
     constructor(metrics: MetricsProvider<*>) : this("Experiment", metrics)
 
@@ -39,44 +39,60 @@ open class SimpleExperiment<T>(
         private val LOGGER: Logger = LoggerFactory.getLogger(SimpleExperiment::class.java)
     }
 
-    open fun run(control: () -> T?, candidate: () -> T?, sample: Sample = sampleFactory.create()): T? {
+    open fun run(
+        control: () -> T?,
+        candidate: () -> T?,
+        sample: Sample = sampleFactory.create(),
+        runOptions: EnumSet<ExperimentOption> = ExperimentOption.DEFAULT
+    ): T? {
         sample.addNote("experiment", name)
-        return if (experimentFlags.contains(ExperimentFlag.SYNC)) {
+        return if (isSync(runOptions)) {
             LOGGER.trace("Running sync")
-            runSync(control, candidate, sample)
+            runSync(control, candidate, sample, runOptions)
         } else {
             LOGGER.trace("Running async")
-            runAsync(control, candidate, sample)
+            runAsync(control, candidate, sample, runOptions)
         }
     }
 
-    open fun runSync(control: () -> T?, candidate: () -> T?, sample: Sample = sampleFactory.create()): T? {
+    open fun runSync(
+        control: () -> T?,
+        candidate: () -> T?,
+        sample: Sample = sampleFactory.create(),
+        runOptions: EnumSet<ExperimentOption> = ExperimentOption.DEFAULT
+    ): T? {
         val controlObservation: ExperimentObservation<T> = executeControl(control)
         val candidateObservation: ExperimentObservation<T> = executeCandidate(candidate)
-        publishResult(controlObservation, candidateObservation, sample).handleComparisonMismatch()
-        return if (experimentFlags.contains(ExperimentFlag.RETURN_CANDIDATE)) {
+        publishResult(controlObservation, candidateObservation, sample, runOptions).handleComparisonMismatch()
+        return if (isReturnCandidate(runOptions)) {
             candidateObservation.value
         } else {
             controlObservation.value
         }
     }
 
-    open fun runAsync(control: () -> T?, candidate: () -> T?, sample: Sample = sampleFactory.create()) =
+
+    open fun runAsync(
+        control: () -> T?,
+        candidate: () -> T?,
+        sample: Sample = sampleFactory.create(),
+        runOptions: EnumSet<ExperimentOption> = ExperimentOption.DEFAULT
+    ) =
         runBlocking {
             val deferredControlObservation = GlobalScope.async {
-                executeControl(control)
+                executeControl(control, runOptions)
             }
             val deferredCandidateObservation = GlobalScope.async {
-                executeCandidate(candidate)
+                executeCandidate(candidate, runOptions)
             }
 
             val deferred = GlobalScope.async {
-                publishAsync(deferredControlObservation, deferredCandidateObservation, sample)
+                publishAsync(deferredControlObservation, deferredCandidateObservation, sample, runOptions)
             }
-            if (experimentFlags.contains(ExperimentFlag.RAISE_ON_MISMATCH)) {
+            if (isRaiseOnMismatch(runOptions)) {
                 deferred.await().handleComparisonMismatch()
             }
-            if (experimentFlags.contains(ExperimentFlag.RETURN_CANDIDATE)) {
+            if (isReturnCandidate(runOptions)) {
                 deferredCandidateObservation.await().value
             } else {
                 deferredControlObservation.await().value
@@ -86,24 +102,26 @@ open class SimpleExperiment<T>(
     private suspend fun publishAsync(
         deferredControlExperimentObservation: Deferred<ExperimentObservation<T>>,
         deferredCandidateExperimentObservation: Deferred<ExperimentObservation<T>>,
-        sample: Sample
+        sample: Sample,
+        runOptions: EnumSet<ExperimentOption>
     ): SimpleExperimentResult<T> {
         val controlObservation = deferredControlExperimentObservation.await()
         LOGGER.trace("controlObservation is {}", controlObservation)
         val candidateObservation = deferredCandidateExperimentObservation.await()
         LOGGER.trace("candidateObservation is {}", candidateObservation)
-        return publishResult(controlObservation, candidateObservation, sample)
+        return publishResult(controlObservation, candidateObservation, sample, runOptions)
     }
 
     private fun publishResult(
         controlExperimentObservation: ExperimentObservation<T>,
         candidateExperimentObservation: ExperimentObservation<T>,
-        sample: Sample
+        sample: Sample,
+        runOptions: EnumSet<ExperimentOption>
     ): SimpleExperimentResult<T> {
         LOGGER.trace("Creating Result...")
         val result = SimpleExperimentResult(this, controlExperimentObservation, candidateExperimentObservation, sample)
         LOGGER.trace("Publishing Result")
-        publish(result)
+        publish(result, runOptions)
         return result
     }
 

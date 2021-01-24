@@ -3,8 +3,8 @@ package com.github.squirrelgrip.scientist4k.http.server
 import com.github.squirrelgrip.cheti.Cheti
 import com.github.squirrelgrip.extension.json.toInstance
 import com.github.squirrelgrip.scientist4k.core.AbstractExperiment
-import com.github.squirrelgrip.scientist4k.core.model.ExperimentFlag
-import com.github.squirrelgrip.scientist4k.core.model.ExperimentFlag.RETURN_CANDIDATE
+import com.github.squirrelgrip.scientist4k.core.model.ExperimentOption
+import com.github.squirrelgrip.scientist4k.core.model.ExperimentOption.RETURN_CANDIDATE
 import com.github.squirrelgrip.scientist4k.http.core.consumer.FileConsumer
 import com.github.squirrelgrip.scientist4k.http.core.extension.failureReasons
 import com.github.squirrelgrip.scientist4k.http.core.extension.matches
@@ -90,13 +90,13 @@ class SimpleHttpExperimentServerTest {
     private fun createExperimentServer(
         controlUrl: String,
         candidateUrl: String,
-        experimentFlags: EnumSet<ExperimentFlag> = ExperimentFlag.DEFAULT
+        experimentOptions: EnumSet<ExperimentOption> = ExperimentOption.DEFAULT
     ) {
         assertIsRunning(controlUrl)
         assertIsRunning(candidateUrl)
         val control = httpExperimentConfiguration.control.copy(url = controlUrl)
         val candidate = httpExperimentConfiguration.candidate.copy(url = candidateUrl)
-        val experiment = httpExperimentConfiguration.experiment.copy(experimentFlags = experimentFlags)
+        val experiment = httpExperimentConfiguration.experiment.copy(experimentOptions = experimentOptions)
         val configuration = httpExperimentConfiguration.copy(
             experiment = experiment,
             control = control,
@@ -203,6 +203,31 @@ class SimpleHttpExperimentServerTest {
         val result = awaitResult("/mappedControl")
         assertThat(result.matches()).isTrue()
         assertThat(result.failureReasons()).isEmpty()
+    }
+
+    @Test
+    fun `request is mapped to another uri and return candidate`() {
+        createExperimentServer(HTTPS_CONTROL_URL, HTTPS_CANDIDATE_URL, EnumSet.of(RETURN_CANDIDATE))
+
+        assertThat(isRunning("$HTTPS_EXPERIMENT_URL/mappedControl")).isTrue()
+
+        val result = awaitResult("/mappedControl")
+        assertThat(result.matches()).isTrue()
+        assertThat(result.failureReasons()).isEmpty()
+    }
+
+    @Test
+    fun `request is mapped to another uri different and return candidate`() {
+        createExperimentServer(HTTPS_CONTROL_URL, HTTPS_CANDIDATE_URL)
+
+        assertThat(isRunning("$HTTPS_EXPERIMENT_URL/mappedControlDifferent", 201)).isTrue()
+
+        val result = awaitResult("/mappedControlDifferent")
+        assertThat(result.matches()).isFalse()
+        assertThat(result.failureReasons()).containsExactlyInAnyOrder(
+            "Control returned status 200 and Candidate returned status 201.",
+            "Contents are different."
+        )
     }
 
     @Test

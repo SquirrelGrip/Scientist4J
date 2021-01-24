@@ -1,8 +1,8 @@
 package com.github.squirrelgrip.scientist4k.simple
 
 import com.github.squirrelgrip.scientist4k.core.exception.MismatchException
-import com.github.squirrelgrip.scientist4k.core.model.ExperimentFlag.RAISE_ON_MISMATCH
-import com.github.squirrelgrip.scientist4k.core.model.ExperimentFlag.RETURN_CANDIDATE
+import com.github.squirrelgrip.scientist4k.core.model.ExperimentOption.RAISE_ON_MISMATCH
+import com.github.squirrelgrip.scientist4k.core.model.ExperimentOption.RETURN_CANDIDATE
 import com.github.squirrelgrip.scientist4k.metrics.noop.NoopMetricsProvider
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertThrows
@@ -50,7 +50,7 @@ class SimpleExperimentAsyncTest {
     @Test
     fun itCandidateReturnsDifferentValueAndCandidateIsReturned() {
         val experiment =
-            SimpleExperiment<Int>("test", NoopMetricsProvider(), experimentFlags = EnumSet.of(RETURN_CANDIDATE))
+            SimpleExperiment<Int>("test", NoopMetricsProvider(), experimentOptions = EnumSet.of(RETURN_CANDIDATE))
         val value = experiment.runAsync({ safeFunction() }, { safeFunctionWithDifferentResult() })
         assertThat(value).isEqualTo(4)
     }
@@ -58,7 +58,7 @@ class SimpleExperimentAsyncTest {
     @Test
     fun itThrowsAnExceptionWhenCandidateFailsAndIsReturned() {
         assertThrows(Exception::class.java) {
-            SimpleExperiment<Int>("test", NoopMetricsProvider(), experimentFlags = EnumSet.of(RETURN_CANDIDATE))
+            SimpleExperiment<Int>("test", NoopMetricsProvider(), experimentOptions = EnumSet.of(RETURN_CANDIDATE))
                 .runAsync({ safeFunction() }, { exceptionThrowingFunction() })
         }
     }
@@ -67,7 +67,7 @@ class SimpleExperimentAsyncTest {
     @Test
     fun itThrowsOnMismatch() {
         val experiment =
-            SimpleExperiment<Int>("test", NoopMetricsProvider(), experimentFlags = EnumSet.of(RAISE_ON_MISMATCH))
+            SimpleExperiment<Int>("test", NoopMetricsProvider(), experimentOptions = EnumSet.of(RAISE_ON_MISMATCH))
         assertThrows(MismatchException::class.java) {
             experiment.runAsync({ safeFunction() }, { safeFunctionWithDifferentResult() })
         }
@@ -76,7 +76,7 @@ class SimpleExperimentAsyncTest {
     @Test
     fun itDoesNotThrowOnMatch() {
         val experiment =
-            SimpleExperiment<Int>("test", NoopMetricsProvider(), experimentFlags = EnumSet.of(RAISE_ON_MISMATCH))
+            SimpleExperiment<Int>("test", NoopMetricsProvider(), experimentOptions = EnumSet.of(RAISE_ON_MISMATCH))
         val value = experiment.runAsync({ safeFunction() }, { safeFunction() })
         assertThat(value).isEqualTo(3)
     }
@@ -91,7 +91,7 @@ class SimpleExperimentAsyncTest {
     @Test
     fun asyncRunsFaster() {
         val experiment =
-            SimpleExperiment<Int>("test", NoopMetricsProvider(), experimentFlags = EnumSet.of(RAISE_ON_MISMATCH))
+            SimpleExperiment<Int>("test", NoopMetricsProvider(), experimentOptions = EnumSet.of(RAISE_ON_MISMATCH))
         val date1 = Date()
         val value = experiment.runAsync({ sleepFunction() }, { sleepFunction() })
         val date2 = Date()
@@ -104,7 +104,7 @@ class SimpleExperimentAsyncTest {
     @Test
     fun raiseOnMismatchRunsSlower() {
         val raisesOnMismatch =
-            SimpleExperiment<Int>("raise", NoopMetricsProvider(), experimentFlags = EnumSet.of(RAISE_ON_MISMATCH))
+            SimpleExperiment<Int>("raise", NoopMetricsProvider(), experimentOptions = EnumSet.of(RAISE_ON_MISMATCH))
         val doesNotRaiseOnMismatch = SimpleExperiment<Int>("does not raise", NoopMetricsProvider())
         val raisesExecutionTime = timeExperiment(raisesOnMismatch)
         val doesNotRaiseExecutionTime = timeExperiment(doesNotRaiseOnMismatch)

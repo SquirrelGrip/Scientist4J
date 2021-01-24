@@ -5,7 +5,7 @@ import com.github.squirrelgrip.scientist4k.core.comparator.ExperimentComparator
 import com.github.squirrelgrip.scientist4k.core.model.ComparisonResult
 import com.github.squirrelgrip.scientist4k.core.model.ExperimentObservation
 import com.github.squirrelgrip.scientist4k.core.model.ExperimentObservationStatus
-import com.github.squirrelgrip.scientist4k.core.model.ExperimentFlag
+import com.github.squirrelgrip.scientist4k.core.model.ExperimentOption
 import com.github.squirrelgrip.scientist4k.core.model.sample.SampleFactory
 import com.github.squirrelgrip.scientist4k.metrics.Counter
 import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
@@ -16,12 +16,12 @@ import org.slf4j.LoggerFactory
 import java.util.*
 
 abstract class AbstractExperiment<T>(
-        val name: String,
-        val metrics: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD"),
-        val comparator: ExperimentComparator<T?> = DefaultExperimentComparator(),
-        val sampleFactory: SampleFactory = SampleFactory(),
-        val eventBus: EventBus = DEFAULT_EVENT_BUS,
-        val experimentFlags: EnumSet<ExperimentFlag> = ExperimentFlag.DEFAULT
+    val name: String,
+    val metrics: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD"),
+    val comparator: ExperimentComparator<T?> = DefaultExperimentComparator(),
+    val sampleFactory: SampleFactory = SampleFactory(),
+    val eventBus: EventBus = DEFAULT_EVENT_BUS,
+    val experimentOptions: EnumSet<ExperimentOption> = ExperimentOption.DEFAULT
 ) {
     /**
      * Note that if `raiseOnMismatch` is true, [.runAsync] will block waiting for
@@ -43,15 +43,48 @@ abstract class AbstractExperiment<T>(
         val DEFAULT_EVENT_BUS: EventBus = EventBus()
     }
 
-    protected fun executeCandidate(candidate: () -> T?): ExperimentObservation<T> =
-            if (experimentFlags.contains(ExperimentFlag.DISABLED)) {
-                scrap("candidate")
-            } else {
-                execute("candidate", candidateTimer, candidate, experimentFlags.contains(ExperimentFlag.RETURN_CANDIDATE))
-            }
+    open fun isSync(runOptions: EnumSet<ExperimentOption>) =
+        runOptions.contains(ExperimentOption.SYNC) || experimentOptions.contains(ExperimentOption.SYNC)
+    open fun isReturnCandidate(runOptions: EnumSet<ExperimentOption>) =
+        runOptions.contains(ExperimentOption.RETURN_CANDIDATE) || experimentOptions.contains(ExperimentOption.RETURN_CANDIDATE)
+    open fun isRaiseOnMismatch(runOptions: EnumSet<ExperimentOption>) =
+        runOptions.contains(ExperimentOption.RAISE_ON_MISMATCH) || experimentOptions.contains(ExperimentOption.RAISE_ON_MISMATCH)
+    open fun isDisabled(runOptions: EnumSet<ExperimentOption>) =
+        runOptions.contains(ExperimentOption.DISABLED) || experimentOptions.contains(ExperimentOption.DISABLED)
+    open fun isWithholdPublication(runOptions: EnumSet<ExperimentOption>) =
+        runOptions.contains(ExperimentOption.WITHHOLD_PUBLICATION) || experimentOptions.contains(ExperimentOption.WITHHOLD_PUBLICATION)
 
-    protected fun executeControl(control: () -> T?): ExperimentObservation<T> =
-            execute("control", controlTimer, control, !experimentFlags.contains(ExperimentFlag.RETURN_CANDIDATE))
+    open fun isPublishable(runOptions: EnumSet<ExperimentOption>) = !isWithholdPublication(runOptions)
+
+    protected fun executeCandidate(
+        candidate: () -> T?,
+        runOptions: EnumSet<ExperimentOption> = ExperimentOption.DEFAULT
+    ): ExperimentObservation<T> =
+        if (isDisabled(runOptions) && !isReturnCandidate(runOptions)) {
+            scrap("candidate")
+        } else {
+            execute(
+                "candidate",
+                candidateTimer,
+                candidate,
+                isReturnCandidate(runOptions)
+            )
+        }
+
+    protected fun executeControl(
+        control: () -> T?,
+        runOptions: EnumSet<ExperimentOption> = ExperimentOption.DEFAULT
+    ): ExperimentObservation<T> =
+        if (isDisabled(runOptions) && isReturnCandidate(runOptions)) {
+            scrap("control")
+        } else {
+            execute(
+                "control",
+                controlTimer,
+                control,
+                !isReturnCandidate(runOptions)
+            )
+        }
 
     private fun countExceptions(experimentObservation: ExperimentObservation<T>, exceptions: Counter) {
         if (experimentObservation.exception != null) {
@@ -59,7 +92,12 @@ abstract class AbstractExperiment<T>(
         }
     }
 
-    protected fun execute(name: String, timer: Timer, function: () -> T?, shouldThrow: Boolean): ExperimentObservation<T> {
+    protected fun execute(
+        name: String,
+        timer: Timer,
+        function: () -> T?,
+        shouldThrow: Boolean
+    ): ExperimentObservation<T> {
         val observation = ExperimentObservation<T>(name, timer)
         observation.time(function)
         val exception = observation.exception
@@ -75,8 +113,10 @@ abstract class AbstractExperiment<T>(
         return experimentObservation
     }
 
-    open fun publish(result: Any) {
-        eventBus.post(result)
+    open fun publish(result: Any, runOptions: EnumSet<ExperimentOption> = ExperimentOption.DEFAULT) {
+        if (isPublishable(runOptions)) {
+            eventBus.post(result)
+        }
     }
 
     fun compare(control: ExperimentObservation<T>, candidate: ExperimentObservation<T>): ComparisonResult {

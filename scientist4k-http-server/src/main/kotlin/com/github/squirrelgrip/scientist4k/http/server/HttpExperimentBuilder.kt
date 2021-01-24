@@ -2,7 +2,7 @@ package com.github.squirrelgrip.scientist4k.http.server
 
 import com.github.squirrelgrip.scientist4k.core.AbstractExperiment
 import com.github.squirrelgrip.scientist4k.core.exception.LaboratoryException
-import com.github.squirrelgrip.scientist4k.core.model.ExperimentFlag
+import com.github.squirrelgrip.scientist4k.core.model.ExperimentOption
 import com.github.squirrelgrip.scientist4k.core.model.sample.SampleFactory
 import com.github.squirrelgrip.scientist4k.http.core.configuration.EndPointConfiguration
 import com.github.squirrelgrip.scientist4k.http.core.configuration.MappingConfiguration
@@ -16,7 +16,7 @@ class HttpExperimentBuilder() {
     private var metrics: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD")
     private var sampleFactory: SampleFactory = SampleFactory()
     private var eventBus: EventBus = AbstractExperiment.DEFAULT_EVENT_BUS
-    private var experimentFlags: EnumSet<ExperimentFlag> = ExperimentFlag.DEFAULT
+    private var experimentOptions: EnumSet<ExperimentOption> = ExperimentOption.DEFAULT
     private var controlConfig: EndPointConfiguration? = null
     private var candidateConfig: EndPointConfiguration? = null
 
@@ -24,12 +24,10 @@ class HttpExperimentBuilder() {
         name = httpExperimentConfiguration.experiment.name
         metrics = httpExperimentConfiguration.experiment.metrics
         sampleFactory = httpExperimentConfiguration.experiment.sampleFactory
-        experimentFlags = httpExperimentConfiguration.experiment.experimentFlags
+        experimentOptions = httpExperimentConfiguration.experiment.experimentOptions
         controlConfig = httpExperimentConfiguration.control
         candidateConfig = httpExperimentConfiguration.candidate
-        mappings = httpExperimentConfiguration.mappings.map { (control, candidate) ->
-            MappingConfiguration(control, candidate)
-        }
+        mappings = httpExperimentConfiguration.mappings
     }
 
     fun withName(name: String): HttpExperimentBuilder {
@@ -72,8 +70,8 @@ class HttpExperimentBuilder() {
         return this
     }
 
-    fun withExperimentFlags(vararg experimentFlag: ExperimentFlag): HttpExperimentBuilder {
-        this.experimentFlags = EnumSet.copyOf(experimentFlag.asList())
+    fun withExperimentOptions(vararg experimentOption: ExperimentOption): HttpExperimentBuilder {
+        this.experimentOptions = EnumSet.copyOf(experimentOption.asList())
         return this
     }
 
@@ -85,7 +83,7 @@ class HttpExperimentBuilder() {
                 sampleFactory,
                 eventBus,
                 mappings,
-                experimentFlags,
+                experimentOptions,
                 controlConfig!!,
                 candidateConfig!!
             )

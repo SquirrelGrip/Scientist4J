@@ -1,12 +1,15 @@
 package com.github.squirrelgrip.scientist4k.http.core.configuration
 
+import com.github.squirrelgrip.scientist4k.core.model.ExperimentOption
+import java.util.*
 import java.util.regex.Pattern
 
 data class MappingConfiguration(
-        val control: String,
-        val candidate: String
+    val control: String,
+    val candidate: String,
+    val options: EnumSet<ExperimentOption> = ExperimentOption.DEFAULT
 ) {
-    val controlPattern: Pattern = Pattern.compile(control)
+    private val controlPattern: Pattern = Pattern.compile(control)
 
     fun matches(uri: String): Boolean {
         return controlPattern.matcher(uri).matches()
