@@ -19,9 +19,9 @@ class JsonContentTypeComparator : ContentTypeComparator {
             SUCCESS
         } else {
             ComparisonResult(
-                    *list.map {
-                        it.toJson()
-                    }.toTypedArray()
+                *list.map {
+                    it.toJson()
+                }.toTypedArray()
             )
         }
     }

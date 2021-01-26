@@ -28,23 +28,22 @@ open class AbstractHttpSimpleExperiment(
     eventBus,
     experimentOptions
 ) {
-    override fun publish(
-        result: Any,
-        runOptions: EnumSet<ExperimentOption>
-    ) {
-        if (isPublishable(runOptions)) {
-            if (result is SimpleExperimentResult<*> && result.control.value is ExperimentResponse) {
-                eventBus.post((result as SimpleExperimentResult<ExperimentResponse>).toHttpExperimentResult())
-            } else {
-                super.publish(result, runOptions)
-            }
-        }
-    }
-
     fun getRunOptions(inboundRequest: HttpServletRequest): EnumSet<ExperimentOption> {
         return mappingConfiguration.firstOrNull {
             it.matches(inboundRequest.pathInfo)
         }?.options ?: ExperimentOption.DEFAULT
+    }
+
+    override fun publish(result: Any, runOptions: EnumSet<ExperimentOption>) {
+        if (isPublishable(runOptions)) {
+            if (result is SimpleExperimentResult<*> && result.control.value is ExperimentResponse) {
+                @Suppress("UNCHECKED_CAST") val experimentResult =
+                    (result as SimpleExperimentResult<ExperimentResponse>).toHttpExperimentResult()
+                eventBus.post(experimentResult)
+            } else {
+                super.publish(result, runOptions)
+            }
+        }
     }
 
 }

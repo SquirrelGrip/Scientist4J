@@ -4,7 +4,7 @@
     <parent>
         <artifactId>scientist4k</artifactId>
         <groupId>com.github.squirrelgrip</groupId>
-        <version>0.9.2</version>
+        <version>0.9.3</version>
     </parent>
     <artifactId>scientist4k-bom</artifactId>
     <packaging>pom</packaging>
@@ -48,7 +48,22 @@
             </dependency>
             <dependency>
                 <groupId>com.github.squirrelgrip</groupId>
-                <artifactId>scientist4k-report-api</artifactId>
+                <artifactId>scientist4k-application-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.squirrelgrip</groupId>
+                <artifactId>scientist4k-application-report</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.squirrelgrip</groupId>
+                <artifactId>scientist4k-application-common</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+             <dependency>
+                <groupId>com.github.squirrelgrip</groupId>
+                <artifactId>scientist4k-application-web</artifactId>
                 <version>${project.version}</version>
             </dependency>
         </dependencies>

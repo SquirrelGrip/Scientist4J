@@ -8,12 +8,10 @@ import com.github.squirrelgrip.scientist4k.http.core.HttpExperimentUtil
 import com.github.squirrelgrip.scientist4k.http.core.HttpExperimentUtil.processResponse
 import com.github.squirrelgrip.scientist4k.http.core.configuration.EndPointConfiguration
 import com.github.squirrelgrip.scientist4k.http.core.configuration.MappingConfiguration
-import com.github.squirrelgrip.scientist4k.http.core.extension.toHttpExperimentResult
 import com.github.squirrelgrip.scientist4k.http.core.factory.RequestFactory
 import com.github.squirrelgrip.scientist4k.http.core.model.ExperimentRequest
 import com.github.squirrelgrip.scientist4k.http.core.model.ExperimentResponse
 import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
-import com.github.squirrelgrip.scientist4k.simple.model.SimpleExperimentResult
 import com.google.common.eventbus.EventBus
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -57,15 +55,20 @@ class HttpSimpleExperiment(
         val candidateRequest = createCandidateRequest(experimentRequest)
 
         val resultResponse =
-            if (candidateConfig.allowedMethods.contains("*") or candidateConfig.allowedMethods.contains(inboundRequest.method)) {
+            if (isMethodAllowed(inboundRequest)) {
                 run(controlRequest, candidateRequest, sample, getRunOptions(inboundRequest))
-            } else if (experimentOptions.contains(ExperimentOption.RETURN_CANDIDATE)) {
-                candidateRequest.invoke()
             } else {
-                controlRequest.invoke()
+                if (isReturnCandidate(getRunOptions(inboundRequest))) {
+                    candidateRequest.invoke()
+                } else {
+                    controlRequest.invoke()
+                }
             }
         processResponse(inboundResponse, resultResponse)
     }
+
+    private fun isMethodAllowed(inboundRequest: HttpServletRequest) =
+        candidateConfig.allowedMethods.contains("*") or candidateConfig.allowedMethods.contains(inboundRequest.method)
 
     private fun createControlRequest(
         request: ExperimentRequest
@@ -77,16 +80,6 @@ class HttpSimpleExperiment(
         request: ExperimentRequest
     ): () -> ExperimentResponse {
         return candidateRequestFactory.create(request)
-    }
-
-    override fun publish(result: Any, runOptions: EnumSet<ExperimentOption>) {
-        if (isPublishable(runOptions)) {
-            if (result is SimpleExperimentResult<*> && result.control.value is ExperimentResponse) {
-                eventBus.post((result as SimpleExperimentResult<ExperimentResponse>).toHttpExperimentResult())
-            } else {
-                super.publish(result, runOptions)
-            }
-        }
     }
 
 }

@@ -30,8 +30,12 @@ open class AbstractControlledHttpExperiment(
 ) {
     override fun publish(result: Any, runOptions: EnumSet<ExperimentOption>) {
         if (isPublishable(runOptions)) {
-            if (result is ControlledExperimentResult<*> && result.control.value is ExperimentResponse) {
-                eventBus.post((result as ControlledExperimentResult<ExperimentResponse>).toHttpExperimentResult())
+            if (result is ControlledExperimentResult<*>) {
+                if (result.control.value is ExperimentResponse) {
+                    @Suppress("UNCHECKED_CAST") val experimentResult =
+                        (result as ControlledExperimentResult<ExperimentResponse>).toHttpExperimentResult()
+                    eventBus.post(experimentResult)
+                }
             } else {
                 super.publish(result, runOptions)
             }

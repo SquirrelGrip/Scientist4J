@@ -42,13 +42,11 @@ open class ControlledExperiment<T>(
      */
     private val referenceTimer: Timer = metrics.timer(NAMESPACE_PREFIX, name, "reference")
 
-    constructor(metrics: MetricsProvider<*>) : this("Experiment", metrics)
-
     companion object {
         private val LOGGER: Logger = LoggerFactory.getLogger(ControlledExperiment::class.java)
     }
 
-    fun isReturnReference(runOptions: EnumSet<ExperimentOption>) =
+    private fun isReturnReference(runOptions: EnumSet<ExperimentOption>) =
         runOptions.contains(ExperimentOption.RETURN_REFERENCE) || experimentOptions.contains(ExperimentOption.RETURN_REFERENCE)
 
     open fun run(

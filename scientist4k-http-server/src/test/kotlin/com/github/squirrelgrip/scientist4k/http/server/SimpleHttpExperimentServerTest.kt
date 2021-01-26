@@ -104,7 +104,7 @@ class SimpleHttpExperimentServerTest {
         )
         testSubject = HttpExperimentServer(configuration)
         testSubject.start()
-        val file = File(File(System.getenv("user.dir"), ".."), "scientist4k-api/report")
+        val file = File(File(System.getenv("user.dir"), ".."), "report")
         (testSubject.handler as HttpExperimentHandler).httpExperiment.eventBus.register(FileConsumer(file))
 
         assertIsRunning(HTTP_EXPERIMENT_URL)

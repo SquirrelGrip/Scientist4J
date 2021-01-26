@@ -21,7 +21,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.net.URL
 
-class RequestFactory(
+class RequestFactory (
         val endPointConfig: EndPointConfiguration,
         val cookieStoreAttributeName: String,
         val mappingConfiguration: List<MappingConfiguration> = emptyList()
@@ -85,11 +85,15 @@ class RequestFactory(
                 setUri(targetUrl)
                 version = HTTP_1_1
                 request.headers.forEach { (headerName, headerValue) ->
-                    if (headerName == TARGET_HOST) {
-                        val url = URL(targetUrl)
-                        setHeader(TARGET_HOST, "${url.host}:${url.port}")
-                    } else if (headerName != CONTENT_LEN) {
-                        setHeader(headerName, headerValue)
+                    when (headerName) {
+                        TARGET_HOST -> {
+                            val url = URL(targetUrl)
+                            setHeader(TARGET_HOST, "${url.host}:${url.port}")
+                        }
+                        CONTENT_LEN -> {}
+                        else -> {
+                            setHeader(headerName, headerValue)
+                        }
                     }
                 }
                 entity = ByteArrayEntity(request.body, ContentType.getByMimeType(request.contentType))

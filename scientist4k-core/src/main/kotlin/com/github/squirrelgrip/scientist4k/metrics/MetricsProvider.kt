@@ -13,7 +13,7 @@ interface MetricsProvider<T> {
                 "MICROMETER" -> "com.github.squirrelgrip.scientist4k.metrics.micrometer.MicrometerMetricsProvider"
                 else -> "com.github.squirrelgrip.scientist4k.metrics.noop.NoopMetricsProvider"
             }
-            return Class.forName(javaClass).newInstance() as MetricsProvider<*>
+            return Class.forName(javaClass).getDeclaredConstructor().newInstance() as MetricsProvider<*>
         }
     }
 }
