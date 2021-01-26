@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <artifactId>scientist4k</artifactId>
+        <groupId>com.github.squirrelgrip</groupId>
+        <version>0.9.3-SNAPSHOT</version>
+    </parent>
+    <artifactId>scientist4k-application</artifactId>
+    <packaging>pom</packaging>
+
+    <properties>
+        <springfox-swagger.version>3.0.0</springfox-swagger.version>
+    </properties>
+
+    <modules>
+        <module>scientist4k-application-common</module>
+        <module>scientist4k-application-api</module>
+        <module>scientist4k-application-web</module>
+        <module>scientist4k-application-report</module>
+    </modules>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.github.squirrelgrip</groupId>
+                <artifactId>scientist4k-http-server</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-security</artifactId>
+                <version>${spring-boot.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.springfox</groupId>
+                <artifactId>springfox-boot-starter</artifactId>
+                <version>${springfox-swagger.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.springfox</groupId>
+                <artifactId>springfox-swagger-ui</artifactId>
+                <version>${springfox-swagger.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+</project>

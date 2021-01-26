@@ -76,7 +76,7 @@ internal class SimpleHttpFilterExperimentTest {
 
     init {
         AbstractExperiment.DEFAULT_EVENT_BUS.register(this)
-        val file = File(File(System.getenv("user.dir"), ".."), "scientist4k-api/report")
+        val file = File(File(System.getenv("user.dir"), ".."), "report")
         AbstractExperiment.DEFAULT_EVENT_BUS.register(FileConsumer(file))
     }
 

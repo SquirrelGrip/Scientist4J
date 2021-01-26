@@ -32,17 +32,13 @@
 
     <modules>
         <module>scientist4k-core</module>
-
         <module>scientist4k-http-core</module>
         <module>scientist4k-http-test</module>
         <module>scientist4k-http-server</module>
         <module>scientist4k-http-filter</module>
         <module>scientist4k-controlled-http-server</module>
         <module>scientist4k-controlled-http-filter</module>
-
-        <module>scientist4k-api</module>
-        <module>scientist4k-web</module>
-
+        <module>scientist4k-application</module>
         <module>scientist4k-bom</module>
     </modules>
 

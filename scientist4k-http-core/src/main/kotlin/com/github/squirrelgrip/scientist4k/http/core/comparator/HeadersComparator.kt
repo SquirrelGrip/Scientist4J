@@ -11,7 +11,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 open class HeadersComparator(
-        vararg val ignoredHeaders: String
+    vararg val ignoredHeaders: String
 ) : ExperimentComparator<HttpExperimentResponse> {
     companion object {
         private val LOGGER: Logger = LoggerFactory.getLogger(HeadersComparator::class.java)
