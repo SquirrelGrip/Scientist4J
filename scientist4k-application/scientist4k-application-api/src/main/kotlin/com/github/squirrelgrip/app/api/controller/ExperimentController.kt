@@ -1,7 +1,7 @@
-package com.github.squirrelgrip.api.controller
+package com.github.squirrelgrip.app.api.controller
 
-import com.github.squirrelgrip.api.exception.ExperimentAlreadyExistsException
-import com.github.squirrelgrip.api.exception.ExperimentNotFoundException
+import com.github.squirrelgrip.app.common.exception.ExperimentAlreadyExistsException
+import com.github.squirrelgrip.app.common.exception.ExperimentNotFoundException
 import com.github.squirrelgrip.scientist4k.http.server.HttpExperimentConfiguration
 import com.github.squirrelgrip.scientist4k.http.server.HttpExperimentServer
 import org.slf4j.Logger

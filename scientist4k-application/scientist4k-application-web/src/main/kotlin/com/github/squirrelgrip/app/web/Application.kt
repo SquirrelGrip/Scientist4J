@@ -1,9 +1,9 @@
-package com.github.squirrelgrip.api
+package com.github.squirrelgrip.app.web
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
-@SpringBootApplication(scanBasePackages = ["com.github.squirrelgrip.api", "com.github.squirrelgrip.api"])
+@SpringBootApplication(scanBasePackages = ["com.github.squirrelgrip.app.common", "com.github.squirrelgrip.app.web", "com.github.squirrelgrip.app.api"])
 class Application {
     companion object {
         @JvmStatic
