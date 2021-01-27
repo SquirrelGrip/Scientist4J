@@ -13,7 +13,8 @@ data class ExperimentConfiguration(
     val metricsProvider: String = "DROPWIZARD",
     val context: Map<String, Any> = emptyMap(),
     val samplePrefix: String = "",
-    val experimentOptions: EnumSet<ExperimentOption> = ExperimentOption.DEFAULT
+    val experimentOptions: EnumSet<ExperimentOption> = ExperimentOption.DEFAULT,
+    val sampleThreshold: Int = 100
 ) {
     @JsonIgnore
     val metrics: MetricsProvider<*> = MetricsProvider.build(metricsProvider)

@@ -37,8 +37,7 @@ class HttpSimpleExperiment(
     mappingConfiguration
 ) {
     private val controlRequestFactory = RequestFactory(controlConfig, HttpExperimentUtil.CONTROL_COOKIE_STORE)
-    private val candidateRequestFactory =
-        RequestFactory(candidateConfig, HttpExperimentUtil.CANDIDATE_COOKIE_STORE, mappingConfiguration)
+    private val candidateRequestFactory = RequestFactory(candidateConfig, HttpExperimentUtil.CANDIDATE_COOKIE_STORE, mappingConfiguration)
 
     companion object {
         private val LOGGER: Logger = LoggerFactory.getLogger(HttpSimpleExperiment::class.java)
@@ -46,9 +45,9 @@ class HttpSimpleExperiment(
 
     fun run(
         inboundRequest: HttpServletRequest,
-        inboundResponse: HttpServletResponse,
-        sample: Sample = sampleFactory.create()
+        inboundResponse: HttpServletResponse
     ) {
+        val sample: Sample = sampleFactory.create(getRunOptions(inboundRequest))
         val experimentRequest = HttpExperimentUtil.createRequest(inboundRequest, sample)
 
         val controlRequest = createControlRequest(experimentRequest)
@@ -56,9 +55,9 @@ class HttpSimpleExperiment(
 
         val resultResponse =
             if (isMethodAllowed(inboundRequest)) {
-                run(controlRequest, candidateRequest, sample, getRunOptions(inboundRequest))
+                run(controlRequest, candidateRequest, sample)
             } else {
-                if (isReturnCandidate(getRunOptions(inboundRequest))) {
+                if (isReturnCandidate(sample)) {
                     candidateRequest.invoke()
                 } else {
                     controlRequest.invoke()

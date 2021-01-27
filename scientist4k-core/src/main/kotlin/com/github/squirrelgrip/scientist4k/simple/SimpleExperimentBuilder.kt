@@ -16,7 +16,8 @@ class SimpleExperimentBuilder<T>(
     private var sampleFactory: SampleFactory = SampleFactory(),
     private var comparator: ExperimentComparator<T?> = DefaultExperimentComparator(),
     private var eventBus: EventBus = AbstractExperiment.DEFAULT_EVENT_BUS,
-    private var experimentOptions: EnumSet<ExperimentOption> = ExperimentOption.DEFAULT
+    private var experimentOptions: EnumSet<ExperimentOption> = ExperimentOption.DEFAULT,
+    private var sampleThreshold: Int = 100
 ) {
     constructor(experimentConfiguration: ExperimentConfiguration) : this(
         experimentConfiguration.name,
@@ -24,7 +25,8 @@ class SimpleExperimentBuilder<T>(
         experimentConfiguration.sampleFactory,
         DefaultExperimentComparator(),
         AbstractExperiment.DEFAULT_EVENT_BUS,
-        experimentConfiguration.experimentOptions
+        experimentConfiguration.experimentOptions,
+        experimentConfiguration.sampleThreshold
     )
 
     fun withName(name: String): SimpleExperimentBuilder<T> {
@@ -62,8 +64,13 @@ class SimpleExperimentBuilder<T>(
         return this
     }
 
+    fun withSampleThreshold(sampleThreshold: Int): SimpleExperimentBuilder<T> {
+        this.sampleThreshold = sampleThreshold
+        return this
+    }
+
     fun build(): SimpleExperiment<T> {
-        return SimpleExperiment(name, metricsProvider, comparator, sampleFactory, eventBus, experimentOptions)
+        return SimpleExperiment(name, metricsProvider, comparator, sampleFactory, eventBus, experimentOptions, sampleThreshold)
     }
 
 }

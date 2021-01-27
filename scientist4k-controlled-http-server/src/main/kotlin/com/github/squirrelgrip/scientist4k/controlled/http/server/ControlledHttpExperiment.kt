@@ -45,7 +45,7 @@ class ControlledHttpExperiment(
     fun run(
         inboundRequest: HttpServletRequest,
         inboundResponse: HttpServletResponse,
-        sample: Sample = sampleFactory.create()
+        sample: Sample = sampleFactory.create(getRunOptions(inboundRequest))
     ) {
         val experimentRequest = createRequest(inboundRequest, sample)
         val controlResponse =
@@ -54,8 +54,7 @@ class ControlledHttpExperiment(
                     createControlRequest(experimentRequest),
                     createReferenceRequest(experimentRequest),
                     createCandidateRequest(experimentRequest),
-                    sample,
-                    getRunOptions(inboundRequest)
+                    sample
                 )
             } else {
                 createControlRequest(experimentRequest).invoke()

@@ -3,13 +3,13 @@ package com.github.squirrelgrip.scientist4k.http.filter
 import com.github.squirrelgrip.scientist4k.core.model.ExperimentOption
 import com.github.squirrelgrip.scientist4k.core.model.sample.Sample
 import com.github.squirrelgrip.scientist4k.core.model.sample.SampleFactory
+import com.github.squirrelgrip.scientist4k.http.core.AbstractHttpSimpleExperiment
 import com.github.squirrelgrip.scientist4k.http.core.HttpExperimentUtil
 import com.github.squirrelgrip.scientist4k.http.core.configuration.EndPointConfiguration
 import com.github.squirrelgrip.scientist4k.http.core.configuration.MappingConfiguration
 import com.github.squirrelgrip.scientist4k.http.core.factory.RequestFactory
 import com.github.squirrelgrip.scientist4k.http.core.model.ExperimentResponse
 import com.github.squirrelgrip.scientist4k.http.core.wrapper.ExperimentResponseWrapper
-import com.github.squirrelgrip.scientist4k.http.core.AbstractHttpSimpleExperiment
 import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
 import com.google.common.eventbus.EventBus
 import java.util.*
@@ -39,16 +39,15 @@ class FilterSimpleExperiment(
     fun run(
         inboundRequest: ServletRequest,
         inboundResponse: ServletResponse,
-        chain: FilterChain,
-        sample: Sample = sampleFactory.create(),
-        runOptions: EnumSet<ExperimentOption> = ExperimentOption.DEFAULT
+        chain: FilterChain
     ) {
+        val sample: Sample = sampleFactory.create(getRunOptions(inboundRequest))
         val wrappedRequest = HttpServletRequestWrapper(inboundRequest as HttpServletRequest)
         val routeRequest = createRouteRequest(wrappedRequest, inboundResponse, chain)
         val detourRequest = createDetourRequest(wrappedRequest, sample)
 
         if (detourConfig.allowedMethods.contains("*") or detourConfig.allowedMethods.contains(inboundRequest.method)) {
-            run(routeRequest, detourRequest, sample, runOptions)
+            run(routeRequest, detourRequest, sample)
         } else {
             routeRequest.invoke()
         }

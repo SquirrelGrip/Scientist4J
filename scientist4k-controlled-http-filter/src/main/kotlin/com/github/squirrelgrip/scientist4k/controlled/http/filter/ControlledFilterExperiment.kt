@@ -42,11 +42,10 @@ class ControlledFilterExperiment(
     private val allowedMethods = detourConfig.allowedMethods
 
     fun run(
-            inboundRequest: ServletRequest,
-            inboundResponse: ServletResponse,
-            chain: FilterChain,
-            sample: Sample = sampleFactory.create(),
-            runOptions: EnumSet<ExperimentOption> = ExperimentOption.DEFAULT
+        inboundRequest: ServletRequest,
+        inboundResponse: ServletResponse,
+        chain: FilterChain,
+        sample: Sample = sampleFactory.create(getRunOptions(inboundRequest)),
     ) {
         val wrappedRequest = HttpServletRequestWrapper(inboundRequest as HttpServletRequest)
         val experimentRequest = HttpExperimentUtil.createRequest(wrappedRequest, sample)

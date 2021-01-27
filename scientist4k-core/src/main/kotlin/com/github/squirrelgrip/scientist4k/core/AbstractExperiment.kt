@@ -6,6 +6,7 @@ import com.github.squirrelgrip.scientist4k.core.model.ComparisonResult
 import com.github.squirrelgrip.scientist4k.core.model.ExperimentObservation
 import com.github.squirrelgrip.scientist4k.core.model.ExperimentObservationStatus
 import com.github.squirrelgrip.scientist4k.core.model.ExperimentOption
+import com.github.squirrelgrip.scientist4k.core.model.sample.Sample
 import com.github.squirrelgrip.scientist4k.core.model.sample.SampleFactory
 import com.github.squirrelgrip.scientist4k.metrics.Counter
 import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
@@ -21,7 +22,8 @@ abstract class AbstractExperiment<T>(
     val comparator: ExperimentComparator<T?> = DefaultExperimentComparator(),
     val sampleFactory: SampleFactory = SampleFactory(),
     val eventBus: EventBus = DEFAULT_EVENT_BUS,
-    val experimentOptions: EnumSet<ExperimentOption> = ExperimentOption.DEFAULT
+    val experimentOptions: EnumSet<ExperimentOption> = ExperimentOption.DEFAULT,
+    val sampleThreshold: Int = 100
 ) {
     /**
      * Note that if `raiseOnMismatch` is true, [.runAsync] will block waiting for
@@ -43,46 +45,50 @@ abstract class AbstractExperiment<T>(
         val DEFAULT_EVENT_BUS: EventBus = EventBus()
     }
 
-    open fun isSync(runOptions: EnumSet<ExperimentOption>) =
-        runOptions.contains(ExperimentOption.SYNC) || experimentOptions.contains(ExperimentOption.SYNC)
-    open fun isReturnCandidate(runOptions: EnumSet<ExperimentOption>) =
-        runOptions.contains(ExperimentOption.RETURN_CANDIDATE) || experimentOptions.contains(ExperimentOption.RETURN_CANDIDATE)
-    open fun isRaiseOnMismatch(runOptions: EnumSet<ExperimentOption>) =
-        runOptions.contains(ExperimentOption.RAISE_ON_MISMATCH) || experimentOptions.contains(ExperimentOption.RAISE_ON_MISMATCH)
-    open fun isDisabled(runOptions: EnumSet<ExperimentOption>) =
-        runOptions.contains(ExperimentOption.DISABLED) || experimentOptions.contains(ExperimentOption.DISABLED)
-    open fun isWithholdPublication(runOptions: EnumSet<ExperimentOption>) =
-        runOptions.contains(ExperimentOption.WITHHOLD_PUBLICATION) || experimentOptions.contains(ExperimentOption.WITHHOLD_PUBLICATION)
+    open fun isSync(sample: Sample) =
+        sample.runOptions.contains(ExperimentOption.SYNC) || experimentOptions.contains(ExperimentOption.SYNC)
 
-    open fun isPublishable(runOptions: EnumSet<ExperimentOption>) = !isWithholdPublication(runOptions)
+    open fun isReturnCandidate(sample: Sample) =
+        sample.runOptions.contains(ExperimentOption.RETURN_CANDIDATE) || experimentOptions.contains(ExperimentOption.RETURN_CANDIDATE)
+
+    open fun isRaiseOnMismatch(sample: Sample) =
+        sample.runOptions.contains(ExperimentOption.RAISE_ON_MISMATCH) || experimentOptions.contains(ExperimentOption.RAISE_ON_MISMATCH)
+
+    open fun isDisabled(sample: Sample) =
+        sample.runOptions.contains(ExperimentOption.DISABLED) || experimentOptions.contains(ExperimentOption.DISABLED)
+
+    open fun isWithholdPublication(sample: Sample) =
+        sample.runOptions.contains(ExperimentOption.WITHHOLD_PUBLICATION) || experimentOptions.contains(ExperimentOption.WITHHOLD_PUBLICATION)
+
+    open fun isPublishable(sample: Sample) = !isWithholdPublication(sample)
 
     protected fun executeCandidate(
         candidate: () -> T?,
-        runOptions: EnumSet<ExperimentOption> = ExperimentOption.DEFAULT
+        sample: Sample
     ): ExperimentObservation<T> =
-        if (isDisabled(runOptions) && !isReturnCandidate(runOptions)) {
+        if (isDisabled(sample) && !isReturnCandidate(sample)) {
             scrap("candidate")
         } else {
             execute(
                 "candidate",
                 candidateTimer,
                 candidate,
-                isReturnCandidate(runOptions)
+                isReturnCandidate(sample)
             )
         }
 
     protected fun executeControl(
         control: () -> T?,
-        runOptions: EnumSet<ExperimentOption> = ExperimentOption.DEFAULT
+        sample: Sample
     ): ExperimentObservation<T> =
-        if (isDisabled(runOptions) && isReturnCandidate(runOptions)) {
+        if (isDisabled(sample) && isReturnCandidate(sample)) {
             scrap("control")
         } else {
             execute(
                 "control",
                 controlTimer,
                 control,
-                !isReturnCandidate(runOptions)
+                !isReturnCandidate(sample)
             )
         }
 
@@ -113,8 +119,8 @@ abstract class AbstractExperiment<T>(
         return experimentObservation
     }
 
-    open fun publish(result: Any, runOptions: EnumSet<ExperimentOption> = ExperimentOption.DEFAULT) {
-        if (isPublishable(runOptions)) {
+    open fun publish(result: Any, sample: Sample) {
+        if (isPublishable(sample)) {
             eventBus.post(result)
         }
     }

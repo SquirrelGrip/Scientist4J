@@ -16,7 +16,8 @@ class ControlledExperimentBuilder<T>(
     private var sampleFactory: SampleFactory = SampleFactory(),
     private var comparator: ExperimentComparator<T?> = DefaultExperimentComparator(),
     private var eventBus: EventBus = DEFAULT_EVENT_BUS,
-    private var experimentOptions: EnumSet<ExperimentOption> = ExperimentOption.DEFAULT
+    private var experimentOptions: EnumSet<ExperimentOption> = ExperimentOption.DEFAULT,
+    private var sampleThreshold: Int = 100
 ) {
     constructor(experimentConfiguration: ExperimentConfiguration): this(
         experimentConfiguration.name,
@@ -24,7 +25,8 @@ class ControlledExperimentBuilder<T>(
         experimentConfiguration.sampleFactory,
         DefaultExperimentComparator(),
         DEFAULT_EVENT_BUS,
-        experimentConfiguration.experimentOptions
+        experimentConfiguration.experimentOptions,
+        experimentConfiguration.sampleThreshold
     )
 
     fun withName(name: String): ControlledExperimentBuilder<T> {
@@ -42,7 +44,7 @@ class ControlledExperimentBuilder<T>(
         return this
     }
 
-    fun withExperimentFlags(vararg experimentOption: ExperimentOption): ControlledExperimentBuilder<T> {
+    fun withExperimentOptions(vararg experimentOption: ExperimentOption): ControlledExperimentBuilder<T> {
         this.experimentOptions = EnumSet.copyOf(experimentOption.asList())
         return this
     }
@@ -57,8 +59,13 @@ class ControlledExperimentBuilder<T>(
         return this
     }
 
+    fun withSampleThreshold(sampleThreshold: Int): ControlledExperimentBuilder<T> {
+        this.sampleThreshold = sampleThreshold
+        return this
+    }
+
     fun build(): ControlledExperiment<T> {
-        return ControlledExperiment(name, metricsProvider, comparator, sampleFactory, eventBus)
+        return ControlledExperiment(name, metricsProvider, comparator, sampleFactory, eventBus, experimentOptions, sampleThreshold)
     }
 
 }

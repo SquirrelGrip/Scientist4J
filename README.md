@@ -10,8 +10,8 @@ A port of Github's refactoring tool [Scientist](https://github.com/github/scient
 ```xml
 <dependency>
     <groupId>com.github.squirrelgrip</groupId>
-    <artifactId>ccientist4k-core</artifactId>
-    <version>0.7.1</version>
+    <artifactId>scientist4k-bom</artifactId>
+    <version>0.9.3</version>
 </dependency>
 ```
 # Usage
@@ -114,4 +114,5 @@ Checkout the release branch and fix the problem and commit the change to the rel
 
 # Ideas
 1. If you don't need to raiseExceptionOmMismatch you don't need a comparator.
-    1. The idea of checking if the control and candidate match may not be a concern for the execution of the experiment. The observations could be recorded only when the results are being processed do they need to be compared.
+1. The idea of checking if the control and candidate match may not be a concern for the execution of the experiment. The observations could be recorded only when the results are being processed do they need to be compared.
+1. Allow for a percentage of comparisons. ie. 50% compared.    

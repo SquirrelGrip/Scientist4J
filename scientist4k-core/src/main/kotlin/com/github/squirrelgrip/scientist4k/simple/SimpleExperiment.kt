@@ -24,17 +24,17 @@ open class SimpleExperiment<T>(
     comparator: ExperimentComparator<T?> = DefaultExperimentComparator(),
     sampleFactory: SampleFactory = SampleFactory(),
     eventBus: EventBus = DEFAULT_EVENT_BUS,
-    experimentOptions: EnumSet<ExperimentOption> = ExperimentOption.DEFAULT
+    experimentOptions: EnumSet<ExperimentOption> = ExperimentOption.DEFAULT,
+    sampleThreshold: Int = 100
 ) : AbstractExperiment<T>(
     name,
     metrics,
     comparator,
     sampleFactory,
     eventBus,
-    experimentOptions
+    experimentOptions,
+    sampleThreshold
 ) {
-    constructor(metrics: MetricsProvider<*>) : this("Experiment", metrics)
-
     companion object {
         private val LOGGER: Logger = LoggerFactory.getLogger(SimpleExperiment::class.java)
     }
@@ -42,57 +42,52 @@ open class SimpleExperiment<T>(
     open fun run(
         control: () -> T?,
         candidate: () -> T?,
-        sample: Sample = sampleFactory.create(),
-        runOptions: EnumSet<ExperimentOption> = ExperimentOption.DEFAULT
+        sample: Sample = sampleFactory.create()
     ): T? {
-        sample.addNote("experiment", name)
-        return if (isSync(runOptions)) {
+        return if (isSync(sample)) {
             LOGGER.trace("Running sync")
-            runSync(control, candidate, sample, runOptions)
+            runSync(control, candidate, sample)
         } else {
             LOGGER.trace("Running async")
-            runAsync(control, candidate, sample, runOptions)
+            runAsync(control, candidate, sample)
         }
     }
 
     open fun runSync(
         control: () -> T?,
         candidate: () -> T?,
-        sample: Sample = sampleFactory.create(),
-        runOptions: EnumSet<ExperimentOption> = ExperimentOption.DEFAULT
+        sample: Sample = sampleFactory.create()
     ): T? {
-        val controlObservation: ExperimentObservation<T> = executeControl(control)
-        val candidateObservation: ExperimentObservation<T> = executeCandidate(candidate)
-        publishResult(controlObservation, candidateObservation, sample, runOptions).handleComparisonMismatch()
-        return if (isReturnCandidate(runOptions)) {
+        val controlObservation: ExperimentObservation<T> = executeControl(control, sample)
+        val candidateObservation: ExperimentObservation<T> = executeCandidate(candidate, sample)
+        publishResult(controlObservation, candidateObservation, sample).handleComparisonMismatch()
+        return if (isReturnCandidate(sample)) {
             candidateObservation.value
         } else {
             controlObservation.value
         }
     }
 
-
     open fun runAsync(
         control: () -> T?,
         candidate: () -> T?,
-        sample: Sample = sampleFactory.create(),
-        runOptions: EnumSet<ExperimentOption> = ExperimentOption.DEFAULT
+        sample: Sample = sampleFactory.create()
     ) =
         runBlocking {
             val deferredControlObservation = GlobalScope.async {
-                executeControl(control, runOptions)
+                executeControl(control, sample)
             }
             val deferredCandidateObservation = GlobalScope.async {
-                executeCandidate(candidate, runOptions)
+                executeCandidate(candidate, sample)
             }
 
             val deferred = GlobalScope.async {
-                publishAsync(deferredControlObservation, deferredCandidateObservation, sample, runOptions)
+                publishAsync(deferredControlObservation, deferredCandidateObservation, sample)
             }
-            if (isRaiseOnMismatch(runOptions)) {
+            if (isRaiseOnMismatch(sample)) {
                 deferred.await().handleComparisonMismatch()
             }
-            if (isReturnCandidate(runOptions)) {
+            if (isReturnCandidate(sample)) {
                 deferredCandidateObservation.await().value
             } else {
                 deferredControlObservation.await().value
@@ -102,26 +97,25 @@ open class SimpleExperiment<T>(
     private suspend fun publishAsync(
         deferredControlExperimentObservation: Deferred<ExperimentObservation<T>>,
         deferredCandidateExperimentObservation: Deferred<ExperimentObservation<T>>,
-        sample: Sample,
-        runOptions: EnumSet<ExperimentOption>
+        sample: Sample
     ): SimpleExperimentResult<T> {
         val controlObservation = deferredControlExperimentObservation.await()
         LOGGER.trace("controlObservation is {}", controlObservation)
         val candidateObservation = deferredCandidateExperimentObservation.await()
         LOGGER.trace("candidateObservation is {}", candidateObservation)
-        return publishResult(controlObservation, candidateObservation, sample, runOptions)
+        return publishResult(controlObservation, candidateObservation, sample)
     }
 
     private fun publishResult(
         controlExperimentObservation: ExperimentObservation<T>,
         candidateExperimentObservation: ExperimentObservation<T>,
-        sample: Sample,
-        runOptions: EnumSet<ExperimentOption>
+        sample: Sample
     ): SimpleExperimentResult<T> {
+        sample.addNote("experiment", name)
         LOGGER.trace("Creating Result...")
         val result = SimpleExperimentResult(this, controlExperimentObservation, candidateExperimentObservation, sample)
         LOGGER.trace("Publishing Result")
-        publish(result, runOptions)
+        publish(result, sample)
         return result
     }
 
