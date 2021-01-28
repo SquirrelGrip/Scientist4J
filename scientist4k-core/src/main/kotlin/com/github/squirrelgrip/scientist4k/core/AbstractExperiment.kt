@@ -2,6 +2,7 @@ package com.github.squirrelgrip.scientist4k.core
 
 import com.github.squirrelgrip.scientist4k.core.comparator.DefaultExperimentComparator
 import com.github.squirrelgrip.scientist4k.core.comparator.ExperimentComparator
+import com.github.squirrelgrip.scientist4k.core.configuration.ExperimentConfiguration
 import com.github.squirrelgrip.scientist4k.core.model.ComparisonResult
 import com.github.squirrelgrip.scientist4k.core.model.ExperimentObservation
 import com.github.squirrelgrip.scientist4k.core.model.ExperimentObservationStatus
@@ -17,27 +18,36 @@ import org.slf4j.LoggerFactory
 import java.util.*
 
 abstract class AbstractExperiment<T>(
-    val name: String,
-    val metrics: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD"),
+    val experimentConfiguration: ExperimentConfiguration,
     val comparator: ExperimentComparator<T?> = DefaultExperimentComparator(),
-    val sampleFactory: SampleFactory = SampleFactory(),
     val eventBus: EventBus = DEFAULT_EVENT_BUS,
-    val experimentOptions: EnumSet<ExperimentOption> = ExperimentOption.DEFAULT,
-    val sampleThreshold: Int = 100
 ) {
+    val name: String
+        get() = experimentConfiguration.name
+
+    val sampleThreshold: Int
+        get() = experimentConfiguration.sampleThreshold
+
+    val experimentOptions: EnumSet<ExperimentOption>
+        get() = experimentConfiguration.experimentOptions
+
+    val metricsProvider: MetricsProvider<*>
+        get() = experimentConfiguration.metricsProvider
+
+    val sampleFactory: SampleFactory
+        get() = experimentConfiguration.sampleFactory
+
     /**
      * Note that if `raiseOnMismatch` is true, [.runAsync] will block waiting for
      * the candidate function to complete before it can raise any resulting errors.
      * In situations where the candidate function may be significantly slower than the control,
      * it is *not* recommended to raise on mismatch.
      */
-    private val controlTimer: Timer = metrics.timer(NAMESPACE_PREFIX, name, "control")
-    private val candidateTimer: Timer = metrics.timer(NAMESPACE_PREFIX, name, "candidate")
-    private val mismatchCount: Counter = metrics.counter(NAMESPACE_PREFIX, name, "mismatch")
-    private val candidateExceptionCount: Counter = metrics.counter(NAMESPACE_PREFIX, name, "candidate.exception")
-    private val totalCount: Counter = metrics.counter(NAMESPACE_PREFIX, name, "total")
-
-    constructor(metrics: MetricsProvider<*>) : this("Experiment", metrics)
+    private val controlTimer: Timer = metricsProvider.timer(NAMESPACE_PREFIX, name, "control")
+    private val candidateTimer: Timer = metricsProvider.timer(NAMESPACE_PREFIX, name, "candidate")
+    private val mismatchCount: Counter = metricsProvider.counter(NAMESPACE_PREFIX, name, "mismatch")
+    private val candidateExceptionCount: Counter = metricsProvider.counter(NAMESPACE_PREFIX, name, "candidate.exception")
+    private val totalCount: Counter = metricsProvider.counter(NAMESPACE_PREFIX, name, "total")
 
     companion object {
         private val LOGGER: Logger = LoggerFactory.getLogger(AbstractExperiment::class.java)

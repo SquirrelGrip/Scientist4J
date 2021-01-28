@@ -5,37 +5,35 @@ import com.github.squirrelgrip.scientist4k.core.comparator.DefaultExperimentComp
 import com.github.squirrelgrip.scientist4k.core.comparator.ExperimentComparator
 import com.github.squirrelgrip.scientist4k.core.configuration.ExperimentConfiguration
 import com.github.squirrelgrip.scientist4k.core.model.ExperimentOption
-import com.github.squirrelgrip.scientist4k.core.model.sample.SampleFactory
-import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
+import com.github.squirrelgrip.scientist4k.metrics.Metrics
 import com.google.common.eventbus.EventBus
 import java.util.*
 
-class ControlledExperimentBuilder<T>(
-    private var name: String = "Test",
-    private var metricsProvider: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD"),
-    private var sampleFactory: SampleFactory = SampleFactory(),
-    private var comparator: ExperimentComparator<T?> = DefaultExperimentComparator(),
-    private var eventBus: EventBus = DEFAULT_EVENT_BUS,
-    private var experimentOptions: EnumSet<ExperimentOption> = ExperimentOption.DEFAULT,
+class ControlledExperimentBuilder<T>() {
+
+    private var name: String = "Test"
+    private var metrics: Metrics = Metrics.DROPWIZARD
+    private var samplePrefix: String = ""
+    private var comparator: ExperimentComparator<T?> = DefaultExperimentComparator()
+    private var eventBus: EventBus = DEFAULT_EVENT_BUS
+    private var experimentOptions: EnumSet<ExperimentOption> = ExperimentOption.DEFAULT
     private var sampleThreshold: Int = 100
-) {
-    constructor(experimentConfiguration: ExperimentConfiguration): this(
-        experimentConfiguration.name,
-        experimentConfiguration.metrics,
-        experimentConfiguration.sampleFactory,
-        DefaultExperimentComparator(),
-        DEFAULT_EVENT_BUS,
-        experimentConfiguration.experimentOptions,
-        experimentConfiguration.sampleThreshold
-    )
+
+    constructor(experimentConfiguration: ExperimentConfiguration) : this() {
+        name = experimentConfiguration.name
+        metrics = experimentConfiguration.metrics
+        samplePrefix = experimentConfiguration.samplePrefix
+        experimentOptions = experimentConfiguration.experimentOptions
+        sampleThreshold = experimentConfiguration.sampleThreshold
+    }
 
     fun withName(name: String): ControlledExperimentBuilder<T> {
         this.name = name
         return this
     }
 
-    fun withMetricsProvider(metricsProvider: MetricsProvider<*>): ControlledExperimentBuilder<T> {
-        this.metricsProvider = metricsProvider
+    fun withMetrics(metrics: Metrics): ControlledExperimentBuilder<T> {
+        this.metrics = metrics
         return this
     }
 
@@ -49,8 +47,8 @@ class ControlledExperimentBuilder<T>(
         return this
     }
 
-    fun withSampleFactory(sampleFactory: SampleFactory): ControlledExperimentBuilder<T> {
-        this.sampleFactory = sampleFactory
+    fun withSamplePrefix(samplePrefix: String): ControlledExperimentBuilder<T> {
+        this.samplePrefix = samplePrefix
         return this
     }
 
@@ -65,7 +63,9 @@ class ControlledExperimentBuilder<T>(
     }
 
     fun build(): ControlledExperiment<T> {
-        return ControlledExperiment(name, metricsProvider, comparator, sampleFactory, eventBus, experimentOptions, sampleThreshold)
+        val experimentConfiguration =
+            ExperimentConfiguration(name, metrics, samplePrefix, experimentOptions, sampleThreshold)
+        return ControlledExperiment(experimentConfiguration, comparator, eventBus)
     }
 
 }

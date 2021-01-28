@@ -3,32 +3,25 @@ package com.github.squirrelgrip.scientist4k.http.controlled
 import com.github.squirrelgrip.scientist4k.controlled.ControlledExperiment
 import com.github.squirrelgrip.scientist4k.controlled.model.ControlledExperimentResult
 import com.github.squirrelgrip.scientist4k.core.comparator.NoopComparator
+import com.github.squirrelgrip.scientist4k.core.configuration.ExperimentConfiguration
 import com.github.squirrelgrip.scientist4k.core.model.ExperimentOption
 import com.github.squirrelgrip.scientist4k.core.model.sample.Sample
-import com.github.squirrelgrip.scientist4k.core.model.sample.SampleFactory
 import com.github.squirrelgrip.scientist4k.http.core.configuration.MappingConfiguration
 import com.github.squirrelgrip.scientist4k.http.core.extension.toHttpExperimentResult
 import com.github.squirrelgrip.scientist4k.http.core.model.ExperimentResponse
-import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
 import com.google.common.eventbus.EventBus
 import java.util.*
 import javax.servlet.ServletRequest
 import javax.servlet.http.HttpServletRequest
 
 open class AbstractControlledHttpExperiment(
-    name: String,
-    metrics: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD"),
-    sampleFactory: SampleFactory = SampleFactory(),
+    experimentConfiguration: ExperimentConfiguration,
     eventBus: EventBus = DEFAULT_EVENT_BUS,
-    experimentOptions: EnumSet<ExperimentOption> = ExperimentOption.DEFAULT,
     val mappingConfiguration: List<MappingConfiguration> = emptyList()
 ) : ControlledExperiment<ExperimentResponse>(
-    name,
-    metrics,
+    experimentConfiguration,
     NoopComparator(),
-    sampleFactory,
-    eventBus,
-    experimentOptions
+    eventBus
 ) {
     override fun publish(result: Any, sample: Sample) {
         if (isPublishable(sample)) {

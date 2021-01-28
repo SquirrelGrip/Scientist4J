@@ -3,11 +3,9 @@ package com.github.squirrelgrip.scientist4k.simple
 import com.github.squirrelgrip.scientist4k.core.AbstractExperiment
 import com.github.squirrelgrip.scientist4k.core.comparator.DefaultExperimentComparator
 import com.github.squirrelgrip.scientist4k.core.comparator.ExperimentComparator
+import com.github.squirrelgrip.scientist4k.core.configuration.ExperimentConfiguration
 import com.github.squirrelgrip.scientist4k.core.model.ExperimentObservation
-import com.github.squirrelgrip.scientist4k.core.model.ExperimentOption
 import com.github.squirrelgrip.scientist4k.core.model.sample.Sample
-import com.github.squirrelgrip.scientist4k.core.model.sample.SampleFactory
-import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
 import com.github.squirrelgrip.scientist4k.simple.model.SimpleExperimentResult
 import com.google.common.eventbus.EventBus
 import kotlinx.coroutines.Deferred
@@ -16,24 +14,15 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.util.*
 
 open class SimpleExperiment<T>(
-    name: String,
-    metrics: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD"),
+    experimentConfiguration: ExperimentConfiguration,
     comparator: ExperimentComparator<T?> = DefaultExperimentComparator(),
-    sampleFactory: SampleFactory = SampleFactory(),
-    eventBus: EventBus = DEFAULT_EVENT_BUS,
-    experimentOptions: EnumSet<ExperimentOption> = ExperimentOption.DEFAULT,
-    sampleThreshold: Int = 100
+    eventBus: EventBus = DEFAULT_EVENT_BUS
 ) : AbstractExperiment<T>(
-    name,
-    metrics,
+    experimentConfiguration,
     comparator,
-    sampleFactory,
-    eventBus,
-    experimentOptions,
-    sampleThreshold
+    eventBus
 ) {
     companion object {
         private val LOGGER: Logger = LoggerFactory.getLogger(SimpleExperiment::class.java)

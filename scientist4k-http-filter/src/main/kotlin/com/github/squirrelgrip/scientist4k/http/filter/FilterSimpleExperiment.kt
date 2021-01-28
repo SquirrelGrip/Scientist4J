@@ -1,8 +1,7 @@
 package com.github.squirrelgrip.scientist4k.http.filter
 
-import com.github.squirrelgrip.scientist4k.core.model.ExperimentOption
+import com.github.squirrelgrip.scientist4k.core.configuration.ExperimentConfiguration
 import com.github.squirrelgrip.scientist4k.core.model.sample.Sample
-import com.github.squirrelgrip.scientist4k.core.model.sample.SampleFactory
 import com.github.squirrelgrip.scientist4k.http.core.AbstractHttpSimpleExperiment
 import com.github.squirrelgrip.scientist4k.http.core.HttpExperimentUtil
 import com.github.squirrelgrip.scientist4k.http.core.configuration.EndPointConfiguration
@@ -10,9 +9,7 @@ import com.github.squirrelgrip.scientist4k.http.core.configuration.MappingConfig
 import com.github.squirrelgrip.scientist4k.http.core.factory.RequestFactory
 import com.github.squirrelgrip.scientist4k.http.core.model.ExperimentResponse
 import com.github.squirrelgrip.scientist4k.http.core.wrapper.ExperimentResponseWrapper
-import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
 import com.google.common.eventbus.EventBus
-import java.util.*
 import javax.servlet.FilterChain
 import javax.servlet.ServletRequest
 import javax.servlet.ServletResponse
@@ -20,19 +17,13 @@ import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletRequestWrapper
 
 class FilterSimpleExperiment(
-    name: String,
-    metrics: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD"),
-    sampleFactory: SampleFactory = SampleFactory(),
+    experimentConfiguration: ExperimentConfiguration,
     eventBus: EventBus = DEFAULT_EVENT_BUS,
-    experimentOptions: EnumSet<ExperimentOption> = ExperimentOption.DEFAULT,
     mappings: List<MappingConfiguration> = emptyList(),
     private val detourConfig: EndPointConfiguration
 ) : AbstractHttpSimpleExperiment(
-    name,
-    metrics,
-    sampleFactory,
-    eventBus,
-    experimentOptions
+    experimentConfiguration,
+    eventBus
 ) {
     private val detourRequestFactory = RequestFactory(detourConfig, HttpExperimentUtil.DETOUR_COOKIE_STORE, mappings)
 

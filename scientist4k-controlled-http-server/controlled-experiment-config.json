@@ -19,12 +19,7 @@
     ]
   },
   "experiment": {
-    "name": "name",
-    "context": {},
-    "metricsProvider": "DROPWIZARD",
-    "sampleFactory": {
-      "prefix": ""
-    }
+    "name": "name"
   },
   "mappings": [
     {

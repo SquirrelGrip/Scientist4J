@@ -5,6 +5,7 @@ import com.github.squirrelgrip.scientist4k.core.configuration.ExperimentConfigur
 import com.github.squirrelgrip.scientist4k.core.exception.MismatchException
 import com.github.squirrelgrip.scientist4k.core.model.ComparisonResult
 import com.github.squirrelgrip.scientist4k.core.model.ExperimentOption.*
+import com.github.squirrelgrip.scientist4k.metrics.Metrics.*
 import com.github.squirrelgrip.scientist4k.metrics.dropwizard.DropwizardMetricsProvider
 import com.github.squirrelgrip.scientist4k.metrics.micrometer.MicrometerMetricsProvider
 import com.github.squirrelgrip.scientist4k.metrics.noop.NoopMetricsProvider
@@ -51,12 +52,12 @@ class SimpleExperimentSyncTest {
     lateinit var argumentCaptor: ArgumentCaptor<SimpleExperimentResult<*>>
 
     @Mock
-    lateinit var eventBus : EventBus
+    lateinit var eventBus: EventBus
 
     @Test
     fun itThrowsAnExceptionWhenControlFails() {
         assertThrows(Exception::class.java) {
-            SimpleExperiment<Int>("test", NoopMetricsProvider()).runSync(
+            SimpleExperiment<Int>(ExperimentConfiguration("test", NOOP)).runSync(
                 { exceptionThrowingFunction() },
                 { exceptionThrowingFunction() })
         }
@@ -65,7 +66,7 @@ class SimpleExperimentSyncTest {
     @Test
     fun itThrowsAnExceptionWhenControlFailsAndCandidateDoesNotFail() {
         assertThrows(Exception::class.java) {
-            SimpleExperiment<Int>("test", NoopMetricsProvider()).runSync(
+            SimpleExperiment<Int>(ExperimentConfiguration("test", NOOP)).runSync(
                 { exceptionThrowingFunction() },
                 { safeFunction() })
         }
@@ -73,14 +74,14 @@ class SimpleExperimentSyncTest {
 
     @Test
     fun itDoesntThrowAnExceptionWhenCandidateFails() {
-        val experiment = SimpleExperiment<Int>("test", NoopMetricsProvider())
+        val experiment = SimpleExperiment<Int>(ExperimentConfiguration("test", NOOP))
         val value = experiment.runSync({ safeFunction() }, { exceptionThrowingFunction() })
         assertThat(value).isEqualTo(3)
     }
 
     @Test
     fun itDoesntThrowAnExceptionWhenCandidateReturnsDifferentValue() {
-        val experiment = SimpleExperiment<Int>("test", NoopMetricsProvider())
+        val experiment = SimpleExperiment<Int>(ExperimentConfiguration("test", NOOP))
         val value = experiment.runSync({ safeFunction() }, { safeFunctionWithDifferentResult() })
         assertThat(value).isEqualTo(3)
     }
@@ -88,32 +89,47 @@ class SimpleExperimentSyncTest {
     @Test
     fun itCandidateReturnsDifferentValueAndCandidateIsReturned() {
         val experiment =
-            SimpleExperiment<Int>("test", NoopMetricsProvider(), experimentOptions = EnumSet.of(RETURN_CANDIDATE))
+            SimpleExperiment<Int>(
+                ExperimentConfiguration(
+                    "test",
+                    NOOP,
+                    experimentOptions = EnumSet.of(RETURN_CANDIDATE)
+                )
+            )
         val value = experiment.runSync({ safeFunction() }, { safeFunctionWithDifferentResult() })
         assertThat(value).isEqualTo(4)
     }
 
     @Test
     fun candidateIsReturnedWhenDisabled() {
-        val experiment = SimpleExperiment<Int>("test", NoopMetricsProvider(), eventBus = eventBus, experimentOptions = EnumSet.of(RETURN_CANDIDATE, DISABLED))
+        val experiment = SimpleExperiment<Int>(
+            ExperimentConfiguration(
+                "test",
+                NOOP,
+                experimentOptions = EnumSet.of(RETURN_CANDIDATE, DISABLED)
+            ),
+            eventBus = eventBus
+        )
         val value = experiment.runSync({ safeFunction() }, { safeFunctionWithDifferentResult() })
         assertThat(value).isEqualTo(4)
         verify(eventBus).post(argumentCaptor.capture())
         assertThat(argumentCaptor.value.candidate?.value).isEqualTo(4)
-        assertThat(argumentCaptor.value.control?.value).isNull()
+        assertThat(argumentCaptor.value.control.value).isNull()
     }
 
     @Test
     fun itThrowsAnExceptionWhenCandidateFailsAndIsReturned() {
         assertThrows(Exception::class.java) {
-            SimpleExperiment<Int>("test", NoopMetricsProvider(), experimentOptions = EnumSet.of(RETURN_CANDIDATE))
+            SimpleExperiment<Int>(
+                ExperimentConfiguration("test", NOOP, experimentOptions = EnumSet.of(RETURN_CANDIDATE))
+            )
                 .runSync({ safeFunction() }, { exceptionThrowingFunction() })
         }
     }
 
     @Test
     fun itDoesntThrowAnExceptionWhenCandidateThrowsException() {
-        val experiment = SimpleExperiment<Int>("test", NoopMetricsProvider())
+        val experiment = SimpleExperiment<Int>(ExperimentConfiguration("test", NOOP))
         val value = experiment.runSync({ safeFunction() }, { exceptionThrowingFunction() })
         assertThat(value).isEqualTo(3)
     }
@@ -121,7 +137,9 @@ class SimpleExperimentSyncTest {
     @Test
     fun itThrowsOnMismatch() {
         val experiment =
-            SimpleExperiment<Int>("test", NoopMetricsProvider(), experimentOptions = EnumSet.of(RAISE_ON_MISMATCH))
+            SimpleExperiment<Int>(
+                ExperimentConfiguration("test", NOOP, experimentOptions = EnumSet.of(RAISE_ON_MISMATCH))
+            )
         assertThrows(MismatchException::class.java) {
             experiment.runSync({ safeFunction() }, { safeFunctionWithDifferentResult() })
         }
@@ -130,7 +148,9 @@ class SimpleExperimentSyncTest {
     @Test
     fun itDoesNotThrowOnMatch() {
         val experiment =
-            SimpleExperiment<Int>("test", NoopMetricsProvider(), experimentOptions = EnumSet.of(RAISE_ON_MISMATCH))
+            SimpleExperiment<Int>(
+                ExperimentConfiguration("test", NOOP, experimentOptions = EnumSet.of(RAISE_ON_MISMATCH))
+            )
         val value = experiment.runSync({ safeFunction() }, { safeFunction() })
         assertThat(value).isEqualTo(3)
     }
@@ -138,7 +158,9 @@ class SimpleExperimentSyncTest {
     @Test
     fun itHandlesNullValues() {
         val experiment =
-            SimpleExperiment<Int?>("test", NoopMetricsProvider(), experimentOptions = EnumSet.of(RAISE_ON_MISMATCH))
+            SimpleExperiment<Int?>(
+                ExperimentConfiguration("test", NOOP, experimentOptions = EnumSet.of(RAISE_ON_MISMATCH))
+            )
         val value = experiment.runSync({ null }, { null })
         assertThat(value).isNull()
     }
@@ -146,7 +168,9 @@ class SimpleExperimentSyncTest {
     @Test
     fun nonAsyncRunsLongTime() {
         val experiment =
-            SimpleExperiment<Int>("test", NoopMetricsProvider(), experimentOptions = EnumSet.of(RAISE_ON_MISMATCH))
+            SimpleExperiment<Int>(
+                ExperimentConfiguration("test", NOOP, experimentOptions = EnumSet.of(RAISE_ON_MISMATCH))
+            )
         val date1 = Date()
         val value = experiment.runSync({ sleepFunction() }, { sleepFunction() })
         val date2 = Date()
@@ -157,29 +181,37 @@ class SimpleExperimentSyncTest {
 
     @Test
     fun itWorksWithAnExtendedClass() {
-        val experiment = SimpleExperiment<Int>("test", NoopMetricsProvider())
+        val experiment = SimpleExperiment<Int>(ExperimentConfiguration("test", NOOP))
         experiment.runSync({ safeFunction() }, { safeFunction() })
     }
 
     @Test
     fun candidateExceptionsAreCounted_dropwizard() {
-        val provider = DropwizardMetricsProvider()
-        val experiment = SimpleExperiment<Int>("test", provider)
+        val experiment = SimpleExperiment<Int>(
+            ExperimentConfiguration("test", DROPWIZARD)
+        )
         experiment.runSync({ 1 }, { exceptionThrowingFunction() })
-        val result = provider.registry.counters[MetricName.build("scientist", "test", "candidate", "exception")]
+        val result = (experiment.metricsProvider as DropwizardMetricsProvider).registry.counters[MetricName.build(
+            "scientist",
+            "test",
+            "candidate",
+            "exception"
+        )]
         assertThat(result!!.count).isEqualTo(1)
     }
 
     @Test
     fun candidateExceptionsAreCounted_micrometer() {
-        val provider = MicrometerMetricsProvider()
-        val experiment = SimpleExperiment<Int>("test", provider)
+        val experiment = SimpleExperiment<Int>(
+            ExperimentConfiguration("test", MICROMETER)
+        )
         experiment.runSync({ 1 }, { exceptionThrowingFunction() })
         Awaitility.await().atMost(5, TimeUnit.SECONDS).until {
-            val result = provider.registry["scientist.test.candidate.exception"].counter()
+            val result = (experiment.metricsProvider as MicrometerMetricsProvider).registry["scientist.test.candidate.exception"].counter()
             result.count().equals(1.0)
         }
-        val result = provider.registry["scientist.test.candidate.exception"].counter()
+        val result =
+            (experiment.metricsProvider as MicrometerMetricsProvider).registry["scientist.test.candidate.exception"].counter()
         assertThat(result.count()).isEqualTo(1.0)
     }
 
@@ -191,7 +223,7 @@ class SimpleExperimentSyncTest {
         val experiment = SimpleExperimentBuilder<Int>()
             .withName("test")
             .withComparator(comparator)
-            .withMetricsProvider(NoopMetricsProvider())
+            .withMetrics(NOOP)
             .build()
         experiment.runSync({ 1 }, { 2 })
         verify(comparator).invoke(eq(1), eq(2))
@@ -201,15 +233,14 @@ class SimpleExperimentSyncTest {
     fun `build() using ExperimentConfiguration`() {
         val experimentConfiguration = ExperimentConfiguration(
             "name",
-            "NOOP",
-            emptyMap(),
+            NOOP,
             "prefix",
             EnumSet.of(RAISE_ON_MISMATCH)
         )
         val experiment = SimpleExperimentBuilder<Int>(experimentConfiguration).build()
 
         assertThat(experiment.name).isEqualTo("name")
-        assertThat(experiment.metrics.javaClass).isEqualTo(NoopMetricsProvider::class.java)
+        assertThat(experiment.metricsProvider.javaClass).isEqualTo(NoopMetricsProvider::class.java)
         assertThat(experiment.sampleFactory.prefix).isEqualTo("prefix")
     }
 
@@ -218,9 +249,9 @@ class SimpleExperimentSyncTest {
         val experiment = SimpleExperimentBuilder<Int>()
             .withEventBus(eventBus)
             .build()
-        experiment.run({ safeFunction() }, { safeFunction() })
+        assertThat(experiment.run({ safeFunction() }, { safeFunction() })).isEqualTo(3)
+        Thread.sleep(100)
         verify(eventBus).post(argumentCaptor.capture())
-        println(argumentCaptor.value)
     }
 
     @Test
@@ -229,7 +260,7 @@ class SimpleExperimentSyncTest {
             .withExperimentOptions(WITHHOLD_PUBLICATION)
             .withEventBus(eventBus)
             .build()
-        experiment.run({ safeFunction() }, { safeFunction() })
+        assertThat(experiment.run({ safeFunction() }, { safeFunction() })).isEqualTo(3)
         verifyNoInteractions(eventBus)
     }
 

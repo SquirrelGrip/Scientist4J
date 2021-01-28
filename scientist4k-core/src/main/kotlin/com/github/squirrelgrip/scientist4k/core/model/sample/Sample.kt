@@ -26,7 +26,8 @@ data class Sample(
         _notes[noteKey] = note
     }
 
-    fun exceedsThreshold(sampleThreshold: Int): Boolean =
-        sampleScore > sampleThreshold
+    fun exceedsThreshold(sampleThreshold: Int): Boolean {
+        return sampleScore >= sampleThreshold
+    }
 
 }

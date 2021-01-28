@@ -1,8 +1,7 @@
 package com.github.squirrelgrip.scientist4k.http.server
 
-import com.github.squirrelgrip.scientist4k.core.model.ExperimentOption
+import com.github.squirrelgrip.scientist4k.core.configuration.ExperimentConfiguration
 import com.github.squirrelgrip.scientist4k.core.model.sample.Sample
-import com.github.squirrelgrip.scientist4k.core.model.sample.SampleFactory
 import com.github.squirrelgrip.scientist4k.http.core.AbstractHttpSimpleExperiment
 import com.github.squirrelgrip.scientist4k.http.core.HttpExperimentUtil
 import com.github.squirrelgrip.scientist4k.http.core.HttpExperimentUtil.processResponse
@@ -11,29 +10,21 @@ import com.github.squirrelgrip.scientist4k.http.core.configuration.MappingConfig
 import com.github.squirrelgrip.scientist4k.http.core.factory.RequestFactory
 import com.github.squirrelgrip.scientist4k.http.core.model.ExperimentRequest
 import com.github.squirrelgrip.scientist4k.http.core.model.ExperimentResponse
-import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
 import com.google.common.eventbus.EventBus
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.util.*
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 class HttpSimpleExperiment(
-    name: String,
-    metrics: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD"),
-    sampleFactory: SampleFactory = SampleFactory(),
+    experimentConfiguration: ExperimentConfiguration,
     eventBus: EventBus = DEFAULT_EVENT_BUS,
     mappingConfiguration: List<MappingConfiguration> = emptyList(),
-    experimentOptions: EnumSet<ExperimentOption> = ExperimentOption.DEFAULT,
     controlConfig: EndPointConfiguration,
     private val candidateConfig: EndPointConfiguration
 ) : AbstractHttpSimpleExperiment(
-    name,
-    metrics,
-    sampleFactory,
+    experimentConfiguration,
     eventBus,
-    experimentOptions,
     mappingConfiguration
 ) {
     private val controlRequestFactory = RequestFactory(controlConfig, HttpExperimentUtil.CONTROL_COOKIE_STORE)

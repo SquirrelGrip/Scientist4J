@@ -1,10 +1,6 @@
 {
   "experiment": {
-    "name": "filter",
-    "metricsProvider": "DROPWIZARD",
-    "sampleFactory": {
-      "prefix": ""
-    }
+    "name": "filter"
   },
   "mappings": {
     "/mappedControl": "/mappedCandidate"

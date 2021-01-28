@@ -4,7 +4,7 @@
     <parent>
         <artifactId>scientist4k-application</artifactId>
         <groupId>com.github.squirrelgrip</groupId>
-        <version>0.9.4-SNAPSHOT</version>
+        <version>0.10.0-SNAPSHOT</version>
     </parent>
     <artifactId>scientist4k-application-common</artifactId>
 

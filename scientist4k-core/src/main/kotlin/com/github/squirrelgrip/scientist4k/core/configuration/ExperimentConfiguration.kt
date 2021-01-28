@@ -4,20 +4,20 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import com.github.squirrelgrip.extension.json.toInstance
 import com.github.squirrelgrip.scientist4k.core.model.ExperimentOption
 import com.github.squirrelgrip.scientist4k.core.model.sample.SampleFactory
+import com.github.squirrelgrip.scientist4k.metrics.Metrics
 import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
 import java.io.File
 import java.util.*
 
 data class ExperimentConfiguration(
     val name: String,
-    val metricsProvider: String = "DROPWIZARD",
-    val context: Map<String, Any> = emptyMap(),
+    val metrics: Metrics = Metrics.DROPWIZARD,
     val samplePrefix: String = "",
     val experimentOptions: EnumSet<ExperimentOption> = ExperimentOption.DEFAULT,
     val sampleThreshold: Int = 100
 ) {
     @JsonIgnore
-    val metrics: MetricsProvider<*> = MetricsProvider.build(metricsProvider)
+    val metricsProvider: MetricsProvider<*> = metrics.getProvider()
 
     @JsonIgnore
     val sampleFactory: SampleFactory = SampleFactory(samplePrefix)

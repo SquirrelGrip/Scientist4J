@@ -1,13 +1,12 @@
 package com.github.squirrelgrip.scientist4k.http.core
 
 import com.github.squirrelgrip.scientist4k.core.comparator.NoopComparator
+import com.github.squirrelgrip.scientist4k.core.configuration.ExperimentConfiguration
 import com.github.squirrelgrip.scientist4k.core.model.ExperimentOption
 import com.github.squirrelgrip.scientist4k.core.model.sample.Sample
-import com.github.squirrelgrip.scientist4k.core.model.sample.SampleFactory
 import com.github.squirrelgrip.scientist4k.http.core.configuration.MappingConfiguration
 import com.github.squirrelgrip.scientist4k.http.core.extension.toHttpExperimentResult
 import com.github.squirrelgrip.scientist4k.http.core.model.ExperimentResponse
-import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
 import com.github.squirrelgrip.scientist4k.simple.SimpleExperiment
 import com.github.squirrelgrip.scientist4k.simple.model.SimpleExperimentResult
 import com.google.common.eventbus.EventBus
@@ -16,19 +15,13 @@ import javax.servlet.ServletRequest
 import javax.servlet.http.HttpServletRequest
 
 open class AbstractHttpSimpleExperiment(
-    name: String,
-    metrics: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD"),
-    sampleFactory: SampleFactory = SampleFactory(),
+    experimentConfiguration: ExperimentConfiguration,
     eventBus: EventBus = DEFAULT_EVENT_BUS,
-    experimentOptions: EnumSet<ExperimentOption> = ExperimentOption.DEFAULT,
     val mappingConfiguration: List<MappingConfiguration> = emptyList()
 ) : SimpleExperiment<ExperimentResponse>(
-    name,
-    metrics,
+    experimentConfiguration,
     NoopComparator(),
-    sampleFactory,
-    eventBus,
-    experimentOptions
+    eventBus
 ) {
     fun getRunOptions(inboundRequest: ServletRequest): EnumSet<ExperimentOption> =
         if (inboundRequest is HttpServletRequest) {

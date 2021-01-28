@@ -4,11 +4,10 @@ import com.github.squirrelgrip.scientist4k.controlled.model.ControlledExperiment
 import com.github.squirrelgrip.scientist4k.core.AbstractExperiment
 import com.github.squirrelgrip.scientist4k.core.comparator.DefaultExperimentComparator
 import com.github.squirrelgrip.scientist4k.core.comparator.ExperimentComparator
+import com.github.squirrelgrip.scientist4k.core.configuration.ExperimentConfiguration
 import com.github.squirrelgrip.scientist4k.core.model.ExperimentObservation
 import com.github.squirrelgrip.scientist4k.core.model.ExperimentOption
 import com.github.squirrelgrip.scientist4k.core.model.sample.Sample
-import com.github.squirrelgrip.scientist4k.core.model.sample.SampleFactory
-import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
 import com.github.squirrelgrip.scientist4k.metrics.Timer
 import com.google.common.eventbus.EventBus
 import kotlinx.coroutines.Deferred
@@ -17,24 +16,15 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.util.*
 
 open class ControlledExperiment<T>(
-    name: String,
-    metrics: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD"),
+    experimentConfiguration: ExperimentConfiguration,
     comparator: ExperimentComparator<T?> = DefaultExperimentComparator(),
-    sampleFactory: SampleFactory = SampleFactory(),
-    eventBus: EventBus = DEFAULT_EVENT_BUS,
-    experimentOptions: EnumSet<ExperimentOption> = ExperimentOption.DEFAULT,
-    sampleThreshold: Int = 100
+    eventBus: EventBus = DEFAULT_EVENT_BUS
 ) : AbstractExperiment<T>(
-    name,
-    metrics,
+    experimentConfiguration,
     comparator,
-    sampleFactory,
-    eventBus,
-    experimentOptions,
-    sampleThreshold
+    eventBus
 ) {
     /**
      * Note that if `raiseOnMismatch` is true, [.runAsync] will block waiting for
@@ -42,7 +32,7 @@ open class ControlledExperiment<T>(
      * In situations where the candidate function may be significantly slower than the control,
      * it is *not* recommended to raise on mismatch.
      */
-    private val referenceTimer: Timer = metrics.timer(NAMESPACE_PREFIX, name, "reference")
+    private val referenceTimer: Timer = metricsProvider.timer(NAMESPACE_PREFIX, name, "reference")
 
     companion object {
         private val LOGGER: Logger = LoggerFactory.getLogger(ControlledExperiment::class.java)
