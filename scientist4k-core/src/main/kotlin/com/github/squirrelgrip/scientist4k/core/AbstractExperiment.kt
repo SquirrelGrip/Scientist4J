@@ -55,10 +55,10 @@ abstract class AbstractExperiment<T>(
         sample.runOptions.contains(ExperimentOption.RAISE_ON_MISMATCH) || experimentOptions.contains(ExperimentOption.RAISE_ON_MISMATCH)
 
     open fun isDisabled(sample: Sample) =
-        sample.runOptions.contains(ExperimentOption.DISABLED) || experimentOptions.contains(ExperimentOption.DISABLED)
+        sample.runOptions.contains(ExperimentOption.DISABLED) || experimentOptions.contains(ExperimentOption.DISABLED) || sample.exceedsThreshold(sampleThreshold)
 
     open fun isWithholdPublication(sample: Sample) =
-        sample.runOptions.contains(ExperimentOption.WITHHOLD_PUBLICATION) || experimentOptions.contains(ExperimentOption.WITHHOLD_PUBLICATION)
+        sample.runOptions.contains(ExperimentOption.WITHHOLD_PUBLICATION) || experimentOptions.contains(ExperimentOption.WITHHOLD_PUBLICATION) || sample.exceedsThreshold(sampleThreshold)
 
     open fun isPublishable(sample: Sample) = !isWithholdPublication(sample)
 

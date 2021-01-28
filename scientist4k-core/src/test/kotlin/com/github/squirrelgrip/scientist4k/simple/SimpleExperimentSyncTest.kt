@@ -4,28 +4,32 @@ import com.github.squirrelgrip.scientist4k.core.comparator.ExperimentComparator
 import com.github.squirrelgrip.scientist4k.core.configuration.ExperimentConfiguration
 import com.github.squirrelgrip.scientist4k.core.exception.MismatchException
 import com.github.squirrelgrip.scientist4k.core.model.ComparisonResult
-import com.github.squirrelgrip.scientist4k.core.model.ExperimentOption
-import com.github.squirrelgrip.scientist4k.core.model.ExperimentOption.RAISE_ON_MISMATCH
-import com.github.squirrelgrip.scientist4k.core.model.ExperimentOption.RETURN_CANDIDATE
+import com.github.squirrelgrip.scientist4k.core.model.ExperimentOption.*
 import com.github.squirrelgrip.scientist4k.metrics.dropwizard.DropwizardMetricsProvider
 import com.github.squirrelgrip.scientist4k.metrics.micrometer.MicrometerMetricsProvider
 import com.github.squirrelgrip.scientist4k.metrics.noop.NoopMetricsProvider
 import com.github.squirrelgrip.scientist4k.simple.model.SimpleExperimentResult
 import com.google.common.eventbus.EventBus
 import com.nhaarman.mockitokotlin2.eq
-import com.nhaarman.mockitokotlin2.isA
 import com.nhaarman.mockitokotlin2.mock
 import io.dropwizard.metrics5.MetricName
 import org.assertj.core.api.Assertions.assertThat
 import org.awaitility.Awaitility
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.ArgumentCaptor
 import org.mockito.BDDMockito.given
+import org.mockito.BDDMockito.verifyNoInteractions
+import org.mockito.Captor
+import org.mockito.Mock
 import org.mockito.Mockito.verify
+import org.mockito.junit.jupiter.MockitoExtension
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-class SimpleExperimentTest {
+@ExtendWith(MockitoExtension::class)
+class SimpleExperimentSyncTest {
     private fun exceptionThrowingFunction(): Int {
         throw Exception("throw an exception")
     }
@@ -42,6 +46,12 @@ class SimpleExperimentTest {
     private fun safeFunctionWithDifferentResult(): Int {
         return 4
     }
+
+    @Captor
+    lateinit var argumentCaptor: ArgumentCaptor<SimpleExperimentResult<*>>
+
+    @Mock
+    lateinit var eventBus : EventBus
 
     @Test
     fun itThrowsAnExceptionWhenControlFails() {
@@ -81,6 +91,16 @@ class SimpleExperimentTest {
             SimpleExperiment<Int>("test", NoopMetricsProvider(), experimentOptions = EnumSet.of(RETURN_CANDIDATE))
         val value = experiment.runSync({ safeFunction() }, { safeFunctionWithDifferentResult() })
         assertThat(value).isEqualTo(4)
+    }
+
+    @Test
+    fun candidateIsReturnedWhenDisabled() {
+        val experiment = SimpleExperiment<Int>("test", NoopMetricsProvider(), eventBus = eventBus, experimentOptions = EnumSet.of(RETURN_CANDIDATE, DISABLED))
+        val value = experiment.runSync({ safeFunction() }, { safeFunctionWithDifferentResult() })
+        assertThat(value).isEqualTo(4)
+        verify(eventBus).post(argumentCaptor.capture())
+        assertThat(argumentCaptor.value.candidate?.value).isEqualTo(4)
+        assertThat(argumentCaptor.value.control?.value).isNull()
     }
 
     @Test
@@ -195,12 +215,31 @@ class SimpleExperimentTest {
 
     @Test
     fun `eventBus is called`() {
-        val eventBus = mock<EventBus>()
         val experiment = SimpleExperimentBuilder<Int>()
-            .withExperimentFlags(ExperimentOption.RAISE_ON_MISMATCH)
             .withEventBus(eventBus)
             .build()
         experiment.run({ safeFunction() }, { safeFunction() })
-        verify(eventBus).post(isA<SimpleExperimentResult<Int>>())
+        verify(eventBus).post(argumentCaptor.capture())
+        println(argumentCaptor.value)
+    }
+
+    @Test
+    fun `eventBus is not called when WITHHOLD_PUBLICATION`() {
+        val experiment = SimpleExperimentBuilder<Int>()
+            .withExperimentOptions(WITHHOLD_PUBLICATION)
+            .withEventBus(eventBus)
+            .build()
+        experiment.run({ safeFunction() }, { safeFunction() })
+        verifyNoInteractions(eventBus)
+    }
+
+    @Test
+    fun `eventBus is not called with sampleThreshold is zero`() {
+        val experiment = SimpleExperimentBuilder<Int>()
+            .withSampleThreshold(0)
+            .withEventBus(eventBus)
+            .build()
+        experiment.run({ safeFunction() }, { safeFunction() })
+        verifyNoInteractions(eventBus)
     }
 }

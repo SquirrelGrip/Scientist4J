@@ -59,7 +59,7 @@ class SimpleExperimentBuilder<T>(
         return this
     }
 
-    fun withExperimentFlags(vararg experimentOption: ExperimentOption): SimpleExperimentBuilder<T> {
+    fun withExperimentOptions(vararg experimentOption: ExperimentOption): SimpleExperimentBuilder<T> {
         this.experimentOptions = EnumSet.copyOf(experimentOption.toList())
         return this
     }
