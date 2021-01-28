@@ -1,30 +1,32 @@
 package com.github.squirrelgrip.scientist4k.http.server
 
 import com.github.squirrelgrip.scientist4k.core.AbstractExperiment
+import com.github.squirrelgrip.scientist4k.core.configuration.ExperimentConfiguration
 import com.github.squirrelgrip.scientist4k.core.exception.LaboratoryException
 import com.github.squirrelgrip.scientist4k.core.model.ExperimentOption
-import com.github.squirrelgrip.scientist4k.core.model.sample.SampleFactory
 import com.github.squirrelgrip.scientist4k.http.core.configuration.EndPointConfiguration
 import com.github.squirrelgrip.scientist4k.http.core.configuration.MappingConfiguration
-import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
+import com.github.squirrelgrip.scientist4k.metrics.Metrics
 import com.google.common.eventbus.EventBus
 import java.util.*
 
 class HttpExperimentBuilder() {
     private var mappings: List<MappingConfiguration> = emptyList()
     private var name: String = "Test"
-    private var metrics: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD")
-    private var sampleFactory: SampleFactory = SampleFactory()
+    private var metrics: Metrics = Metrics.DROPWIZARD
+    private var samplePrefix: String = ""
     private var eventBus: EventBus = AbstractExperiment.DEFAULT_EVENT_BUS
     private var experimentOptions: EnumSet<ExperimentOption> = ExperimentOption.DEFAULT
     private var controlConfig: EndPointConfiguration? = null
     private var candidateConfig: EndPointConfiguration? = null
+    private var sampleThreshold: Int = 100
 
     constructor(httpExperimentConfiguration: HttpExperimentConfiguration) : this() {
         name = httpExperimentConfiguration.experiment.name
         metrics = httpExperimentConfiguration.experiment.metrics
-        sampleFactory = httpExperimentConfiguration.experiment.sampleFactory
+        samplePrefix = httpExperimentConfiguration.experiment.samplePrefix
         experimentOptions = httpExperimentConfiguration.experiment.experimentOptions
+        sampleThreshold = httpExperimentConfiguration.experiment.sampleThreshold
         controlConfig = httpExperimentConfiguration.control
         candidateConfig = httpExperimentConfiguration.candidate
         mappings = httpExperimentConfiguration.mappings
@@ -35,18 +37,13 @@ class HttpExperimentBuilder() {
         return this
     }
 
-    fun withMetricsProvider(metricsProvider: String): HttpExperimentBuilder {
-        this.metrics = MetricsProvider.build(metricsProvider)
+    fun withMetrics(metrics: Metrics): HttpExperimentBuilder {
+        this.metrics = metrics
         return this
     }
 
-    fun withMetricsProvider(metricsProvider: MetricsProvider<*>): HttpExperimentBuilder {
-        this.metrics = metricsProvider
-        return this
-    }
-
-    fun withSampleFactory(sampleFactory: SampleFactory): HttpExperimentBuilder {
-        this.sampleFactory = sampleFactory
+    fun withSamplePrefix(samplePrefix: String): HttpExperimentBuilder {
+        this.samplePrefix = samplePrefix
         return this
     }
 
@@ -65,6 +62,11 @@ class HttpExperimentBuilder() {
         return this
     }
 
+    fun withSampleThreshold(sampleThreshold: Int): HttpExperimentBuilder {
+        this.sampleThreshold = sampleThreshold
+        return this
+    }
+
     fun withMappings(vararg mapping: MappingConfiguration): HttpExperimentBuilder {
         this.mappings = mapping.toList()
         return this
@@ -78,12 +80,9 @@ class HttpExperimentBuilder() {
     fun build(): HttpSimpleExperiment {
         if (controlConfig != null && candidateConfig != null) {
             return HttpSimpleExperiment(
-                name,
-                metrics,
-                sampleFactory,
+                ExperimentConfiguration(name, metrics, samplePrefix, experimentOptions, sampleThreshold),
                 eventBus,
                 mappings,
-                experimentOptions,
                 controlConfig!!,
                 candidateConfig!!
             )

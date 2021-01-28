@@ -1,8 +1,7 @@
 package com.github.squirrelgrip.scientist4k.controlled.http.filter
 
-import com.github.squirrelgrip.scientist4k.core.model.ExperimentOption
+import com.github.squirrelgrip.scientist4k.core.configuration.ExperimentConfiguration
 import com.github.squirrelgrip.scientist4k.core.model.sample.Sample
-import com.github.squirrelgrip.scientist4k.core.model.sample.SampleFactory
 import com.github.squirrelgrip.scientist4k.http.controlled.AbstractControlledHttpExperiment
 import com.github.squirrelgrip.scientist4k.http.core.HttpExperimentUtil
 import com.github.squirrelgrip.scientist4k.http.core.configuration.EndPointConfiguration
@@ -11,9 +10,7 @@ import com.github.squirrelgrip.scientist4k.http.core.factory.RequestFactory
 import com.github.squirrelgrip.scientist4k.http.core.model.ExperimentRequest
 import com.github.squirrelgrip.scientist4k.http.core.model.ExperimentResponse
 import com.github.squirrelgrip.scientist4k.http.core.wrapper.ExperimentResponseWrapper
-import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
 import com.google.common.eventbus.EventBus
-import java.util.*
 import javax.servlet.FilterChain
 import javax.servlet.ServletRequest
 import javax.servlet.ServletResponse
@@ -21,20 +18,14 @@ import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletRequestWrapper
 
 class ControlledFilterExperiment(
-    name: String,
-    metrics: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD"),
-    sampleFactory: SampleFactory = SampleFactory(),
+    experimentConfiguration: ExperimentConfiguration,
     eventBus: EventBus = DEFAULT_EVENT_BUS,
-    experimentOptions: EnumSet<ExperimentOption> = ExperimentOption.DEFAULT,
     mappings: List<MappingConfiguration> = emptyList(),
     detourConfig: EndPointConfiguration,
     referenceConfig: EndPointConfiguration
 ) : AbstractControlledHttpExperiment(
-        name,
-        metrics,
-        sampleFactory,
-        eventBus,
-        experimentOptions
+    experimentConfiguration,
+    eventBus
 ) {
     private val detourRequestFactory = RequestFactory(detourConfig, HttpExperimentUtil.DETOUR_COOKIE_STORE, mappings)
     private val referenceRequestFactory = RequestFactory(referenceConfig, HttpExperimentUtil.REFERENCE_COOKIE_STORE)
@@ -42,11 +33,10 @@ class ControlledFilterExperiment(
     private val allowedMethods = detourConfig.allowedMethods
 
     fun run(
-            inboundRequest: ServletRequest,
-            inboundResponse: ServletResponse,
-            chain: FilterChain,
-            sample: Sample = sampleFactory.create(),
-            runOptions: EnumSet<ExperimentOption> = ExperimentOption.DEFAULT
+        inboundRequest: ServletRequest,
+        inboundResponse: ServletResponse,
+        chain: FilterChain,
+        sample: Sample = sampleFactory.create(getRunOptions(inboundRequest)),
     ) {
         val wrappedRequest = HttpServletRequestWrapper(inboundRequest as HttpServletRequest)
         val experimentRequest = HttpExperimentUtil.createRequest(wrappedRequest, sample)
@@ -63,9 +53,9 @@ class ControlledFilterExperiment(
     }
 
     private fun createRouteRequest(
-            wrappedRequest: HttpServletRequestWrapper,
-            response: ServletResponse,
-            chain: FilterChain
+        wrappedRequest: HttpServletRequestWrapper,
+        response: ServletResponse,
+        chain: FilterChain
     ): () -> ExperimentResponse {
         return {
             val wrappedResponse = ExperimentResponseWrapper(response)
@@ -75,13 +65,13 @@ class ControlledFilterExperiment(
     }
 
     private fun createDetourRequest(
-            experimentRequest: ExperimentRequest
+        experimentRequest: ExperimentRequest
     ): () -> ExperimentResponse {
         return detourRequestFactory.create(experimentRequest)
     }
 
     private fun createReferenceRequest(
-            experimentRequest: ExperimentRequest
+        experimentRequest: ExperimentRequest
     ): () -> ExperimentResponse {
         return referenceRequestFactory.create(experimentRequest)
     }

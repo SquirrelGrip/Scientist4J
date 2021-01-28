@@ -19,11 +19,7 @@
     ]
   },
   "experiment": {
-    "name": "scientist4k-http-server",
-    "metricsProvider": "DROPWIZARD",
-    "sampleFactory": {
-      "prefix": ""
-    }
+    "name": "scientist4k-http-server"
   },
   "mappings": [
     {

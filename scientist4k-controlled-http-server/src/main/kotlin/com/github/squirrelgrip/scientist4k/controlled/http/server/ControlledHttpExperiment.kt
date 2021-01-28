@@ -1,8 +1,7 @@
 package com.github.squirrelgrip.scientist4k.controlled.http.server
 
-import com.github.squirrelgrip.scientist4k.core.model.ExperimentOption
+import com.github.squirrelgrip.scientist4k.core.configuration.ExperimentConfiguration
 import com.github.squirrelgrip.scientist4k.core.model.sample.Sample
-import com.github.squirrelgrip.scientist4k.core.model.sample.SampleFactory
 import com.github.squirrelgrip.scientist4k.http.controlled.AbstractControlledHttpExperiment
 import com.github.squirrelgrip.scientist4k.http.core.HttpExperimentUtil.CANDIDATE_COOKIE_STORE
 import com.github.squirrelgrip.scientist4k.http.core.HttpExperimentUtil.CONTROL_COOKIE_STORE
@@ -14,28 +13,20 @@ import com.github.squirrelgrip.scientist4k.http.core.configuration.MappingConfig
 import com.github.squirrelgrip.scientist4k.http.core.factory.RequestFactory
 import com.github.squirrelgrip.scientist4k.http.core.model.ExperimentRequest
 import com.github.squirrelgrip.scientist4k.http.core.model.ExperimentResponse
-import com.github.squirrelgrip.scientist4k.metrics.MetricsProvider
 import com.google.common.eventbus.EventBus
-import java.util.*
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 class ControlledHttpExperiment(
-    name: String,
-    metrics: MetricsProvider<*> = MetricsProvider.build("DROPWIZARD"),
-    sampleFactory: SampleFactory = SampleFactory(),
+    experimentConfiguration: ExperimentConfiguration,
     eventBus: EventBus = DEFAULT_EVENT_BUS,
-    experimentOptions: EnumSet<ExperimentOption> = ExperimentOption.DEFAULT,
     mappingConfiguration: List<MappingConfiguration> = emptyList(),
     controlConfig: EndPointConfiguration,
     referenceConfig: EndPointConfiguration,
     private val candidateConfig: EndPointConfiguration
 ) : AbstractControlledHttpExperiment(
-    name,
-    metrics,
-    sampleFactory,
+    experimentConfiguration,
     eventBus,
-    experimentOptions,
     mappingConfiguration
 ) {
     private val controlRequestFactory = RequestFactory(controlConfig, CONTROL_COOKIE_STORE)
@@ -45,7 +36,7 @@ class ControlledHttpExperiment(
     fun run(
         inboundRequest: HttpServletRequest,
         inboundResponse: HttpServletResponse,
-        sample: Sample = sampleFactory.create()
+        sample: Sample = sampleFactory.create(getRunOptions(inboundRequest))
     ) {
         val experimentRequest = createRequest(inboundRequest, sample)
         val controlResponse =
@@ -54,8 +45,7 @@ class ControlledHttpExperiment(
                     createControlRequest(experimentRequest),
                     createReferenceRequest(experimentRequest),
                     createCandidateRequest(experimentRequest),
-                    sample,
-                    getRunOptions(inboundRequest)
+                    sample
                 )
             } else {
                 createControlRequest(experimentRequest).invoke()

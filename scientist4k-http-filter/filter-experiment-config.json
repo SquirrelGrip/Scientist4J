@@ -1,10 +1,6 @@
 {
   "experiment": {
-    "name": "scientist4k-http-filter",
-    "metricsProvider": "DROPWIZARD",
-    "sampleFactory": {
-      "prefix": ""
-    }
+    "name": "scientist4k-http-filter"
   },
   "mappings": {
     "/mappedControl": "/mappedCandidate"
