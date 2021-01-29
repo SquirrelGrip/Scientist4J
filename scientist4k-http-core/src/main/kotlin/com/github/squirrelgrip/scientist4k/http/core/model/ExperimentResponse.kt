@@ -21,11 +21,11 @@ data class ExperimentResponse(
     constructor(
             status: StatusLine,
             headers: Array<Header>,
-            entity: HttpEntity
+            entity: HttpEntity?
     ) : this(
             status.statusCode,
             headers.map { it.name to it.value }.toMap(),
-            entity.content?.readBytes() ?: ByteArray(0)
+            entity?.content?.readBytes() ?: ByteArray(0)
     )
 
     val mediaType: MediaType?
