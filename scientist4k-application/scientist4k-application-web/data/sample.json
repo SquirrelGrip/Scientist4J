@@ -1,0 +1,35 @@
+{
+  "server": {
+    "connectors": [
+      {
+        "port": 8999
+      }
+    ]
+  },
+  "experiment": {
+    "name": "sample"
+  },
+  "mappings": [
+    {
+      "control": "\\/mappedControl",
+      "candidate": "/mappedCandidate"
+    },
+    {
+      "control": "\\/mappedControlDifferent",
+      "candidate": "/mappedCandidateDifferent",
+      "options": ["RETURN_CANDIDATE"]
+    }
+  ],
+  "control": {
+    "url": "http://localhost:9002",
+    "allowedMethods": [
+      "*"
+    ]
+  },
+  "candidate": {
+    "url": "https://localhost:9012",
+    "allowedMethods": [
+      "GET"
+    ]
+  }
+}

@@ -19,6 +19,10 @@
             <artifactId>scientist4k-application-api</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.dropwizard.metrics5</groupId>
+            <artifactId>metrics-core</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
