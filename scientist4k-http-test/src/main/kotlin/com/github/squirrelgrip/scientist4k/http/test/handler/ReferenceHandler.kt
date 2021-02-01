@@ -4,8 +4,9 @@ import com.github.squirrelgrip.extension.json.toJson
 import com.github.squirrelgrip.scientist4k.http.core.configuration.ConnectorConfiguration
 import com.github.squirrelgrip.scientist4k.http.core.configuration.ServerConfiguration
 import com.github.squirrelgrip.scientist4k.http.core.server.SecuredServer
-import com.github.squirrelgrip.scientist4k.http.test.handler.CommonUtil.textHtml
-import com.github.squirrelgrip.scientist4k.http.test.handler.CommonUtil.textPlain
+import com.github.squirrelgrip.scientist4k.http.test.handler.CommonUtil.helloContent
+import com.github.squirrelgrip.scientist4k.http.test.handler.CommonUtil.textHtmlContentType
+import com.github.squirrelgrip.scientist4k.http.test.handler.CommonUtil.textPlainContentType
 import com.google.common.net.MediaType
 import org.eclipse.jetty.server.Request
 import org.eclipse.jetty.server.handler.AbstractHandler
@@ -20,12 +21,13 @@ class ReferenceHandler : AbstractHandler() {
         private val LOGGER: Logger = LoggerFactory.getLogger(ReferenceHandler::class.java)
 
         val serverConfiguration = ServerConfiguration(
-                listOf(
-                        ConnectorConfiguration(9021),
-                        ConnectorConfiguration(9022,
-                                Main.sslConfiguration
-                        )
+            listOf(
+                ConnectorConfiguration(9021),
+                ConnectorConfiguration(
+                    9022,
+                    Main.sslConfiguration
                 )
+            )
         )
 
         fun handleRequest(request: HttpServletRequest, response: HttpServletResponse, target: String) {
@@ -33,72 +35,68 @@ class ReferenceHandler : AbstractHandler() {
             val out = response.writer
             when (target) {
                 "/control" -> {
-                    response.contentType = textPlain
+                    response.contentType = textPlainContentType
                     response.status = HttpServletResponse.SC_OK
                     out.println("Control")
                 }
                 "/ok" -> {
-                    response.contentType = textHtml
+                    response.contentType = textHtmlContentType
                     response.status = HttpServletResponse.SC_OK
                     out.println("<h1>OK</h1>")
                 }
                 "/differentContent" -> {
-                    response.contentType = textPlain
+                    response.contentType = textPlainContentType
                     response.status = HttpServletResponse.SC_OK
                     out.println("Control Content")
                 }
                 "/mappedControl" -> {
-                    response.contentType = textPlain
+                    response.contentType = textPlainContentType
                     response.status = HttpServletResponse.SC_OK
                     out.println("mapped")
                 }
                 "/status" -> {
-                    response.contentType = textHtml
+                    response.contentType = textHtmlContentType
                     response.status = HttpServletResponse.SC_OK
                     out.println("<h1>status</h1>")
                 }
                 "/contentType" -> {
-                    response.contentType = textHtml
+                    response.contentType = textHtmlContentType
                     response.status = HttpServletResponse.SC_OK
                     out.println("<h1>content type</h1>")
                 }
                 "/cookie" -> {
-                    response.contentType = textHtml
+                    response.contentType = textHtmlContentType
                     response.status = HttpServletResponse.SC_OK
                     response.addCookie(Cookie("name", "value"))
                     out.println("<h1>cookie</h1>")
                 }
-                "/addcookie" -> {
-                    response.contentType = textHtml
+                "/addcookie", "/alteredcookie" -> {
+                    response.contentType = textHtmlContentType
                     response.status = HttpServletResponse.SC_OK
                     response.addCookie(Cookie("name", "value"))
-                    out.println("<h1>Hello</h1>")
-                }
-                "/alteredcookie" -> {
-                    response.contentType = textHtml
-                    response.status = HttpServletResponse.SC_OK
-                    response.addCookie(Cookie("name", "value"))
-                    out.println("<h1>Hello</h1>")
+                    out.println(helloContent)
                 }
                 "/removedcookie" -> {
-                    response.contentType = textHtml
+                    response.contentType = textHtmlContentType
                     response.status = HttpServletResponse.SC_OK
                     val cookie = Cookie("name", "value")
                     response.addCookie(cookie)
-                    out.println("<h1>Hello</h1>")
+                    out.println(helloContent)
                 }
                 "/redirect" -> {
                     response.sendRedirect("/ok")
                 }
-                "/json" -> {
-                    response.contentType = MediaType.JSON_UTF_8.toString()
-                    response.status = HttpServletResponse.SC_OK
-                    out.println(mapOf("1" to "AAA", "2" to listOf("BBB", "CCC"), "3" to mapOf("4" to listOf("DDD", "EEE"))).toJson())
-                }
+                "/json",
                 "/jsonDifferent" -> {
                     response.contentType = MediaType.JSON_UTF_8.toString()
                     response.status = HttpServletResponse.SC_OK
-                    out.println(mapOf("1" to "AAA", "2" to listOf("BBB", "CCC"), "3" to mapOf("4" to listOf("DDD", "EEE"))).toJson())
+                    out.println(
+                        mapOf(
+                            "1" to "AAA",
+                            "2" to listOf("BBB", "CCC"),
+                            "3" to mapOf("4" to listOf("DDD", "EEE"))
+                        ).toJson()
+                    )
                 }
                 else -> {
                     response.status = HttpServletResponse.SC_NOT_FOUND
@@ -108,10 +106,10 @@ class ReferenceHandler : AbstractHandler() {
     }
 
     override fun handle(
-            target: String,
-            baseRequest: Request,
-            request: HttpServletRequest,
-            response: HttpServletResponse
+        target: String,
+        baseRequest: Request,
+        request: HttpServletRequest,
+        response: HttpServletResponse
     ) {
         handleRequest(request, response, target)
         baseRequest.isHandled = true
