@@ -4,6 +4,8 @@ import com.github.squirrelgrip.extension.json.toJson
 import com.github.squirrelgrip.scientist4k.http.core.configuration.ConnectorConfiguration
 import com.github.squirrelgrip.scientist4k.http.core.configuration.ServerConfiguration
 import com.github.squirrelgrip.scientist4k.http.core.server.SecuredServer
+import com.github.squirrelgrip.scientist4k.http.test.handler.CommonUtil.textHtml
+import com.github.squirrelgrip.scientist4k.http.test.handler.CommonUtil.textPlain
 import com.google.common.net.MediaType
 import org.eclipse.jetty.server.Request
 import org.eclipse.jetty.server.handler.AbstractHandler
@@ -29,60 +31,60 @@ class ControlHandler : AbstractHandler() {
             val out = response.writer
             when (target) {
                 "/control" -> {
-                    response.contentType = "text/plain;charset=utf-8"
+                    response.contentType = textPlain
                     response.status = HttpServletResponse.SC_OK
                     out.println("Control")
                 }
                 "/ok" -> {
-                    response.contentType = "text/html;charset=utf-8"
+                    response.contentType = textHtml
                     response.status = HttpServletResponse.SC_OK
                     out.println("<h1>OK</h1>")
                 }
                 "/differentContent" -> {
-                    response.contentType = "text/plain;charset=utf-8"
+                    response.contentType = textPlain
                     response.status = HttpServletResponse.SC_OK
                     out.println("Control Content")
                 }
                 "/mappedControl" -> {
-                    response.contentType = "text/plain;charset=utf-8"
+                    response.contentType = textPlain
                     response.status = HttpServletResponse.SC_OK
                     out.println("mapped")
                 }
                 "/mappedControlDifferent" -> {
-                    response.contentType = "text/plain;charset=utf-8"
+                    response.contentType = textPlain
                     response.status = HttpServletResponse.SC_OK
                     out.println("mappedDifferentControl")
                 }
                 "/status" -> {
-                    response.contentType = "text/html;charset=utf-8"
+                    response.contentType = textHtml
                     response.status = HttpServletResponse.SC_OK
                     out.println("<h1>status</h1>")
                 }
                 "/contentType" -> {
-                    response.contentType = "text/html;charset=utf-8"
+                    response.contentType = textHtml
                     response.status = HttpServletResponse.SC_OK
                     out.println("<h1>content type</h1>")
                 }
                 "/cookie" -> {
-                    response.contentType = "text/html;charset=utf-8"
+                    response.contentType = textHtml
                     response.status = HttpServletResponse.SC_OK
                     response.addCookie(Cookie("name", "value"))
                     out.println("<h1>cookie</h1>")
                 }
                 "/addcookie" -> {
-                    response.contentType = "text/html;charset=utf-8"
+                    response.contentType = textHtml
                     response.status = HttpServletResponse.SC_OK
                     response.addCookie(Cookie("name", "value"))
                     out.println("<h1>Hello</h1>")
                 }
                 "/alteredcookie" -> {
-                    response.contentType = "text/html;charset=utf-8"
+                    response.contentType = textHtml
                     response.status = HttpServletResponse.SC_OK
                     response.addCookie(Cookie("name", "value"))
                     out.println("<h1>Hello</h1>")
                 }
                 "/removedcookie" -> {
-                    response.contentType = "text/html;charset=utf-8"
+                    response.contentType = textHtml
                     response.status = HttpServletResponse.SC_OK
                     val cookie = Cookie("name", "value")
                     response.addCookie(cookie)
