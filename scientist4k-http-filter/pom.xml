@@ -4,9 +4,10 @@
     <parent>
         <groupId>com.github.squirrelgrip</groupId>
         <artifactId>scientist4k</artifactId>
-        <version>0.10.2-SNAPSHOT</version>
+        <version>0.10.3</version>
     </parent>
     <artifactId>scientist4k-http-filter</artifactId>
+    <version>0.10.2</version>
 
     <name>${project.artifactId}</name>
 
