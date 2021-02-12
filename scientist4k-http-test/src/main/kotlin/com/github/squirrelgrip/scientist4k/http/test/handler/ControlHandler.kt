@@ -73,17 +73,11 @@ class ControlHandler : AbstractHandler() {
                     out.println("<h1>cookie</h1>")
                 }
                 "/addcookie",
-                "/alteredcookie" -> {
-                    response.contentType = textHtmlContentType
-                    response.status = HttpServletResponse.SC_OK
-                    response.addCookie(Cookie("name", "value"))
-                    out.println(helloContent)
-                }
+                "/alteredcookie",
                 "/removedcookie" -> {
                     response.contentType = textHtmlContentType
                     response.status = HttpServletResponse.SC_OK
-                    val cookie = Cookie("name", "value")
-                    response.addCookie(cookie)
+                    response.addCookie(Cookie("name", "value"))
                     out.println(helloContent)
                 }
                 "/redirect" -> {
