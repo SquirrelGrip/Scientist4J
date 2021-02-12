@@ -8,6 +8,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>scientist4k-http-core</artifactId>
+    <version>0.10.3-SNAPSHOT</version>
     <name>${project.artifactId}</name>
 
     <dependencies>

@@ -7,6 +7,7 @@
         <version>0.10.3-SNAPSHOT</version>
     </parent>
     <artifactId>scientist4k-http-server</artifactId>
+    <version>0.10.3-SNAPSHOT</version>
     <name>${project.artifactId}</name>
 
     <dependencies>
