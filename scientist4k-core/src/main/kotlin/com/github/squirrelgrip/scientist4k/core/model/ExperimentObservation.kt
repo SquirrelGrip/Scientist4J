@@ -6,17 +6,17 @@ import com.github.squirrelgrip.scientist4k.metrics.noop.NoopTimer
 import com.github.squirrelgrip.util.initOnce
 
 @JsonPropertyOrder (
-        "name",
+        "type",
         "value",
         "exception",
         "duration",
         "status"
 )
 class ExperimentObservation<T>(
-        val name: String,
-        private val timer: Timer
+    val type: ExperimentObservationType,
+    private val timer: Timer
 ) {
-    constructor(name: String): this(name, SCRAP_TIMER)
+    constructor(name: ExperimentObservationType): this(name, SCRAP_TIMER)
 
     private var _exception: Exception? = null
     private var _value: T? = null

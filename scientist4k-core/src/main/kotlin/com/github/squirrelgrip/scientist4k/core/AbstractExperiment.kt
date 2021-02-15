@@ -3,10 +3,8 @@ package com.github.squirrelgrip.scientist4k.core
 import com.github.squirrelgrip.scientist4k.core.comparator.DefaultExperimentComparator
 import com.github.squirrelgrip.scientist4k.core.comparator.ExperimentComparator
 import com.github.squirrelgrip.scientist4k.core.configuration.ExperimentConfiguration
-import com.github.squirrelgrip.scientist4k.core.model.ComparisonResult
-import com.github.squirrelgrip.scientist4k.core.model.ExperimentObservation
-import com.github.squirrelgrip.scientist4k.core.model.ExperimentObservationStatus
-import com.github.squirrelgrip.scientist4k.core.model.ExperimentOption
+import com.github.squirrelgrip.scientist4k.core.model.*
+import com.github.squirrelgrip.scientist4k.core.model.ExperimentObservationType.*
 import com.github.squirrelgrip.scientist4k.core.model.sample.Sample
 import com.github.squirrelgrip.scientist4k.core.model.sample.SampleFactory
 import com.github.squirrelgrip.scientist4k.metrics.Counter
@@ -77,10 +75,10 @@ abstract class AbstractExperiment<T>(
         sample: Sample
     ): ExperimentObservation<T> =
         if (isDisabled(sample) && !isReturnCandidate(sample)) {
-            scrap("candidate")
+            scrap(CANDIDATE)
         } else {
             execute(
-                "candidate",
+                CANDIDATE,
                 candidateTimer,
                 candidate,
                 isReturnCandidate(sample)
@@ -92,10 +90,10 @@ abstract class AbstractExperiment<T>(
         sample: Sample
     ): ExperimentObservation<T> =
         if (isDisabled(sample) && isReturnCandidate(sample)) {
-            scrap("control")
+            scrap(CONTROL)
         } else {
             execute(
-                "control",
+                CONTROL,
                 controlTimer,
                 control,
                 !isReturnCandidate(sample)
@@ -109,12 +107,12 @@ abstract class AbstractExperiment<T>(
     }
 
     protected fun execute(
-        name: String,
+        type: ExperimentObservationType,
         timer: Timer,
         function: () -> T?,
         shouldThrow: Boolean
     ): ExperimentObservation<T> {
-        val observation = ExperimentObservation<T>(name, timer)
+        val observation = ExperimentObservation<T>(type, timer)
         observation.time(function)
         val exception = observation.exception
         if (exception != null && shouldThrow) {
@@ -123,8 +121,8 @@ abstract class AbstractExperiment<T>(
         return observation
     }
 
-    protected fun scrap(name: String): ExperimentObservation<T> {
-        val experimentObservation: ExperimentObservation<T> = ExperimentObservation(name)
+    protected fun scrap(type: ExperimentObservationType): ExperimentObservation<T> {
+        val experimentObservation: ExperimentObservation<T> = ExperimentObservation(type)
         experimentObservation.status = ExperimentObservationStatus.SCRAPPED
         return experimentObservation
     }

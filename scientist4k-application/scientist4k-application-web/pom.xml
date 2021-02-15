@@ -4,7 +4,7 @@
     <parent>
         <artifactId>scientist4k-application</artifactId>
         <groupId>com.github.squirrelgrip</groupId>
-        <version>0.10.1</version>
+        <version>0.10.3</version>
     </parent>
     <artifactId>scientist4k-application-web</artifactId>
 
@@ -18,6 +18,10 @@
             <groupId>com.github.squirrelgrip</groupId>
             <artifactId>scientist4k-application-api</artifactId>
             <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.dropwizard.metrics5</groupId>
+            <artifactId>metrics-core</artifactId>
         </dependency>
     </dependencies>
 

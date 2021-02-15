@@ -6,6 +6,8 @@ import com.github.squirrelgrip.scientist4k.core.comparator.DefaultExperimentComp
 import com.github.squirrelgrip.scientist4k.core.comparator.ExperimentComparator
 import com.github.squirrelgrip.scientist4k.core.configuration.ExperimentConfiguration
 import com.github.squirrelgrip.scientist4k.core.model.ExperimentObservation
+import com.github.squirrelgrip.scientist4k.core.model.ExperimentObservationType
+import com.github.squirrelgrip.scientist4k.core.model.ExperimentObservationType.REFERENCE
 import com.github.squirrelgrip.scientist4k.core.model.ExperimentOption
 import com.github.squirrelgrip.scientist4k.core.model.sample.Sample
 import com.github.squirrelgrip.scientist4k.metrics.Timer
@@ -110,9 +112,9 @@ open class ControlledExperiment<T>(
         sample: Sample
     ): ExperimentObservation<T> =
         if (isDisabled(sample)) {
-            scrap("reference")
+            scrap(REFERENCE)
         } else {
-            execute("reference", referenceTimer, reference, isReturnReference(sample))
+            execute(REFERENCE, referenceTimer, reference, isReturnReference(sample))
         }
 
     private suspend fun publishAsync(

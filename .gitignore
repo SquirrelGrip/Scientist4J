@@ -216,14 +216,12 @@ hs_err_pid*
 travis/all.gpg
 *.iml
 .idea/
+report/
+node/
+node_modules/
 !/certs/cheti.json
 /certs/*.pwd
 /certs/*.p12
 /certs/*.jks
 /certs/**/*.crt
 /certs/**/*.key
-/scientist4k-web/report/
-/scientist4k-report-api/src/main/resources/static/
-/scientist4k-report-ui/build/
-/scientist4k-report-ui/node/
-/scientist4k-report-ui/node_modules/

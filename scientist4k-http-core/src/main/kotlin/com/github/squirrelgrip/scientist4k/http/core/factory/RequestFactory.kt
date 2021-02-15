@@ -90,7 +90,9 @@ class RequestFactory (
                             val url = URL(targetUrl)
                             setHeader(TARGET_HOST, "${url.host}:${url.port}")
                         }
-                        CONTENT_LEN -> {}
+                        CONTENT_LEN -> {
+                            // Remove this header
+                        }
                         else -> {
                             setHeader(headerName, headerValue)
                         }

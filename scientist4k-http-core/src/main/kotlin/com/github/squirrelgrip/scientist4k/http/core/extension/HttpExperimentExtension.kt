@@ -3,6 +3,7 @@ package com.github.squirrelgrip.scientist4k.http.core.extension
 import com.github.squirrelgrip.scientist4k.controlled.model.ControlledExperimentResult
 import com.github.squirrelgrip.scientist4k.core.model.ComparisonResult
 import com.github.squirrelgrip.scientist4k.core.model.ExperimentObservation
+import com.github.squirrelgrip.scientist4k.core.model.ExperimentObservationType.*
 import com.github.squirrelgrip.scientist4k.http.core.comparator.DefaultHttpExperimentResponseComparator
 import com.github.squirrelgrip.scientist4k.http.core.comparator.HttpExperimentResponseComparator
 import com.github.squirrelgrip.scientist4k.http.core.model.*
@@ -41,7 +42,7 @@ fun ExperimentRequest.toHttpExperimentRequest(): HttpExperimentRequest {
 }
 
 fun ExperimentObservation<ExperimentResponse>.toHttpExperimentObservation(): HttpExperimentObservation {
-    return HttpExperimentObservation(name, value!!.toHttpExperimentResponse(), duration)
+    return HttpExperimentObservation(type, value!!.toHttpExperimentResponse(), duration)
 }
 
 fun ExperimentResponse.toHttpExperimentResponse(): HttpExperimentResponse {
@@ -49,7 +50,7 @@ fun ExperimentResponse.toHttpExperimentResponse(): HttpExperimentResponse {
 }
 
 fun HttpExperimentResult.compare(comparator: HttpExperimentResponseComparator = DefaultHttpExperimentResponseComparator()): ComparisonResult {
-    return comparator.invoke(this["control"]!!.response, this["candidate"]!!.response)
+    return comparator.invoke(this[CONTROL]!!.response, this[CANDIDATE]!!.response)
 }
 
 fun HttpExperimentResult.matches(comparator: HttpExperimentResponseComparator = DefaultHttpExperimentResponseComparator()): Boolean {

@@ -11,9 +11,10 @@ A port of Github's refactoring tool [Scientist](https://github.com/github/scient
 <dependency>
     <groupId>com.github.squirrelgrip</groupId>
     <artifactId>scientist4k-bom</artifactId>
-    <version>0.9.3</version>
+    <version>0.10.3</version>
 </dependency>
 ```
+
 # Usage
 
 This Kotlin port supports most of the functionality of the original Scientist library in Ruby, however its interface is a bit different.
@@ -24,7 +25,7 @@ The core component of this library is the `ExperimentSummary<T>` class. It's rec
 
 You can either run a synchronous experiment or an asynchronous experiment.
 
-For a synchronous experiment, the order in which control and candidate functions are run is randomized.
+For a synchronous experiment, the order in which control and candidate functions are run.
 
 To run a synchronous experiment:
 
