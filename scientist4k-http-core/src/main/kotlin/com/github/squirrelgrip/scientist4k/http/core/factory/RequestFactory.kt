@@ -6,7 +6,7 @@ import com.github.squirrelgrip.scientist4k.http.core.model.ExperimentRequest
 import com.github.squirrelgrip.scientist4k.http.core.model.ExperimentResponse
 import org.apache.http.HttpVersion.HTTP_1_1
 import org.apache.http.client.CookieStore
-import org.apache.http.client.ResponseHandler
+import org.apache.http.client.HttpClient
 import org.apache.http.client.methods.HttpUriRequest
 import org.apache.http.client.methods.RequestBuilder
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory
@@ -40,26 +40,28 @@ class RequestFactory (
             createHttpClient(cookieStore).use {
                 val url = buildUrl(request)
                 val httpUriRequest: HttpUriRequest = createRequest(request, url)
-
-                val responseHandler = ResponseHandler { response ->
-                    LOGGER.debug("Response received for request {}", url)
-                    ExperimentResponse(
-                            response.statusLine,
-                            response.allHeaders,
-                            response.entity
-                    )
-                }
-                val response = it.execute(httpUriRequest, responseHandler)
+                val experimentResponse = execute(it, httpUriRequest)
                 if (LOGGER.isDebugEnabled) {
-                    LOGGER.debug("${request.url}=>${response.status}")
+                    LOGGER.debug("${request.url}=>${experimentResponse.status}")
                     cookieStore.cookies.forEach { cookie ->
                         LOGGER.debug("${cookie.name}=${cookie.value}")
                     }
                 }
                 setCookieStore(request, cookieStore)
-                response
+                experimentResponse
             }
         }
+    }
+
+    private fun execute(
+        httpClient: HttpClient,
+        httpUriRequest: HttpUriRequest,
+    ) = httpClient.execute(httpUriRequest) { response ->
+        ExperimentResponse(
+            response.statusLine,
+            response.allHeaders,
+            response.entity
+        )
     }
 
     private fun setCookieStore(request: ExperimentRequest, cookieStore: CookieStore) {

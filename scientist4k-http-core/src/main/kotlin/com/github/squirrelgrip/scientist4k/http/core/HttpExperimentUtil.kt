@@ -22,19 +22,19 @@ object HttpExperimentUtil {
     }
 
     fun processResponse(
-            inboundResponse: HttpServletResponse,
-            controlResponse: ExperimentResponse?
+        inboundResponse: HttpServletResponse,
+        controlResponse: ExperimentResponse?
     ) {
         LOGGER.debug("processing response {}", controlResponse)
         if (controlResponse != null) {
             inboundResponse.status = controlResponse.status
             controlResponse.headers
-                    .filter {
-                        it.key != "Set-Cookie"
-                    }
-                    .forEach {
-                        inboundResponse.addHeader(it.key, it.value)
-                    }
+                .filter {
+                    it.key != "Set-Cookie"
+                }
+                .forEach {
+                    inboundResponse.addHeader(it.key, it.value)
+                }
             inboundResponse.outputStream.write(controlResponse.body)
         } else {
             LOGGER.warn("Control Response is null")

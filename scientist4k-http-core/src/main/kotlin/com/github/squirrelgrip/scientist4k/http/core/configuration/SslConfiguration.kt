@@ -10,29 +10,29 @@ import javax.net.ssl.SSLContext
 import javax.net.ssl.TrustManagerFactory
 
 open class SslConfiguration(
-        val keyStorePath: String = "",
-        val keyStorePassword: String = "",
-        val keyStoreType: String = KeyStore.getDefaultType(),
-        val trustStorePath: String = "",
-        val trustStorePassword: String = "",
-        val trustStoreType: String = KeyStore.getDefaultType(),
-        val algorithm: String = "TLS",
-        val needClientAuth: Boolean = false,
-        val wantClientAuth: Boolean = false
+    val keyStorePath: String = "",
+    val keyStorePassword: String = "",
+    val keyStoreType: String = KeyStore.getDefaultType(),
+    val trustStorePath: String = "",
+    val trustStorePassword: String = "",
+    val trustStoreType: String = KeyStore.getDefaultType(),
+    val algorithm: String = "TLS",
+    val needClientAuth: Boolean = false,
+    val wantClientAuth: Boolean = false
 ) {
     fun sslContext(): SSLContext = SSLContext.getInstance(algorithm).apply {
         init(keyManagerFactory().keyManagers, trustManagerFactory().trustManagers, SecureRandom())
     }
 
     fun trustManagerFactory(): TrustManagerFactory =
-            TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm()).apply {
-                init(trustStore())
-            }
+        TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm()).apply {
+            init(trustStore())
+        }
 
     fun keyManagerFactory(): KeyManagerFactory =
-            KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm()).apply {
-                init(keyStore(), keyStorePassword.password())
-            }
+        KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm()).apply {
+            init(keyStore(), keyStorePassword.password())
+        }
 
     fun trustStore(): KeyStore {
         if (trustStoreType == "Windows-ROOT") {
@@ -54,9 +54,11 @@ open class SslConfiguration(
 }
 
 fun File.toKeyStore(password: String, keyStoreType: String = KeyStore.getDefaultType()): KeyStore =
-        KeyStore.getInstance(keyStoreType).also {
-            it.load(this.toInputStream(), password.password())
+    KeyStore.getInstance(keyStoreType).also { keyStore ->
+        this.toInputStream().use { inputStream ->
+            keyStore.load(inputStream, password.password())
         }
+    }
 
 fun String.password(): CharArray {
     try {
