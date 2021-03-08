@@ -4,10 +4,10 @@
     <parent>
         <artifactId>scientist4k</artifactId>
         <groupId>com.github.squirrelgrip</groupId>
-        <version>0.10.5-SNAPSHOT</version>
+        <version>0.10.6-SNAPSHOT</version>
     </parent>
     <artifactId>scientist4k-application</artifactId>
-    <version>0.10.5-SNAPSHOT</version>
+    <version>0.10.6-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <properties>
