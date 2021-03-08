@@ -4,6 +4,9 @@ import com.github.squirrelgrip.extension.json.toJson
 import com.github.squirrelgrip.scientist4k.http.core.configuration.ConnectorConfiguration
 import com.github.squirrelgrip.scientist4k.http.core.configuration.ServerConfiguration
 import com.github.squirrelgrip.scientist4k.http.core.server.SecuredServer
+import com.github.squirrelgrip.scientist4k.http.test.handler.CommonUtil.helloContent
+import com.github.squirrelgrip.scientist4k.http.test.handler.CommonUtil.textHtmlContentType
+import com.github.squirrelgrip.scientist4k.http.test.handler.CommonUtil.textPlainContentType
 import com.google.common.net.MediaType
 import org.eclipse.jetty.server.Request
 import org.eclipse.jetty.server.handler.AbstractHandler
@@ -29,32 +32,32 @@ class CandidateHandler : AbstractHandler() {
             val out = response.writer
             when (target) {
                 "/candidate" -> {
-                    response.contentType = "text/plain;charset=utf-8"
+                    response.contentType = textPlainContentType
                     response.status = HttpServletResponse.SC_OK
                     out.println("Candidate")
                 }
                 "/ok" -> {
-                    response.contentType = "text/html;charset=utf-8"
+                    response.contentType = textHtmlContentType
                     response.status = HttpServletResponse.SC_OK
                     out.println("<h1>OK</h1>")
                 }
                 "/differentContent" -> {
-                    response.contentType = "text/plain;charset=utf-8"
+                    response.contentType = textPlainContentType
                     response.status = HttpServletResponse.SC_OK
                     out.println("Candidate Content")
                 }
                 "/mappedCandidate" -> {
-                    response.contentType = "text/plain;charset=utf-8"
+                    response.contentType = textPlainContentType
                     response.status = HttpServletResponse.SC_OK
                     out.println("mapped")
                 }
                 "/mappedCandidateDifferent" -> {
-                    response.contentType = "text/plain;charset=utf-8"
+                    response.contentType = textPlainContentType
                     response.status = HttpServletResponse.SC_CREATED
                     out.println("mappedDifferentCandidate")
                 }
                 "/status" -> {
-                    response.contentType = "text/html;charset=utf-8"
+                    response.contentType = textHtmlContentType
                     response.status = HttpServletResponse.SC_CREATED
                     out.println("<h1>status</h1>")
                 }
@@ -64,28 +67,28 @@ class CandidateHandler : AbstractHandler() {
                     out.println("<h1>content type</h1>")
                 }
                 "/cookie" -> {
-                    response.contentType = "text/html;charset=utf-8"
+                    response.contentType = textHtmlContentType
                     response.status = HttpServletResponse.SC_OK
                     response.addCookie(Cookie("name", "value"))
                     out.println("<h1>Cookie</h1>")
                 }
                 "/addcookie" -> {
-                    response.contentType = "text/html;charset=utf-8"
+                    response.contentType = textHtmlContentType
                     response.status = HttpServletResponse.SC_OK
                     response.addCookie(Cookie("name", "value"))
                     response.addCookie(Cookie("add", "value"))
-                    out.println("<h1>Hello</h1>")
+                    out.println(helloContent)
                 }
                 "/alteredcookie" -> {
-                    response.contentType = "text/html;charset=utf-8"
+                    response.contentType = textHtmlContentType
                     response.status = HttpServletResponse.SC_OK
                     response.addCookie(Cookie("name", "different_value"))
-                    out.println("<h1>Hello</h1>")
+                    out.println(helloContent)
                 }
                 "/removedcookie" -> {
-                    response.contentType = "text/html;charset=utf-8"
+                    response.contentType = textHtmlContentType
                     response.status = HttpServletResponse.SC_OK
-                    out.println("<h1>Hello</h1>")
+                    out.println(helloContent)
                 }
                 "/redirect" -> {
                     response.sendRedirect("/ok")

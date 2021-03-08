@@ -7,7 +7,7 @@
         <version>0.10.3</version>
     </parent>
     <artifactId>scientist4k-application</artifactId>
-    <version>0.10.2</version>
+    <version>0.10.3</version>
     <packaging>pom</packaging>
 
     <properties>
@@ -17,8 +17,9 @@
     <modules>
         <module>scientist4k-application-common</module>
         <module>scientist4k-application-api</module>
-        <module>scientist4k-application-web</module>
         <module>scientist4k-application-report</module>
+        <module>scientist4k-application-ui</module>
+        <module>scientist4k-application-web</module>
     </modules>
 
     <dependencyManagement>

@@ -23,9 +23,9 @@ open class ExperimentResult<T>(
             val msg = if (exception != null) {
                 val stackTrace = exception.stackTrace.toString()
                 val exceptionName = exception.javaClass.name
-                "${candidate.name} raised an exception: $exceptionName $stackTrace"
+                "${candidate.type} raised an exception: $exceptionName $stackTrace"
             } else {
-                "${candidate.name} does not match control value (${control.value} != ${candidate.value})"
+                "${candidate.type} does not match control value (${control.value} != ${candidate.value})"
             }
             throw MismatchException(msg)
         }
