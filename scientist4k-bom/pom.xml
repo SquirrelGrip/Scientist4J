@@ -4,10 +4,10 @@
     <parent>
         <artifactId>scientist4k</artifactId>
         <groupId>com.github.squirrelgrip</groupId>
-        <version>0.10.4-SNAPSHOT</version>
+        <version>0.10.5-SNAPSHOT</version>
     </parent>
     <artifactId>scientist4k-bom</artifactId>
-    <version>0.10.2</version>
+    <version>0.10.3-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <dependencyManagement>
@@ -15,57 +15,57 @@
             <dependency>
                 <groupId>com.github.squirrelgrip</groupId>
                 <artifactId>scientist4k-core</artifactId>
-                <version>${project.version}</version>
+                <version>0.10.5-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.github.squirrelgrip</groupId>
                 <artifactId>scientist4k-http-core</artifactId>
-                <version>${project.version}</version>
+                <version>0.10.5-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.github.squirrelgrip</groupId>
                 <artifactId>scientist4k-http-test</artifactId>
-                <version>${project.version}</version>
+                <version>0.10.5-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.github.squirrelgrip</groupId>
                 <artifactId>scientist4k-http-server</artifactId>
-                <version>${project.version}</version>
+                <version>0.10.5-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.github.squirrelgrip</groupId>
                 <artifactId>scientist4k-http-filter</artifactId>
-                <version>${project.version}</version>
+                <version>0.10.5-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.github.squirrelgrip</groupId>
                 <artifactId>scientist4k-controlled-http-server</artifactId>
-                <version>${project.version}</version>
+                <version>0.10.5-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.github.squirrelgrip</groupId>
                 <artifactId>scientist4k-controlled-http-filter</artifactId>
-                <version>${project.version}</version>
+                <version>0.10.5-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.github.squirrelgrip</groupId>
                 <artifactId>scientist4k-application-api</artifactId>
-                <version>${project.version}</version>
+                <version>0.10.5-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.github.squirrelgrip</groupId>
                 <artifactId>scientist4k-application-report</artifactId>
-                <version>${project.version}</version>
+                <version>0.10.5-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.github.squirrelgrip</groupId>
                 <artifactId>scientist4k-application-common</artifactId>
-                <version>${project.version}</version>
+                <version>0.10.5-SNAPSHOT</version>
             </dependency>
              <dependency>
                 <groupId>com.github.squirrelgrip</groupId>
                 <artifactId>scientist4k-application-web</artifactId>
-                <version>${project.version}</version>
+                <version>0.10.5-SNAPSHOT</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
