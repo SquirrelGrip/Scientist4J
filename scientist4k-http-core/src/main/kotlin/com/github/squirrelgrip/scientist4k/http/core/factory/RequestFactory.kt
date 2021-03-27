@@ -1,7 +1,7 @@
 package com.github.squirrelgrip.scientist4k.http.core.factory
 
 import com.github.squirrelgrip.scientist4k.http.core.configuration.EndPointConfiguration
-import com.github.squirrelgrip.scientist4k.http.core.configuration.MappingConfiguration
+import com.github.squirrelgrip.scientist4k.http.core.configuration.MappingsConfiguration
 import com.github.squirrelgrip.scientist4k.http.core.model.ExperimentRequest
 import com.github.squirrelgrip.scientist4k.http.core.model.ExperimentResponse
 import org.apache.http.HttpVersion.HTTP_1_1
@@ -21,10 +21,10 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.net.URL
 
-class RequestFactory (
-        val endPointConfig: EndPointConfiguration,
-        val cookieStoreAttributeName: String,
-        val mappingConfiguration: List<MappingConfiguration> = emptyList()
+class RequestFactory(
+    val endPointConfig: EndPointConfiguration,
+    val cookieStoreAttributeName: String,
+    val mappingsConfiguration: MappingsConfiguration = MappingsConfiguration()
 ) {
     companion object {
         private val LOGGER: Logger = LoggerFactory.getLogger(RequestFactory::class.java)
@@ -33,7 +33,7 @@ class RequestFactory (
     val sessions: MutableMap<String, MutableMap<String, CookieStore>> = mutableMapOf()
 
     fun create(
-            request: ExperimentRequest
+        request: ExperimentRequest
     ): () -> ExperimentResponse {
         return {
             val cookieStore: CookieStore = getCookieStore(request)
@@ -56,7 +56,7 @@ class RequestFactory (
     private fun execute(
         httpClient: HttpClient,
         httpUriRequest: HttpUriRequest,
-    ) = httpClient.execute(httpUriRequest) { response ->
+    ): ExperimentResponse = httpClient.execute(httpUriRequest) { response ->
         ExperimentResponse(
             response.statusLine,
             response.allHeaders,
@@ -69,48 +69,41 @@ class RequestFactory (
     }
 
     private fun getCookieStore(request: ExperimentRequest): CookieStore =
-            getSession(request)[cookieStoreAttributeName]!!
+        getSession(request)[cookieStoreAttributeName]!!
 
     private fun buildUrl(request: ExperimentRequest): String {
-        var url = request.url
-        val replacements = mappingConfiguration.filter {
-            it.matches(url)
-        }
-        replacements.forEach {
-            url = it.replace(url)
-        }
-        return "${endPointConfig.url}$url"
+        return "${endPointConfig.url}${mappingsConfiguration.replace(request.url)}"
     }
 
     private fun createRequest(request: ExperimentRequest, targetUrl: String): HttpUriRequest =
-            RequestBuilder.create(request.method).apply {
-                setUri(targetUrl)
-                version = HTTP_1_1
-                request.headers.forEach { (headerName, headerValue) ->
-                    when (headerName) {
-                        TARGET_HOST -> {
-                            val url = URL(targetUrl)
-                            setHeader(TARGET_HOST, "${url.host}:${url.port}")
-                        }
-                        CONTENT_LEN -> {
-                            // Remove this header
-                        }
-                        else -> {
-                            setHeader(headerName, headerValue)
-                        }
+        RequestBuilder.create(request.method).apply {
+            setUri(targetUrl)
+            version = HTTP_1_1
+            request.headers.forEach { (headerName, headerValue) ->
+                when (headerName) {
+                    TARGET_HOST -> {
+                        val url = URL(targetUrl)
+                        setHeader(TARGET_HOST, "${url.host}:${url.port}")
+                    }
+                    CONTENT_LEN -> {
+                        // Remove this header
+                    }
+                    else -> {
+                        setHeader(headerName, headerValue)
                     }
                 }
-                entity = ByteArrayEntity(request.body, ContentType.getByMimeType(request.contentType))
-            }.build()
+            }
+            entity = ByteArrayEntity(request.body, ContentType.getByMimeType(request.contentType))
+        }.build()
 
     private fun createHttpClient(cookieStore: CookieStore): CloseableHttpClient {
         val clientBuilder = HttpClients.custom().setDefaultCookieStore(cookieStore)
         if (endPointConfig.sslConfiguration != null) {
             clientBuilder.setSSLSocketFactory(
-                    SSLConnectionSocketFactory(
-                            endPointConfig.sslConfiguration.sslContext(),
-                            SSLConnectionSocketFactory.getDefaultHostnameVerifier()
-                    )
+                SSLConnectionSocketFactory(
+                    endPointConfig.sslConfiguration.sslContext(),
+                    SSLConnectionSocketFactory.getDefaultHostnameVerifier()
+                )
             )
         }
         return clientBuilder.build()

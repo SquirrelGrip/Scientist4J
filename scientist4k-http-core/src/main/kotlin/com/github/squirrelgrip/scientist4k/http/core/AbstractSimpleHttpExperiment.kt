@@ -14,24 +14,14 @@ import java.util.*
 import javax.servlet.ServletRequest
 import javax.servlet.http.HttpServletRequest
 
-open class AbstractHttpSimpleExperiment(
+open class AbstractSimpleHttpExperiment(
     experimentConfiguration: ExperimentConfiguration,
-    eventBus: EventBus = DEFAULT_EVENT_BUS,
-    val mappingConfiguration: List<MappingConfiguration> = emptyList()
+    eventBus: EventBus = DEFAULT_EVENT_BUS
 ) : SimpleExperiment<ExperimentResponse>(
     experimentConfiguration,
     NoopComparator(),
     eventBus
 ) {
-    fun getRunOptions(inboundRequest: ServletRequest): EnumSet<ExperimentOption> =
-        if (inboundRequest is HttpServletRequest) {
-            mappingConfiguration.firstOrNull {
-                it.matches(inboundRequest.pathInfo)
-            }?.options ?: ExperimentOption.DEFAULT
-        } else {
-            ExperimentOption.DEFAULT
-        }
-
     override fun publish(result: Any, sample: Sample) {
         if (isPublishable(sample)) {
             if (result is SimpleExperimentResult<*> && result.control.value is ExperimentResponse) {
@@ -43,5 +33,4 @@ open class AbstractHttpSimpleExperiment(
             }
         }
     }
-
 }

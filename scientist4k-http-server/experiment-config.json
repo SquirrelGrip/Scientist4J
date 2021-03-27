@@ -21,17 +21,21 @@
   "experiment": {
     "name": "scientist4k-http-server"
   },
-  "mappings": [
-    {
-      "control": "\\/mappedControl",
-      "candidate": "/mappedCandidate"
-    },
-    {
-      "control": "\\/mappedControlDifferent",
-      "candidate": "/mappedCandidateDifferent",
-      "options": ["RETURN_CANDIDATE"]
-    }
-  ],
+  "mappings": {
+    "mappings": [
+      {
+        "control": "\\/mappedControl",
+        "candidate": "/mappedCandidate"
+      },
+      {
+        "control": "\\/mappedControlDifferent",
+        "candidate": "/mappedCandidateDifferent",
+        "options": [
+          "RETURN_CANDIDATE"
+        ]
+      }
+    ]
+  },
   "control": {
     "url": "https://localhost:9002",
     "sslConfiguration": {

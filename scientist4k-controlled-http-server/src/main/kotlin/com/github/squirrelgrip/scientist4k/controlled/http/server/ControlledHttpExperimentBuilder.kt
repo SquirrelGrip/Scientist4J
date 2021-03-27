@@ -7,13 +7,14 @@ import com.github.squirrelgrip.scientist4k.core.model.ExperimentOption
 import com.github.squirrelgrip.scientist4k.http.core.configuration.EndPointConfiguration
 import com.github.squirrelgrip.scientist4k.http.core.configuration.HttpExperimentConfiguration
 import com.github.squirrelgrip.scientist4k.http.core.configuration.MappingConfiguration
+import com.github.squirrelgrip.scientist4k.http.core.configuration.MappingsConfiguration
 import com.github.squirrelgrip.scientist4k.metrics.Metrics
 import com.google.common.eventbus.EventBus
 import java.util.*
 
 class ControlledHttpExperimentBuilder() {
     private var sampleThreshold: Int = 100
-    private var mappings: List<MappingConfiguration> = emptyList()
+    private var mappings: MappingsConfiguration = MappingsConfiguration()
     private var name: String = "Test"
     private var metrics: Metrics = Metrics.DROPWIZARD
     private var samplePrefix: String = ""
@@ -31,9 +32,7 @@ class ControlledHttpExperimentBuilder() {
         controlConfig = httpExperimentConfiguration.control
         candidateConfig = httpExperimentConfiguration.candidate
         referenceConfig = httpExperimentConfiguration.reference
-        mappings = httpExperimentConfiguration.mappings.map { (control, candidate) ->
-            MappingConfiguration(control, candidate)
-        }
+        mappings = httpExperimentConfiguration.mappings
     }
 
     fun withName(name: String): ControlledHttpExperimentBuilder {
@@ -76,8 +75,8 @@ class ControlledHttpExperimentBuilder() {
         return this
     }
 
-    fun withMappings(vararg mapping: MappingConfiguration): ControlledHttpExperimentBuilder {
-        this.mappings = mapping.toList()
+    fun withMappings(mappings: MappingsConfiguration): ControlledHttpExperimentBuilder {
+        this.mappings = mappings
         return this
     }
 

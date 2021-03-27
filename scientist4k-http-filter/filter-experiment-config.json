@@ -3,7 +3,12 @@
     "name": "scientist4k-http-filter"
   },
   "mappings": {
-    "/mappedControl": "/mappedCandidate"
+    "mappings": [
+      {
+        "control": "/mappedControl",
+        "candidate": "/mappedCandidate"
+      }
+    ]
   },
   "detour": {
     "url": "https://localhost:9012",

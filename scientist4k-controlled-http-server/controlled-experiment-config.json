@@ -21,12 +21,14 @@
   "experiment": {
     "name": "name"
   },
-  "mappings": [
-    {
-      "control": "\\/mappedControl",
-      "candidate": "/mappedCandidate"
-    }
-  ],
+  "mappings": {
+    "mappings": [
+      {
+        "control": "\\/mappedControl",
+        "candidate": "/mappedCandidate"
+      }
+    ]
+  },
   "control": {
     "url": "https://localhost:9002",
     "sslConfiguration": {

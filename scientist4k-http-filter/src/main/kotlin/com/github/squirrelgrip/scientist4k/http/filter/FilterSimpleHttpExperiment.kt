@@ -2,10 +2,11 @@ package com.github.squirrelgrip.scientist4k.http.filter
 
 import com.github.squirrelgrip.scientist4k.core.configuration.ExperimentConfiguration
 import com.github.squirrelgrip.scientist4k.core.model.sample.Sample
-import com.github.squirrelgrip.scientist4k.http.core.AbstractHttpSimpleExperiment
+import com.github.squirrelgrip.scientist4k.http.core.AbstractSimpleHttpExperiment
 import com.github.squirrelgrip.scientist4k.http.core.HttpExperimentUtil
 import com.github.squirrelgrip.scientist4k.http.core.configuration.EndPointConfiguration
 import com.github.squirrelgrip.scientist4k.http.core.configuration.MappingConfiguration
+import com.github.squirrelgrip.scientist4k.http.core.configuration.MappingsConfiguration
 import com.github.squirrelgrip.scientist4k.http.core.factory.RequestFactory
 import com.github.squirrelgrip.scientist4k.http.core.model.ExperimentResponse
 import com.github.squirrelgrip.scientist4k.http.core.wrapper.ExperimentResponseWrapper
@@ -16,12 +17,12 @@ import javax.servlet.ServletResponse
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletRequestWrapper
 
-class FilterSimpleExperiment(
+class FilterSimpleHttpExperiment(
     experimentConfiguration: ExperimentConfiguration,
     eventBus: EventBus = DEFAULT_EVENT_BUS,
-    mappings: List<MappingConfiguration> = emptyList(),
+    private val mappings: MappingsConfiguration,
     private val detourConfig: EndPointConfiguration
-) : AbstractHttpSimpleExperiment(
+) : AbstractSimpleHttpExperiment(
     experimentConfiguration,
     eventBus
 ) {
@@ -32,7 +33,7 @@ class FilterSimpleExperiment(
         inboundResponse: ServletResponse,
         chain: FilterChain
     ) {
-        val sample: Sample = sampleFactory.create(getRunOptions(inboundRequest))
+        val sample: Sample = sampleFactory.create(mappings.getRunOptions(inboundRequest))
         val wrappedRequest = HttpServletRequestWrapper(inboundRequest as HttpServletRequest)
         val routeRequest = createRouteRequest(wrappedRequest, inboundResponse, chain)
         val detourRequest = createDetourRequest(wrappedRequest, sample)

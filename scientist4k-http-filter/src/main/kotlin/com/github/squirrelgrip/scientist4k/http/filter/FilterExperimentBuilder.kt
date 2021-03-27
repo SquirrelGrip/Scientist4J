@@ -6,13 +6,14 @@ import com.github.squirrelgrip.scientist4k.core.exception.LaboratoryException
 import com.github.squirrelgrip.scientist4k.core.model.ExperimentOption
 import com.github.squirrelgrip.scientist4k.http.core.configuration.EndPointConfiguration
 import com.github.squirrelgrip.scientist4k.http.core.configuration.MappingConfiguration
+import com.github.squirrelgrip.scientist4k.http.core.configuration.MappingsConfiguration
 import com.github.squirrelgrip.scientist4k.metrics.Metrics
 import com.github.squirrelgrip.scientist4k.metrics.Metrics.DROPWIZARD
 import com.google.common.eventbus.EventBus
 import java.util.*
 
 class FilterExperimentBuilder() {
-    private var mappings: List<MappingConfiguration> = emptyList()
+    private var mappings: MappingsConfiguration = MappingsConfiguration()
     private var name: String = "Test"
     private var metrics: Metrics = DROPWIZARD
     private var samplePrefix: String = ""
@@ -27,9 +28,7 @@ class FilterExperimentBuilder() {
         samplePrefix = httpExperimentConfiguration.experiment.samplePrefix
         experimentOptions = httpExperimentConfiguration.experiment.experimentOptions
         detourConfig = httpExperimentConfiguration.detour
-        mappings = httpExperimentConfiguration.mappings.map { (control, candidate) ->
-            MappingConfiguration(control, candidate)
-        }
+        mappings = httpExperimentConfiguration.mappings
     }
 
     fun withName(name: String): FilterExperimentBuilder {
@@ -52,8 +51,8 @@ class FilterExperimentBuilder() {
         return this
     }
 
-    fun withMappings(vararg mapping: MappingConfiguration): FilterExperimentBuilder {
-        this.mappings = mapping.toList()
+    fun withMappings(mappings: MappingsConfiguration): FilterExperimentBuilder {
+        this.mappings = mappings
         return this
     }
 
@@ -72,9 +71,9 @@ class FilterExperimentBuilder() {
         return this
     }
 
-    fun build(): FilterSimpleExperiment {
+    fun build(): FilterSimpleHttpExperiment {
         if (detourConfig != null) {
-            return FilterSimpleExperiment(
+            return FilterSimpleHttpExperiment(
                 ExperimentConfiguration(name, metrics, samplePrefix, experimentOptions, sampleThreshold),
                 eventBus,
                 mappings,

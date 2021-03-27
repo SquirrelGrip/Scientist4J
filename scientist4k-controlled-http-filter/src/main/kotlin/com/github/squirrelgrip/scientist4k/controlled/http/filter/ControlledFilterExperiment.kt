@@ -6,6 +6,7 @@ import com.github.squirrelgrip.scientist4k.http.controlled.AbstractControlledHtt
 import com.github.squirrelgrip.scientist4k.http.core.HttpExperimentUtil
 import com.github.squirrelgrip.scientist4k.http.core.configuration.EndPointConfiguration
 import com.github.squirrelgrip.scientist4k.http.core.configuration.MappingConfiguration
+import com.github.squirrelgrip.scientist4k.http.core.configuration.MappingsConfiguration
 import com.github.squirrelgrip.scientist4k.http.core.factory.RequestFactory
 import com.github.squirrelgrip.scientist4k.http.core.model.ExperimentRequest
 import com.github.squirrelgrip.scientist4k.http.core.model.ExperimentResponse
@@ -20,7 +21,7 @@ import javax.servlet.http.HttpServletRequestWrapper
 class ControlledFilterExperiment(
     experimentConfiguration: ExperimentConfiguration,
     eventBus: EventBus = DEFAULT_EVENT_BUS,
-    mappings: List<MappingConfiguration> = emptyList(),
+    private val mappings: MappingsConfiguration = MappingsConfiguration(),
     detourConfig: EndPointConfiguration,
     referenceConfig: EndPointConfiguration
 ) : AbstractControlledHttpExperiment(
@@ -36,7 +37,7 @@ class ControlledFilterExperiment(
         inboundRequest: ServletRequest,
         inboundResponse: ServletResponse,
         chain: FilterChain,
-        sample: Sample = sampleFactory.create(getRunOptions(inboundRequest)),
+        sample: Sample = sampleFactory.create(mappings.getRunOptions(inboundRequest)),
     ) {
         val wrappedRequest = HttpServletRequestWrapper(inboundRequest as HttpServletRequest)
         val experimentRequest = HttpExperimentUtil.createRequest(wrappedRequest, sample)

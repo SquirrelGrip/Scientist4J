@@ -7,7 +7,7 @@ import javax.servlet.http.HttpServletResponse
 
 
 class HttpExperimentHandler(
-        val httpExperiment: HttpSimpleExperiment
+        val httpExperiment: SimpleHttpExperiment
 ) : AbstractHandler() {
 
     constructor(httpExperimentConfiguration: HttpExperimentConfiguration): this(HttpExperimentBuilder(httpExperimentConfiguration).build())

@@ -6,12 +6,13 @@ import com.github.squirrelgrip.scientist4k.core.exception.LaboratoryException
 import com.github.squirrelgrip.scientist4k.core.model.ExperimentOption
 import com.github.squirrelgrip.scientist4k.http.core.configuration.EndPointConfiguration
 import com.github.squirrelgrip.scientist4k.http.core.configuration.MappingConfiguration
+import com.github.squirrelgrip.scientist4k.http.core.configuration.MappingsConfiguration
 import com.github.squirrelgrip.scientist4k.metrics.Metrics
 import com.google.common.eventbus.EventBus
 import java.util.*
 
 class HttpExperimentBuilder() {
-    private var mappings: List<MappingConfiguration> = emptyList()
+    private var mappings: MappingsConfiguration = MappingsConfiguration()
     private var name: String = "Test"
     private var metrics: Metrics = Metrics.DROPWIZARD
     private var samplePrefix: String = ""
@@ -67,8 +68,8 @@ class HttpExperimentBuilder() {
         return this
     }
 
-    fun withMappings(vararg mapping: MappingConfiguration): HttpExperimentBuilder {
-        this.mappings = mapping.toList()
+    fun withMappings(mappings: MappingsConfiguration): HttpExperimentBuilder {
+        this.mappings = mappings
         return this
     }
 
@@ -77,13 +78,13 @@ class HttpExperimentBuilder() {
         return this
     }
 
-    fun build(): HttpSimpleExperiment {
+    fun build(): SimpleHttpExperiment {
         if (controlConfig != null && candidateConfig != null) {
-            return HttpSimpleExperiment(
+            return SimpleHttpExperiment(
                 ExperimentConfiguration(name, metrics, samplePrefix, experimentOptions, sampleThreshold),
                 eventBus,
-                mappings,
                 controlConfig!!,
+                mappings,
                 candidateConfig!!
             )
         }

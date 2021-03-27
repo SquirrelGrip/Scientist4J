@@ -8,5 +8,5 @@ data class HttpExperimentConfiguration(
     val control: EndPointConfiguration,
     val reference: EndPointConfiguration,
     val candidate: EndPointConfiguration,
-    val mappings: List<MappingConfiguration> = emptyList()
+    val mappings: MappingsConfiguration
 )

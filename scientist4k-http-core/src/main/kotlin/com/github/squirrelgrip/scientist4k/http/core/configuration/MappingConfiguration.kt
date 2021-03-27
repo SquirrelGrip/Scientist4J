@@ -7,7 +7,8 @@ import java.util.regex.Pattern
 data class MappingConfiguration(
     val control: String,
     val candidate: String,
-    val options: EnumSet<ExperimentOption> = ExperimentOption.DEFAULT
+    val options: EnumSet<ExperimentOption> = ExperimentOption.DEFAULT,
+    val overrides: MappingOverrideConfiguration = MappingOverrideConfiguration()
 ) {
     private val controlPattern: Pattern = Pattern.compile(control)
 

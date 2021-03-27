@@ -2,11 +2,12 @@ package com.github.squirrelgrip.scientist4k.http.server
 
 import com.github.squirrelgrip.scientist4k.core.configuration.ExperimentConfiguration
 import com.github.squirrelgrip.scientist4k.core.model.sample.Sample
-import com.github.squirrelgrip.scientist4k.http.core.AbstractHttpSimpleExperiment
+import com.github.squirrelgrip.scientist4k.http.core.AbstractSimpleHttpExperiment
 import com.github.squirrelgrip.scientist4k.http.core.HttpExperimentUtil
 import com.github.squirrelgrip.scientist4k.http.core.HttpExperimentUtil.processResponse
 import com.github.squirrelgrip.scientist4k.http.core.configuration.EndPointConfiguration
 import com.github.squirrelgrip.scientist4k.http.core.configuration.MappingConfiguration
+import com.github.squirrelgrip.scientist4k.http.core.configuration.MappingsConfiguration
 import com.github.squirrelgrip.scientist4k.http.core.factory.RequestFactory
 import com.github.squirrelgrip.scientist4k.http.core.model.ExperimentRequest
 import com.github.squirrelgrip.scientist4k.http.core.model.ExperimentResponse
@@ -16,29 +17,28 @@ import org.slf4j.LoggerFactory
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
-class HttpSimpleExperiment(
+class SimpleHttpExperiment(
     experimentConfiguration: ExperimentConfiguration,
     eventBus: EventBus = DEFAULT_EVENT_BUS,
-    mappingConfiguration: List<MappingConfiguration> = emptyList(),
     controlConfig: EndPointConfiguration,
+    private val mappings: MappingsConfiguration,
     private val candidateConfig: EndPointConfiguration
-) : AbstractHttpSimpleExperiment(
+) : AbstractSimpleHttpExperiment(
     experimentConfiguration,
     eventBus,
-    mappingConfiguration
 ) {
     private val controlRequestFactory = RequestFactory(controlConfig, HttpExperimentUtil.CONTROL_COOKIE_STORE)
-    private val candidateRequestFactory = RequestFactory(candidateConfig, HttpExperimentUtil.CANDIDATE_COOKIE_STORE, mappingConfiguration)
+    private val candidateRequestFactory = RequestFactory(candidateConfig, HttpExperimentUtil.CANDIDATE_COOKIE_STORE, mappings)
 
     companion object {
-        private val LOGGER: Logger = LoggerFactory.getLogger(HttpSimpleExperiment::class.java)
+        private val LOGGER: Logger = LoggerFactory.getLogger(SimpleHttpExperiment::class.java)
     }
 
     fun run(
         inboundRequest: HttpServletRequest,
         inboundResponse: HttpServletResponse
     ) {
-        val sample: Sample = sampleFactory.create(getRunOptions(inboundRequest))
+        val sample: Sample = sampleFactory.create(mappings.getRunOptions(inboundRequest))
         val experimentRequest = HttpExperimentUtil.createRequest(inboundRequest, sample)
 
         val controlRequest = createControlRequest(experimentRequest)

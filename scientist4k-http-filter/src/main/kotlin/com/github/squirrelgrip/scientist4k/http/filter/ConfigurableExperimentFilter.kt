@@ -11,7 +11,7 @@ class ConfigurableExperimentFilter : Filter {
         private val LOGGER: Logger = LoggerFactory.getLogger(ConfigurableExperimentFilter::class.java)
     }
 
-    lateinit var experiment: FilterSimpleExperiment
+    lateinit var experiment: FilterSimpleHttpExperiment
 
     override fun init(filterConfig: FilterConfig) {
         val config = filterConfig.getInitParameter("config")

@@ -7,6 +7,7 @@ import com.github.squirrelgrip.scientist4k.core.configuration.ExperimentConfigur
 import com.github.squirrelgrip.scientist4k.core.model.ExperimentOption
 import com.github.squirrelgrip.scientist4k.core.model.sample.Sample
 import com.github.squirrelgrip.scientist4k.http.core.configuration.MappingConfiguration
+import com.github.squirrelgrip.scientist4k.http.core.configuration.MappingsConfiguration
 import com.github.squirrelgrip.scientist4k.http.core.extension.toHttpExperimentResult
 import com.github.squirrelgrip.scientist4k.http.core.model.ExperimentResponse
 import com.google.common.eventbus.EventBus
@@ -16,8 +17,7 @@ import javax.servlet.http.HttpServletRequest
 
 open class AbstractControlledHttpExperiment(
     experimentConfiguration: ExperimentConfiguration,
-    eventBus: EventBus = DEFAULT_EVENT_BUS,
-    val mappingConfiguration: List<MappingConfiguration> = emptyList()
+    eventBus: EventBus = DEFAULT_EVENT_BUS
 ) : ControlledExperiment<ExperimentResponse>(
     experimentConfiguration,
     NoopComparator(),
@@ -36,14 +36,5 @@ open class AbstractControlledHttpExperiment(
             }
         }
     }
-
-    fun getRunOptions(inboundRequest: ServletRequest): EnumSet<ExperimentOption> =
-        if (inboundRequest is HttpServletRequest) {
-            mappingConfiguration.firstOrNull {
-                it.matches(inboundRequest.pathInfo)
-            }?.options ?: ExperimentOption.DEFAULT
-        } else {
-            ExperimentOption.DEFAULT
-        }
 
 }
