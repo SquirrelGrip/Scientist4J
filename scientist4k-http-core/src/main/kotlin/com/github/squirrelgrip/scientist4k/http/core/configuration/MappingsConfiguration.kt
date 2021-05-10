@@ -6,7 +6,8 @@ import javax.servlet.ServletRequest
 import javax.servlet.http.HttpServletRequest
 
 data class MappingsConfiguration(
-    val mappings: List<MappingConfiguration> = emptyList()
+    val mappings: List<MappingConfiguration> = emptyList(),
+    val defaultOverride: MappingOverrideConfiguration = MappingOverrideConfiguration()
 ) {
     fun getRunOptions(inboundRequest: ServletRequest): EnumSet<ExperimentOption> =
         getMappingConfiguration(inboundRequest)?.options ?: ExperimentOption.DEFAULT

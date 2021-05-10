@@ -8,8 +8,8 @@ import org.eclipse.jetty.server.session.DefaultSessionIdManager
 import org.eclipse.jetty.server.session.SessionHandler
 
 open class SecuredServer(
-        val serverConfiguration: ServerConfiguration,
-        val handler: Handler? = null
+    val serverConfiguration: ServerConfiguration,
+    val handler: Handler? = null
 ) {
     val server = Server()
 
