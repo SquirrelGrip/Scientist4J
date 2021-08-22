@@ -14,7 +14,7 @@
     <dependencies>
         <dependency>
             <groupId>com.github.squirrelgrip</groupId>
-            <artifactId>cheti</artifactId>
+            <artifactId>cheti-core</artifactId>
         </dependency>
         <dependency>
             <groupId>com.github.squirrelgrip</groupId>

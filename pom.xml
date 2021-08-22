@@ -44,8 +44,8 @@
     </modules>
 
     <properties>
-        <cheti.version>1.1.13</cheti.version>
-        <extensions.version>1.2.1</extensions.version>
+        <cheti.version>1.2.0</cheti.version>
+        <extensions.version>1.2.2</extensions.version>
     </properties>
 
     <dependencyManagement>
@@ -57,7 +57,7 @@
             </dependency>
             <dependency>
                 <groupId>com.github.squirrelgrip</groupId>
-                <artifactId>cheti</artifactId>
+                <artifactId>cheti-core</artifactId>
                 <version>${cheti.version}</version>
             </dependency>
         </dependencies>

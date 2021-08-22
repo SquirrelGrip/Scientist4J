@@ -60,7 +60,7 @@ internal class JsonContentTypeComparatorTest {
     }
 
     @Test
-    fun `json when both inner list and out list has swapped`() {
+    fun `json when both inner list and outer list has swapped`() {
         val listA = listOf(
                 Example(1, "SSS", mapOf(1 to "AAA"), listOf(Item(1, "AAA1"), Item(2, "BBB1"))),
                 Example(2, "RRR", mapOf(1 to "BBB"), listOf(Item(1, "AAA2"), Item(2, "BBB2"))),
