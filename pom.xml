@@ -4,8 +4,8 @@
 
     <parent>
         <groupId>com.github.squirrelgrip</groupId>
-        <artifactId>root</artifactId>
-        <version>1.1.7</version>
+        <artifactId>dependencies</artifactId>
+        <version>1.2.10</version>
     </parent>
     <artifactId>scientist4k</artifactId>
     <version>0.10.6-SNAPSHOT</version>
@@ -45,14 +45,14 @@
 
     <properties>
         <cheti.version>1.1.13</cheti.version>
-        <extensions.version>1.1.0</extensions.version>
+        <extensions.version>1.2.1</extensions.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
             <dependency>
                 <groupId>com.github.squirrelgrip</groupId>
-                <artifactId>extensions</artifactId>
+                <artifactId>kotlin-extensions</artifactId>
                 <version>${extensions.version}</version>
             </dependency>
             <dependency>

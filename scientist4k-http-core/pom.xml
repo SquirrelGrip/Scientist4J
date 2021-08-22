@@ -23,7 +23,7 @@
         </dependency>
         <dependency>
             <groupId>com.github.squirrelgrip</groupId>
-            <artifactId>extensions</artifactId>
+            <artifactId>kotlin-extensions</artifactId>
         </dependency>
         <dependency>
             <groupId>com.github.squirrelgrip</groupId>
